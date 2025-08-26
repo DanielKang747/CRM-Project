@@ -1,0 +1,567 @@
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+public class CustomerCare
+{	
+	Connection connection;
+	PreparedStatement preparedStatement;
+	Statement statement;
+	ResultSet resultSet;
+	ResultSet resultAutomobileSet;
+	
+	public String customerID;
+		
+	public final int SEARCH_ID = 0;
+	public final int SEARCH_FIRST_NAME = 1;
+	public final int SEARCH_LAST_NAME = 2;
+	public final int SEARCH_CELL = 3;
+	public final int SEARCH_ALL = 4;
+
+	public final int NEW_MODE = 1;
+	public final int EDIT_MODE = 2;
+	
+	JFrame jFrame = new JFrame("CRM1");
+	
+	DefaultTableModel defaultTableModel_Automobile_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Time Stamp", "TXN_Type", "Plate", "DOC_NO", "EXP_DATE", "NEW_EXP_DATE",
+											  "Proc_Type", "PREMIUM", "TEXT_DATE_TIME", "CALL_DATE_TIME", "VISIT_DATE_TIME",  
+											  "COMPLETE_DATE", "COMPANY_NAME", "MEMO", "OWNERSHIP"}, 0)
+	{
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+
+	DefaultTableModel defaultTableModel_House_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "House", "First Name", "Cell Num", "Birth Date", "E-mail"}, 0)
+	{
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+
+	DefaultTableModel defaultTableModel_Traveler_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "TTT", "First Name", "Cell Num", "Birth Date", "E-mail"}, 0)
+	{
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+
+	JTabbedPane tabbedPane = new JTabbedPane();
+	ImageIcon icon = createImageIcon("middle.gif");
+	
+	JTable jTable_Automobile_Info = new JTable(defaultTableModel_Automobile_Info);
+	JTable jTable_House_Info = new JTable(defaultTableModel_House_Info);
+	JTable jTable_Traveler_Info = new JTable(defaultTableModel_Traveler_Info);
+
+	JScrollPane jScrollPane_Automobile_Info = new JScrollPane(jTable_Automobile_Info);
+	JScrollPane jScrollPane_House_Info = new JScrollPane(jTable_House_Info);
+	JScrollPane jScrollPane_Traveler_Info = new JScrollPane(jTable_Traveler_Info);
+
+	JComponent panel_Automobile_Info = jScrollPane_Automobile_Info;
+	JComponent panel_House_Info = jScrollPane_House_Info;
+	JComponent panel_Traveler_Info = jScrollPane_Traveler_Info;
+					
+	JPanel jPanel_Search_Result = new JPanel(new FlowLayout());
+	JPanel jPanel_Search = new JPanel(new FlowLayout());
+	
+	JComboBox<String> jComboBox = new JComboBox<String>(new String[] {"ID", "First Name", "Last Name", "Cell #", "All"}); 
+	JMenuBar menuBar = new JMenuBar();
+	JMenu adminMenu = new JMenu("Admin");
+	
+	public CustomerCare()
+	{
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		
+		jTable_Automobile_Info.getTableHeader().setReorderingAllowed(false);
+		jTable_House_Info.getTableHeader().setReorderingAllowed(false);
+		jTable_Traveler_Info.getTableHeader().setReorderingAllowed(false);
+        
+		adminMenu.add(new JMenuItem("New"));
+		adminMenu.add(new JMenuItem("Update"));
+		adminMenu.addSeparator();
+		
+		menuBar.add(adminMenu);
+		
+		jFrame.setJMenuBar(menuBar);
+		
+        tabbedPane.addTab("Automobile", icon, panel_Automobile_Info,
+                "Automobile Information");
+        tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
+        
+        tabbedPane.addTab("House", icon, panel_House_Info,
+                "House Information");
+        tabbedPane.setMnemonicAt(1, KeyEvent.VK_3);
+
+        tabbedPane.addTab("Traveller", icon, panel_Traveler_Info,
+                "Traveler Information");
+        tabbedPane.setMnemonicAt(2, KeyEvent.VK_4);
+
+        Dimension nd = new Dimension(screenSize.width/2, screenSize.height);
+        tabbedPane.setPreferredSize(nd);
+        
+        //The following line enables to use scrolling tabs.
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        
+        //Add the tabbed pane to this panel.
+        jPanel_Search_Result.add(tabbedPane);
+		
+//		jFrame.add(jPanel_Search_Result, "East");
+//		jFrame.add(jPanel_Search, "North");
+		
+        //JFrame이 두개 나오는데 한개가 귀신이다 - 떠나질 않고 어디에서 오는지 모르겠다.
+		jFrame.setSize(screenSize.width/2, screenSize.height/2);
+		jFrame.setResizable(true);
+		jFrame.setVisible(true);
+		jFrame.setLocationRelativeTo(null);
+		
+		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				
+		Connection connection = null;
+	    PreparedStatement query = null;
+	    
+		adminMenu.getItem(0).addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				MemberDialog memberDialog = new MemberDialog();
+				memberDialog.jDialog.setModal(true);
+				memberDialog.jDialog.setVisible(true);
+			}			
+		});
+		
+		//Update
+		adminMenu.getItem(1).addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				switch(jTable_Automobile_Info.getSelectedRowCount())
+				{
+					case 0:
+						
+						JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+					break;
+					
+					case 1:
+						
+						String id = String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 0));
+						String lastName = String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 1));
+						String firstName = String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 2));
+						String cellNum = String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 3));
+						String birthDate = String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 4));
+						String email = String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 5));
+		
+						MemberDialog memberDialog = new MemberDialog(id, lastName, firstName, cellNum, birthDate, email);
+						memberDialog.jDialog.setModal(true);
+						memberDialog.jDialog.setVisible(true);
+					break;
+					
+					default:
+//						JOptionPane.showMessageDialog(jFrame, "Please select only one column.");
+					break;
+				}
+			}			
+		});
+	}
+ 
+    protected static ImageIcon createImageIcon(String path) 
+    {
+        java.net.URL imgURL = CustomerCare.class.getResource(path);
+        if (imgURL != null) 
+        {
+            return new ImageIcon(imgURL);
+        } else 
+        {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+  	}
+
+    
+	public void closeDatabase()
+	{
+		try
+		{
+			if (connection != null)
+			{
+				connection.close();
+			}
+			 
+			if (statement != null)
+			{
+				statement.close();
+			}
+			 
+			if (resultSet != null)
+			{
+				resultSet.close();
+			}
+		}
+		catch (SQLException e)
+		{
+			System.out.println("closeDatabase" +  e.getStackTrace());
+		}
+	}
+	
+	public String idCheck()
+	{
+		
+		String result = null;
+		
+		try
+		{
+//			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+// 
+//			statement = connection.createStatement();
+// 
+//			resultSet = statement.executeQuery("SELECT * FROM cccustom WHERE CUST_ID='"+ id + "'");
+//			
+//			if(resultSet.next())
+//			{
+//				result = Integer.valueOf(resultSet.getString(1));
+//			}
+			
+			//UPDATE CCCUSTID SET CUST_SEQ = ( SELECT IFNULL(MAX(CUST_ID),0)  +1 FROM cccustom) ; 
+			
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+			statement = connection.createStatement();
+ 
+			resultSet = statement.executeQuery("SELECT IFNULL(MAX(CUST_ID),0)  +1 FROM cccustom;");
+			
+			if (resultSet.next())
+			{
+				result = resultSet.getString(1);
+			}
+		}
+		catch (SQLException e)
+		{
+			System.out.println("IDCheck" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+		
+		return result;
+	}
+
+	public void insertAutoMobileInfo(String customerID) {
+		try
+		{
+//			JDialog jDialog = new JDialog(jFrame, "Automobile Info");
+
+			System.out.println("hello1 = " + customerID);
+			
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+		
+			resultAutomobileSet = statement.executeQuery("SELECT * FROM autxnprm where autxnprm.CUST_ID = \"" + customerID + "\"");
+	
+			System.out.println("hello2");
+
+			//AutomobileInfo
+			ResultSetMetaData resultAutomobileSetMetaData = resultAutomobileSet.getMetaData();
+	
+			Object [] tempAutomobileObject = new Object[resultAutomobileSetMetaData.getColumnCount()];
+			
+			defaultTableModel_Automobile_Info.setRowCount(0);
+						
+			if (resultAutomobileSet.next() == false) {
+//				JOptionPane.showMessageDialog(jDialog, "This person doesn't have AutoMobile Info!");							
+			}			
+			else
+			{	
+				System.out.println("hello5 = " + resultAutomobileSet.next());
+
+				for (int i=0; i < resultAutomobileSetMetaData.getColumnCount(); i++)
+				{
+					tempAutomobileObject[i] = resultAutomobileSet.getString(i+1);
+				}
+				defaultTableModel_Automobile_Info.addRow(tempAutomobileObject);
+			}
+			
+			if (defaultTableModel_Automobile_Info.getRowCount() > 0)
+			{
+				jTable_Automobile_Info.setRowSelectionInterval(0, 0);
+			}
+			//AutomobileInfo end
+		}
+		catch (SQLException e)
+		{
+			System.out.println("SQLException2" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+	}
+	
+	public boolean submitMember(int dialogMode, String tempID, String LastName, String FirstName, String cellNum, String birthDate, String email)
+	{
+		int result = 0;
+		
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+					 
+			if (dialogMode == NEW_MODE)
+			{
+				System.out.println("submitMember new");
+
+				System.out.println(tempID);
+				String id = String.format("%010d", Integer.parseInt(tempID));
+				System.out.println(id);
+			    
+				ResultSetMetaData resultAutomobileSetMetaData = resultAutomobileSet.getMetaData();
+				
+				System.out.println("resultAutomobileSetMetaData = " + resultAutomobileSetMetaData);
+				
+			    int columnCount = resultAutomobileSetMetaData.getColumnCount();    
+			    System.out.println("columnCount = " + columnCount);
+			    for (int i = 0; i <= columnCount; i++) {
+					preparedStatement = connection.prepareStatement("INSERT INTO autxnprm (CUST_ID, LAST_NAME, FIRST_NAME, CELL_NO, BIRTH_DATE, EMAIL)" + "VALUES ( ?, ?, ?, ?, ?, ? )");
+				    
+					preparedStatement.setString(1, id);
+					preparedStatement.setString(2, LastName);
+					preparedStatement.setString(3, FirstName);
+					preparedStatement.setString(4, cellNum);
+					preparedStatement.setString(5, birthDate);
+					preparedStatement.setString(6, email);
+	//			       the mysql insert statement
+					preparedStatement.execute();
+			    }
+			}
+			else
+			{
+				System.out.println("submitMember new2");
+				preparedStatement = connection.prepareStatement("UPDATE cccustom SET LAST_NAME=?, FIRST_NAME=?, CELL_NO=?, BIRTH_DATE=?, EMAIL=? WHERE CUST_ID=?");
+				preparedStatement.setString(1, LastName);
+				preparedStatement.setString(2, FirstName);
+				preparedStatement.setString(3, cellNum);
+				preparedStatement.setString(4, birthDate);
+				preparedStatement.setString(5, email);
+				preparedStatement.setString(6, tempID);
+
+			}
+				
+			result = preparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			System.out.println("submitMember" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+		
+		System.out.println("SearchMember::submitMember");
+		
+		return (result > 0) ? true : false;
+	}	
+	
+	public static void main(String[] args)
+	{
+		new CustomerCare();
+		new CustomerSearchPanel();
+	}
+
+	class MemberDialog
+	{		
+		
+//		JDialog jDialog = new JDialog(jFrame, "Customer Info Input");
+		JButton submitButton = new JButton("Register");
+		JButton cancelButton = new JButton("Cancel");
+		
+		JPanel fieldNamePanel = new JPanel(new GridLayout(8,1));
+		JPanel fieldValuePanel = new JPanel(new GridLayout(8,1));
+		JPanel buttonPanel = new JPanel(new FlowLayout());
+		JPanel idPanel = new JPanel(new BorderLayout());
+		
+		JLabel idLabel = new JLabel("ID");
+		JLabel lastNameLabel = new JLabel("Last Name");
+		JLabel firstNameLabel = new JLabel("First Name");
+		JLabel cellLabel= new JLabel("Phone #");
+		JLabel birthDateLabel= new JLabel("Birth Date");
+		JLabel emailLabel = new JLabel("Email");
+		
+		JTextField idField = new JTextField(20);
+		JTextField lastNameField = new JTextField(20);
+		JTextField firstNameField = new JTextField(20);
+		JTextField cellField = new JTextField(20);
+		JTextField birthDateField = new JTextField(20);
+		JTextField emailField = new JTextField(20);
+
+		int dialogMode = NEW_MODE;
+
+		MemberDialog()
+		{
+			fieldNamePanel.add(idLabel);
+			fieldNamePanel.add(lastNameLabel);
+			fieldNamePanel.add(firstNameLabel);
+			fieldNamePanel.add(cellLabel);
+			fieldNamePanel.add(birthDateLabel);
+			fieldNamePanel.add(emailLabel);
+
+			idPanel.add(idField);
+			
+			fieldValuePanel.add(idPanel);
+			fieldValuePanel.add(lastNameField);
+			fieldValuePanel.add(firstNameField);
+			fieldValuePanel.add(cellField);
+			fieldValuePanel.add(birthDateField);
+			fieldValuePanel.add(emailField);
+			
+			buttonPanel.add(submitButton);
+			buttonPanel.add(cancelButton);
+			
+			jDialog.add(fieldNamePanel, "West");
+			jDialog.add(fieldValuePanel, "Center");
+			jDialog.add(buttonPanel, "South");
+
+			jDialog.setSize(350, 250);
+			jDialog.setLocationRelativeTo(jFrame);
+			jDialog.setResizable(false);
+			jDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			
+			idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+			idField.setText(CustomerCare.this.idCheck());
+			
+			submitButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					
+					if(lastNameField.getText().trim().length() == 0 )
+					{
+						JOptionPane.showMessageDialog(jDialog, "Please input last name!");
+						lastNameField.requestFocus();
+					}
+					else if(firstNameField.getText().trim().length() > 20)
+					{
+						JOptionPane.showMessageDialog(jDialog, "Please input first name!");
+						firstNameField.requestFocus();
+					}
+
+					//No error
+					else
+					{
+//						String id = String.format("%010d", Integer.parseInt(inputkeyWord));
+						
+						System.out.println ("idField.getText().trim()::" + idField.getText().trim());
+						if (CustomerCare.this.submitMember(dialogMode, idField.getText().trim(), lastNameField.getText().trim(), 
+														  firstNameField.getText().trim(),cellField.getText().trim(), birthDateField.getText().trim(), 
+														  emailField.getText().trim()))
+						{
+							if (dialogMode == NEW_MODE)
+							{
+								JOptionPane.showMessageDialog(jDialog, "Register Completed!");
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(jDialog, "Succesfully Updated!");
+							}
+							
+							jDialog.dispose();
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(jDialog, "Error in input!");							
+						}	
+					}
+				}			
+			});
+
+			cancelButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					jDialog.dispose();
+				}			
+			});
+			
+		}
+
+		MemberDialog(String id, String lastName, String firstName, String cellNum ,String birthDate, String email)
+		{
+			this();
+			
+			dialogMode = EDIT_MODE;
+			
+			idField.setText(id);
+			lastNameField.setText(lastName);
+			firstNameField.setText(firstName);
+			cellField.setText(cellNum);
+			birthDateField.setText(birthDate);
+			emailField.setText(email);
+
+			idField.setEnabled(false);
+			
+			submitButton.setText("Update");
+		}
+
+		public boolean isNumber(String s)
+		{
+			
+			try
+			{
+				Integer.valueOf(s);
+				return true;
+			}
+			catch(NumberFormatException e)
+			{
+				return false;
+			}
+		}
+	}
+}
