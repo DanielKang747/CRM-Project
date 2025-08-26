@@ -1,0 +1,1 @@
+INDEX VERSION 1.130+/Users/Kang/Downloads/workspace_ver0006_working_version/.metadata/.plugins/org.eclipse.jdt.core
