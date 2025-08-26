@@ -1,0 +1,276 @@
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class MemberDialog {	
+		
+		public CustomerCare customerCare;
+		
+		JDialog jDialog = new JDialog(customerCare.jFrame, "Customer Info Input");
+		JComboBox<String> jComboBox = new JComboBox<String>(new String[] {"Customer Info", "Automobile"}); 
+		
+		JButton submitButton = new JButton("Register");
+		JButton cancelButton = new JButton("Cancel");
+		
+		JPanel fieldNamePanel = new JPanel(new GridLayout(8,1));
+		JPanel fieldValuePanel = new JPanel(new GridLayout(8,1));
+		JPanel buttonPanel = new JPanel(new FlowLayout());
+		JPanel idPanel = new JPanel(new BorderLayout());
+		
+		JLabel idLabel = new JLabel("ID");
+		JLabel lastNameLabel = new JLabel("Last Name");
+		JLabel firstNameLabel = new JLabel("First Name");
+		JLabel cellLabel= new JLabel("Phone #");
+		JLabel birthDateLabel= new JLabel("Birth Date");
+		JLabel emailLabel = new JLabel("Email");
+		
+		JLabel timeStampLabel = new JLabel("Time Stamp");
+		JLabel txnTypeLabel = new JLabel("Txn Type");
+		JLabel plateNoLabel = new JLabel("Plate Number");
+		JLabel docNoLabel = new JLabel("Doc Number");
+		JLabel expDatelabel = new JLabel("Expiry Date");
+		JLabel newExpDatelabel = new JLabel("New Expiry Date");
+		JLabel procTypeLabel = new JLabel("Proc Type");
+		JLabel premiumLabel = new JLabel("Premium");
+		JLabel textDateTime = new JLabel("Text Date");
+		JLabel callDateTime = new JLabel("Call Date");
+		JLabel visitDateTime = new JLabel("Visit Date");
+		JLabel completeDateLabel = new JLabel("Complete Date");
+		JLabel companyNameLabel = new JLabel("Company Name");
+		JLabel onwerLabel = new JLabel("Owner");
+
+		JTextField idField = new JTextField(20);
+		JTextField lastNameField = new JTextField(20);
+		JTextField firstNameField = new JTextField(20);
+		JTextField cellField = new JTextField(20);
+		JTextField birthDateField = new JTextField(20);
+		JTextField emailField = new JTextField(20);
+		
+		JTextField timeStampField = new JTextField(20);
+		JTextField txnTypeField = new JTextField(20);
+		JTextField plateNoField = new JTextField(20);
+		JTextField docNoField = new JTextField(20);
+		JTextField expDateField = new JTextField(20);
+		JTextField newExpDateField = new JTextField(20);
+		JTextField procTypeField = new JTextField(20);
+		JTextField premiumField = new JTextField(20);
+		JTextField textDateTimField = new JTextField(20);
+		JTextField callDateTimeField = new JTextField(20);
+		JTextField visitDateTimeField = new JTextField(20);
+		JTextField completeDateField = new JTextField(20);
+		JTextField companyNameField = new JTextField(20);
+		JTextField onwerField = new JTextField(20);
+
+		int dialogMode = NEW_MODE;
+
+		MemberDialog()
+		{
+			System.out.println("jComboBox.getSelectedIndex() = "+ inputMode);
+
+			buttonPanel.add(submitButton);
+			buttonPanel.add(cancelButton);
+			
+			jDialog.add(jComboBox);
+			jDialog.add(buttonPanel, "South");
+
+			jDialog.setSize(350, 250);
+			jDialog.setLocationRelativeTo(jFrame);
+			jDialog.setResizable(true);
+			jDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+			
+			if (jComboBox.getSelectedIndex() == CUSTOMER_MODE) {
+				System.out.println("Customer Mode");
+				fieldNamePanel.add(idLabel);
+				fieldNamePanel.add(lastNameLabel);
+				fieldNamePanel.add(firstNameLabel);
+				fieldNamePanel.add(cellLabel);
+				fieldNamePanel.add(birthDateLabel);
+				fieldNamePanel.add(emailLabel);
+				
+				fieldValuePanel.add(idPanel);
+				fieldValuePanel.add(lastNameField);
+				fieldValuePanel.add(firstNameField);
+				fieldValuePanel.add(cellField);
+				fieldValuePanel.add(birthDateField);
+				fieldValuePanel.add(emailField);				
+
+				idPanel.add(idField);
+				idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+				idField.setText(CustomerCare.this.idCheck());
+			}
+			else if (jComboBox.getSelectedIndex() == AUTOMOBILE_MODE) {
+				System.out.println("Customer Mode");
+
+				fieldNamePanel.add(timeStampLabel);
+				fieldNamePanel.add(txnTypeLabel);
+				fieldNamePanel.add(plateNoLabel);
+				fieldNamePanel.add(docNoLabel);
+				fieldNamePanel.add(expDatelabel);
+				fieldNamePanel.add(newExpDatelabel);
+				fieldNamePanel.add(procTypeLabel);
+				fieldNamePanel.add(premiumLabel);
+				fieldNamePanel.add(textDateTime);
+				fieldNamePanel.add(callDateTime);
+				fieldNamePanel.add(visitDateTime);
+				fieldNamePanel.add(completeDateLabel);
+				fieldNamePanel.add(companyNameLabel);
+				fieldNamePanel.add(onwerLabel);
+
+				idPanel.add(idField);
+				idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+				idField.setText(CustomerCare.this.idCheck());
+				
+				fieldValuePanel.add(timeStampField);
+				fieldValuePanel.add(txnTypeField);
+				fieldValuePanel.add(plateNoField);
+				fieldValuePanel.add(docNoField);
+				fieldValuePanel.add(expDateField);
+				fieldValuePanel.add(newExpDateField);	
+				fieldValuePanel.add(procTypeField);
+				fieldValuePanel.add(premiumField);
+				fieldValuePanel.add(textDateTimField);
+				fieldValuePanel.add(callDateTimeField);
+				fieldValuePanel.add(visitDateTimeField);
+				fieldValuePanel.add(completeDateField);	
+				fieldValuePanel.add(companyNameField);	
+				fieldValuePanel.add(onwerField);	
+			}
+			
+			jDialog.add(fieldNamePanel, "West");
+			jDialog.add(fieldValuePanel, "Center");
+			
+			submitButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+
+//					if(idField.getText().trim().length() == 0)
+//					{
+//						JOptionPane.showMessageDialog(jDialog, "Please input ID!");
+//						idField.requestFocus();
+//					}
+//					else if(idField.getText().trim().length() > 30)
+//					{
+//						JOptionPane.showMessageDialog(jDialog, "ID has to be within 10 digits!");
+//						idField.requestFocus();
+//					}
+//					else if(dialogMode == NEW_MODE && CustomerCare.this.idCheck(idField.getText()))
+//					{
+//						JOptionPane.showMessageDialog(jDialog, "ID already exists!");
+//						
+//						idField.setText(null);
+//						idField.requestFocus();
+//					}
+					if(lastNameField.getText().trim().length() == 0 )
+					{
+						JOptionPane.showMessageDialog(jDialog, "Please input last name!");
+						lastNameField.requestFocus();
+					}
+					else if(firstNameField.getText().trim().length() > 20)
+					{
+						JOptionPane.showMessageDialog(jDialog, "Please input first name!");
+						firstNameField.requestFocus();
+					}
+
+					//No error
+					else
+					{
+//						String id = String.format("%010d", Integer.parseInt(inputkeyWord));
+						
+						System.out.println ("idField.getText().trim()::" + idField.getText().trim());
+						if (CustomerCare.this.submitMember(dialogMode, idField.getText().trim(), lastNameField.getText().trim(), 
+														  firstNameField.getText().trim(),cellField.getText().trim(), birthDateField.getText().trim(), 
+														  emailField.getText().trim()))
+						{
+							if (dialogMode == NEW_MODE)
+							{
+								JOptionPane.showMessageDialog(jDialog, "Register Completed!");
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(jDialog, "Succesfully Updated!");
+							}
+							
+							jDialog.dispose();
+						}						
+						else if (CustomerCare.this.submitMemberForAuto(dialogMode, idField.getText().trim(), timeStampField.getText().trim(), 
+																		txnTypeField.getText().trim(), plateNoField.getText().trim(), docNoField.getText().trim(), 
+																		expDateField.getText().trim(), newExpDateField.getText().trim(), procTypeField.getText().trim(),
+																		premiumField.getText().trim(), textDateTimField.getText().trim(), callDateTimeField.getText().trim(),
+																		visitDateTimeField.getText().trim(), completeDateField.getText().trim(), 
+																		companyNameField.getText().trim(), onwerField.getText().trim()))
+						{
+							if (dialogMode == NEW_MODE)
+							{
+								JOptionPane.showMessageDialog(jDialog, "Register Completed!");
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(jDialog, "Succesfully Updated!");
+							}
+	
+							jDialog.dispose();
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(jDialog, "Error in input!");							
+						}	
+					}
+				}			
+			});
+
+			cancelButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					jDialog.dispose();
+				}			
+			});
+			
+		}
+
+		MemberDialog(String id, String lastName, String firstName, String cellNum ,String birthDate, String email)
+		{
+			this();
+			
+			dialogMode = EDIT_MODE;
+			
+			idField.setText(id);
+			lastNameField.setText(lastName);
+			firstNameField.setText(firstName);
+			cellField.setText(cellNum);
+			birthDateField.setText(birthDate);
+			emailField.setText(email);
+
+			idField.setEnabled(false);
+			
+			submitButton.setText("Update");
+		}
+
+		public boolean isNumber(String s)
+		{
+			
+			try
+			{
+				Integer.valueOf(s);
+				return true;
+			}
+			catch(NumberFormatException e)
+			{
+				return false;
+			}
+		}
+	}
