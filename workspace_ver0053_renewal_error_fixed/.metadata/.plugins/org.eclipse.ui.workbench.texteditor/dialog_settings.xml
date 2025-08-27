@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="jPanel_Search_2" key="selection"/>
+		<item value="true" key="casesensitive"/>
+		<item value="true" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="jPanel_Search_2"/>
+			<item value="tabbedPaneForCustomerInfo"/>
+			<item value="jPanel_Customer_Search"/>
+			<item value="tabbedPane"/>
+			<item value="tabbedPaneForFamilyInfo"/>
+			<item value="jPanel_Customer"/>
+			<item value="tabbedpane"/>
+			<item value="jframe.setsi"/>
+			<item value="Jframe.set"/>
+			<item value="priCustIDField.setBounds"/>
+			<item value="jPanel_Detailed_Search.set"/>
+			<item value="jPanel_Detailed_Search"/>
+			<item value="jPanel"/>
+			<item value=" LastNameTextField.setBounds"/>
+			<item value="birthDateField"/>
+		</list>
+		<list key="replacehistory">
+			<item value="&quot;0.00&quot;"/>
+			<item value="0.00"/>
+			<item value="tcmForCommercial"/>
+			<item value="tcmForTravel"/>
+			<item value="tcmForHouse"/>
+			<item value="tcmForPersonal"/>
+			<item value=""/>
+			<item value="jPanel_Search_1"/>
+			<item value="resultSet"/>
+			<item value="jDialogCalendar"/>
+			<item value="birthDateTextField"/>
+			<item value="setText"/>
+			<item value="JTextField"/>
+			<item value="null;"/>
+			<item value="resultHomeSet"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="292" key="DIALOG_WIDTH"/>
+		<item value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont" key="DIALOG_FONT_NAME"/>
+		<item value="406" key="DIALOG_HEIGHT"/>
+		<item value="586" key="DIALOG_X_ORIGIN"/>
+		<item value="143" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>
