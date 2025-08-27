@@ -1,8 +1,0 @@
-
-public class DatabaseConstant
-{
-	public final static String DRIVERNAME = "com.mysql.jdbc.Driver";
-	public final static String URL = "jdbc:mysql://127.0.0.1:3306/CustomerCares";
-	public final static String USER = "root";
-	public final static String PASSWORD = "qwe123";
-}
