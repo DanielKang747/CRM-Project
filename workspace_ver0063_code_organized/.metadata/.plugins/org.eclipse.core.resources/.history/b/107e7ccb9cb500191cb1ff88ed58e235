@@ -1,0 +1,46 @@
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Utilities {
+	public class DateItem {
+
+	    private Date mDate;
+
+	    public DateItem(Date date) {
+	        mDate = date;
+	    }
+
+	    public Date getDate() {
+	        return mDate;
+	    }
+
+	    @Override
+	    public String toString() {
+
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+
+	        return sdf.format(mDate);
+	    }
+	}
+	
+	public int getRowCount(ResultSet resultSet) {
+	    if (resultSet == null) {
+	        return 0;
+	    }
+	    try {
+	        resultSet.last();
+	        return resultSet.getRow();
+	    } catch (SQLException exp) {
+	        exp.printStackTrace();
+	    } finally {
+	        try {
+	            resultSet.beforeFirst();
+	        } catch (SQLException exp) {
+	            exp.printStackTrace();
+	        }
+	    }
+	    return 0;
+	}
+}

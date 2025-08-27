@@ -1,0 +1,12 @@
+
+public class test1
+{
+	public static void main(String args [ ])
+	{
+		String response = "";
+		if (statement.indexOf("no") >= 0)
+		{
+			response = "Why so negative?";
+		}
+	}
+}

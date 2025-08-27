@@ -1,0 +1,17 @@
+import java.util.Scanner;
+
+public class test1
+{
+	public static void main(String args [ ])
+	{
+		Scanner in = new Scanner(System.in);
+		
+		String statement = in.nextLine();
+		String response = "";
+		if (statement.indexOf("no") >= 0)
+		{
+			response = "Why so negative?";
+			System.out.println("response = " + response);
+		}
+	}
+}

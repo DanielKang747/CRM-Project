@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="Date" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="true" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="true" key="wholeword"/>
+		<list key="findhistory">
+			<item value="dateItem"/>
+			<item value="jFrameX"/>
+			<item value="DateItem"/>
+			<item value="SearchMember::submitMember&#x0A;"/>
+			<item value="txnTypeFieldForAuto"/>
+			<item value="premiumField"/>
+			<item value="jDialogUpdateForCommercial"/>
+			<item value="jDialogUpdateForAuto"/>
+			<item value="customerCare.preparedStatement"/>
+			<item value="jFrameForRegister"/>
+			<item value="jDialogUpdateForTravel"/>
+			<item value="jDialogUpdateForHome"/>
+			<item value="customerCare.statement"/>
+			<item value="customerCare.connection"/>
+			<item value="customerCare.resultCommercialInfoSet"/>
+		</list>
+		<list key="replacehistory">
+			<item value="GUIForMemberDialog.txnTypeFieldForAuto"/>
+			<item value="GUIForMemberDialog.premiumField"/>
+			<item value="GUIForMemberDialog.jDialogUpdateForCommercial"/>
+			<item value="GUIForMemberDialog.jDialogUpdateForAuto"/>
+			<item value="Utilities.preparedStatement"/>
+			<item value="customerCare.preparedStatement"/>
+			<item value="GUIForMemberDialog.jFrameForRegister"/>
+			<item value="GUIForMemberDialog.jDialogUpdateForTravel"/>
+			<item value="GUIForMemberDialog.jDialogUpdateForHome"/>
+			<item value="Utilities.statement"/>
+			<item value="Utilities.connection"/>
+			<item value="Utilities."/>
+			<item value="Utilities.resultCommercialInfoSet"/>
+			<item value="Utilities.resultTravelSet"/>
+			<item value="Utilities.resultHomeSet"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="292" key="DIALOG_WIDTH"/>
+		<item value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont" key="DIALOG_FONT_NAME"/>
+		<item value="406" key="DIALOG_HEIGHT"/>
+		<item value="1086" key="DIALOG_X_ORIGIN"/>
+		<item value="58" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>
