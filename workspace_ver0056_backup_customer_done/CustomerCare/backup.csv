@@ -1,0 +1,168 @@
+Customer ID,Last Name,First Name,PhoneNum,Birth Date,Email,PriCustID,Memo,Postal Cd,AddrStNm,AddrPvNm,Chg Date Time
+0000000002,BAEK,WOONHACK,7789527599,19760512,m,null,,,,,null
+0000000003,BYUN,MI SUP,7788785532,19640215,null,null,null,null,null,null,null
+0000000004,CHOI,SU JU,7788668002,null,null,null,null,null,null,null,null
+0000000005,CHOI,CHOONG YURL,7788883717,19560827,null,null,null,null,null,null,null
+0000000006,CHOI,JAEMIN,7789032331,null,ltmohikan@naver.com,null,null,null,null,null,null
+0000000007,GIM,WOEN ENG,6047809385,19680225,,null,,,,,20171015091651
+0000000008,HAN,KI KU,6048281274,19740218,ppqqal12@yahoo.ca,null,null,null,null,null,null
+0000000009,HAN,YUSEON,7789536911,19780118,null,null,null,null,null,null,null
+0000000010,HEO,CHANGWEON,6045183001,19650624,null,null,null,null,null,null,null
+0000000011,JEONG,JEONGJAE,6044415245,null,null,null,null,null,null,null,null
+0000000012,JIN,HYEOK,7789524536,19681121,null,null,null,null,null,null,null
+0000000013,JUNG,NAMJIN,7788288944,19701113,null,null,null,null,null,null,null
+0000000014,JUNG,JINAH,7788994330,19740723,jinahj74@gmail.com,null,null,null,null,null,null
+0000000015,KANG,YOUNGJU,7788086321,19690516,null,null,null,null,null,null,null
+0000000016,KIM,SOO JUNG,6047897379,19680806,null,null,null,null,null,null,null
+0000000017,KIM,SEOCK SOON,7782315416,19660404,null,null,null,null,null,null,null
+0000000018,KIM,HAGSUN,7782451254,19590426,abcd123canada@gmail.com,null,null,null,null,null,null
+0000000019,KIM,SUK YOUN,7782552223,null,sue0530@hanmail.net,null,null,null,null,null,null
+0000000020,KIM,JAEHOON,7787105199,null,null,null,null,null,null,null,null
+0000000021,KIM,SEONGKU,7788378306,19670630,null,null,null,null,null,null,null
+0000000022,KIM,GYEONGLEE,7788887783,19650122,koma7799@naver.com,null,null,null,null,null,null
+0000000023,KIM,YOUNGHEE,7788990737,19610104,null,null,null,null,null,null,null
+0000000024,KIM,YOUNGSUK,7788669319,19620217,sbpwork93@hotmail.com,null,null,null,null,null,null
+0000000025,KIM,SANG HEE,7789387780,19770805,shdosa1210@naver.com,null,null,null,null,null,null
+0000000026,KIM,JUNG WOO,7789961976,19760916,null,null,null,null,null,null,null
+0000000027,KIM,TAE YOUNG,7789080977,19740211,null,null,null,null,null,null,null
+0000000028,KIM,KYUNGHA,7783470687,19680324,null,null,null,null,null,null,null
+0000000029,KOO,HYE DUCK,7788712435,19701214,hdkoo04@daum.net,null,null,null,null,null,null
+0000000030,KWON,SU YOUNG,6047827735,null,cindy@vanwest.com,null,null,null,null,null,null
+0000000031,KWON,YEONG CHO,6049880106,19420115,estherkwonvan@hotmail.com,null,null,null,null,null,null
+0000000032,LEE,SOOYOUNG,6043796366,19770628,aham12@naver.com,null,null,null,null,null,null
+0000000033,LEE,KOO SEUL YOO,6044463778,19751212,null,null,null,null,null,null,null
+0000000034,LEE,KYUNG HEE,6044463778,19731030,null,null,null,null,null,null,null
+0000000035,LEE,SEUNGYOUN,7788469309,19720309,igisellelee@gmail.com,null,null,null,null,null,null
+0000000036,MA,CHANGWAN,7788879192,19731010,null,null,null,null,null,null,null
+0000000037,LEE,MEE KYUNG,7789828819,null,null,null,null,null,null,null,null
+0000000038,PARK,JOUNGKI,7788913464,19620316,null,null,null,null,null,null,null
+0000000039,PARK,SUNGHEE,7788235668,19710803,null,null,null,null,null,null,null
+0000000040,PARK,CHUNG MI,7788869527,19700611,null,null,null,null,null,null,null
+0000000041,PYO,JINYOUNG,6046570254,19930208,jypyo@hotmail.com,null,null,null,null,null,null
+0000000042,RYU,YOUNG JIN,7788687311,19741123,ryu0422@hanmail.net,null,null,null,null,null,null
+0000000043,SHIN,YOUNGSOOK,6043548456,19700320,null,null,null,null,null,null,null
+0000000044,YANG,SU JUNG,6048332433,null,null,null,null,null,null,null,null
+0000000045,YOON,KYUNG OK,6043147714,19460908,null,null,null,null,null,null,null
+0000000046,YOON,MYUNG JA,6048369807,19400112,null,null,null,null,null,null,null
+0000000047,YOON,HYEYOUNG,6048808951,19730115,graceyoon89@gmail.com,null,null,null,null,null,null
+0000000048,YOO,KWANG,7782450054,19700129,null,null,null,null,null,null,null
+0000000049,YOO,MI,7783458331,19770817,null,null,null,null,null,null,null
+0000000050,YU,WON JE,6047810540,19661110,null,null,null,null,null,null,null
+0000000051,MOON,HYUN SOOK,6042179312,196101,,null,asdf,,,,20171015092305
+0000000052,HUR,BORA,7789527499,19760924,null,0000000002,null,null,null,null,null
+0000000053,BAEK,CHAEWON,null,20031031,null,0000000002,null,null,null,null,null
+0000000054,BAIK,SUK BONG,7788395501,19430101,49leesoon@hanmail.net,0000000002,null,null,null,null,null
+0000000055,LEE,SOON JA,7788395501,19491124,49leesoon@hanmail.net,0000000054,null,null,null,null,null
+0000000056,CHOI,EUN JI,7788883717,19890112,null,0000000005,null,null,null,null,null
+0000000057,KIM,JIHYE,6047809385,19650110,null,0000000007,null,null,null,null,null
+0000000058,HWANG,JI EUN,6047809385,19771011,null,0000000027,null,null,null,null,null
+0000000059,SEO,KYUNGMI,7782315416,19710227,null,0000000017,null,null,null,null,null
+0000000060,KIM,YOUNGJA,null,19650721,null,0000000018,null,null,null,null,null
+0000000061,BAE,JOON CHUL,7789870416,19760416,null,0000000025,null,null,null,null,null
+0000000062,KANG,SUYUN,7789961976,19760830,null,0000000026,null,null,null,null,null
+0000000063,KWON,MYUNG SOON,6049880106,19490528,null,0000000031,null,null,null,null,null
+0000000064,KIM,SUNYOUNG,6043796366,19780109,null,0000000032,null,null,null,null,null
+0000000065,GO,SEOUNG JIN,null,null,null,null,null,null,null,null,null
+0000000066,CHO,JUN MO,null,null,null,null,null,null,null,null,null
+0000000067,KIM,YOUNG-SUK,null,null,null,null,null,null,null,null,null
+0000000068,YOO,HYUNNGZUN,null,null,null,null,null,null,null,null,null
+0000000069,CHUNG,HOSEOK,null,null,null,null,null,null,null,null,null
+0000000070,LUKE BROS INTERNATIONAL TRADING LTD.,null,null,null,null,null,null,null,null,null,null
+0000000071,KIM,TAEYONG,null,null,null,null,null,null,null,null,null
+0000000072,WILDWOOD FOODS LTD.,null,null,null,null,null,null,null,null,null,null
+0000000073,HAN,SO YOUNG,null,null,null,null,null,null,null,null,null
+0000000074,HONG,SOON GON,6043148111,19591215,null,null,null,null,null,null,null
+0000000075,JUN,YE RI,null,19580812,null,null,null,null,null,null,null
+0000000076,HYUN,CHANGLAK,null,19810129,null,null,null,null,null,null,null
+0000000077,HAN,SOON JEONG,6048253584,19720924,null,null,null,null,null,null,null
+0000000078,KIM,CHEOL,7786863398,null,null,null,null,null,null,null,null
+0000000079,LEE,KYOUNG SEOP,6049929850,19750209,null,null,null,null,null,null,null
+0000000080,LEE,MI KYOUNG,null,19571113,null,null,null,null,null,null,null
+0000000081,HAN,JI HWAN,null,19720420,null,null,null,null,null,null,null
+0000000082,CHA,SOO KYUNG,6048286411,19810520,null,null,null,null,null,null,null
+0000000083,JUNG,YOUNG HEE,7788867714,19690602,null,null,null,null,null,null,null
+0000000084,ROE,SOOYOUNG,7789264980,19840114,null,null,null,null,null,null,null
+0000000085,0748085 BC LTD.,null,6048253584,19720927,null,null,null,null,null,null,null
+0000000086,LEE,KUMTAE,null,19001018,null,null,null,null,null,null,null
+0000000087,LEE,YAM,7783882250,19651226,null,null,null,null,null,null,null
+0000000088,LEE,YONGRO,6048334342,19541023,null,null,null,null,null,null,null
+0000000089,SON,MYUNG WOONG,7788868345,19831212,null,null,null,null,null,null,null
+0000000090,HONG,JUNG SOON,null,19570712,null,null,null,null,null,null,null
+0000000091,KIM,KYONG  SUN,null,19590326,null,null,null,null,null,null,null
+0000000092,BONG,EUN JOO,7789976536,19691022,null,null,null,null,null,null,null
+0000000093,JEON,JEONGWOON AHN,6048257489,19700106,null,null,null,null,null,null,null
+0000000094,JUNG,TAESUN,6046003207,null,null,null,null,null,null,null,null
+0000000095,SHIN,SUNGMIN,7788899521,19850222,null,null,null,null,null,null,null
+0000000096,CHANG,YOUNGKWANG,6047795709,19600606,null,null,null,null,null,null,null
+0000000097,CHO,SUNG SOO,6045338899,null,null,null,null,null,null,null,null
+0000000098,AHN,YEON-HEE CHO,7788677355,19590725,null,null,null,null,null,null,null
+0000000099,KIM,BYUNG SUK,7788878289,null,null,null,null,null,null,null,null
+0000000100,HWANG,JIYONG,null,null,null,null,null,null,null,null,null
+0000000101,POTTER'S GARDEN KOREAN RESTAURANT LTD.,null,7788998293,null,null,null,null,null,null,null,null
+0000000102,CHA/CHA QUALITY SERVICE LTD.,null,6045064239,null,null,null,null,null,null,null,null
+0000000103,IM,YONG SOON,7788780191,19591213,,0000000001,,,,,20171009003118
+0000000104,KIM,YOUNG-WOONG,6045610318,19850514,null,null,null,null,null,null,null
+0000000105,KANG,EUN-ZA,7788086038,null,null,null,null,null,null,null,null
+0000000106,LEE,SANG HO,6048791234,19420225,null,null,null,null,null,null,null
+0000000107,KANG,UN JUNG,6047867585,,,null,,,,,20171015092422
+0000000108,YOON,DU HUI,null,null,null,null,null,null,null,null,null
+0000000109,PARK,KYUNGOK,null,null,null,null,null,null,null,null,null
+0000000110,CHO,EUN HEE,7788749278,null,null,null,null,null,null,null,null
+0000000111,KIM,TAE HOON,6048171782,null,null,null,null,null,null,null,null
+0000000112,LIM,KWANGHEE,7789274652,19870102,,null,,,,,20171015091611
+0000000113,READING GATE LEARNING CENTRE LTD.,null,7788933592,null,null,null,null,null,null,null,null
+0000000114,DE BAAR,JENNIFER ANN,null,null,null,null,null,null,null,null,null
+0000000115,BYUN,BIT NA,null,null,null,null,null,null,null,null,null
+0000000116,GU,SUNGKYU,null,null,null,null,null,null,null,null,null
+0000000117,CHOI,BIN,7788092227,null,null,null,null,null,null,null,null
+0000000118,KIM,WHA SICK,6048859721,null,null,null,null,null,null,null,null
+0000000119,PARK,KI SEOK,null,null,null,null,null,null,null,null,null
+0000000120,YOON,SEYUEN,7788680735,null,null,null,null,null,null,null,null
+0000000121,LEE,KYUDUCK,6048580085,null,null,null,null,null,null,null,null
+0000000122,KOO,BONG KYUN,7788995624,null,null,null,null,null,null,null,null
+0000000123,LEE,SEYOUNG,7783163321,null,null,null,null,null,null,null,null
+0000000124,PARK,KYUNG RAE,6045650234,null,null,null,null,null,null,null,null
+0000000125,KIM,MI JUNG,null,null,null,null,null,null,null,null,null
+0000000126,asdf,asd,,1,,1,,,,,null
+0000000127,asdf,asdf,,,,null,,,,,null
+0000000128,asdf,asdf,,,,null,,,,,null
+0000000129,asdf,asdf,12345,,,null,,,,,null
+0000000130,aaa,qqq,,,,null,,,,,null
+0000000131,ttt,www,,,,null,,,,,null
+0000000132,asdf,asdf,,,,null,,,,,null
+0000000133,asdf,asdf,,,,null,,,,,null
+0000000134,kjh,iu,,,,null,,,,,20171008003746
+0000000135,asdf,asdf,,,,null,,,,,20171008083901
+0000000136,asdf,asdf,,,,null,,,,,20171008084320
+0000000137,aaa,bbb,,,,null,,,,,20171008084411
+0000000138,bbb,ccc,,,,null,,,,,20171008084623
+0000000139,ccc,ddd,,,,null,,,,,20171008085223
+000000001,null,null,null,null,null,null,null,null,null,null,null
+0000000140,ddd,eee,,,,null,,,,,20171008091853
+0000000141,ASDF,ASDF,,,,null,,,,,20171008093717
+0000000142,asdf,asdf,,,,null,,,,,20171008093917
+0000000143,asdf,sadf,,,,null,,,,,20171008095619
+0000000144,asdf,asdf,,,,null,,,,,20171008095658
+0000000145,asdf,asdf,,,,null,,,,,20171009001909
+0000000146,asdf,asdf,,,,null,,,,,20171009001947
+0000000147,asdf,asdf,,,,null,,,,,20171009002035
+0000000148,asdf,asdf,,,,null,,,,,20171009002127
+0000000149,asdf,asdf,,,,null,,,,,20171009002304
+0000000150,ddd,eee,,,,null,,,,,20171009005102
+0000000151,asdf,asdf,,,,null,,,,,20171009005406
+0000000152,asdf,asdf,,,,null,,,,,20171009005430
+0000000153,aaa,aaa,,,,null,,,,,20171009005530
+0000000154,asdf,asdf,,,,null,,,,,20171009012133
+0000000155,asdf,asdf,,,,null,,,,,20171009012141
+0000000156,asdf,asdf,,,,null,,,,,20171009012158
+0000000157,asdf,asdf,,,,null,,,,,20171009012227
+0000000158,asdf,asdf,,,,null,,,,,20171009012334
+0000000159,asdf,asdf,,,,null,,,,,20171009012418
+0000000160,777,777,,,,null,,,,,20171009155700
+0000000161,kjhg,lkjh,,,,null,,,,,20171009160113
+0000000162,sdf,asdf,,,,null,,,,,20171009160353
+0000000163,asdf,asdf,,,,null,,,,,20171009160753
+0000000164,asdf,asdf,,,,null,,,,,20171009160814
+0000000165,asdf,asdf,,,,null,,,,,20171009161827
+0000000166,lkjh,kjk,,,,null,,,,,20171009161935
+0000000167,kang,daniel,7785472220,,,null,,,,,20171228093333
