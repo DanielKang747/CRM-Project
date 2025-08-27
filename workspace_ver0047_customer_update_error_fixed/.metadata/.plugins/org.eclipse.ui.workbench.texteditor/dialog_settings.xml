@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="SQLException3123" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="SQLException3123"/>
+			<item value="submitMemberForFamily"/>
+			<item value="setSelectedItem"/>
+			<item value="JComboBox"/>
+			<item value="20"/>
+			<item value="jButtonUpdateForCustomer"/>
+			<item value="jButtonUpdate"/>
+			<item value="resultAutomobileSet"/>
+			<item value="(10);"/>
+			<item value="new"/>
+			<item value="JTextField"/>
+			<item value="commercialInfo"/>
+			<item value="insert"/>
+			<item value="resultTravelSet"/>
+			<item value="resultHomeSet"/>
+		</list>
+		<list key="replacehistory">
+			<item value="setText"/>
+			<item value="JTextField"/>
+			<item value=""/>
+			<item value="resultSet"/>
+			<item value="null;"/>
+			<item value="resultHomeSet"/>
+			<item value="resultTravelSet"/>
+			<item value="resultAutomobileSet"/>
+			<item value="resultCommercialInfoSet"/>
+			<item value=")"/>
+			<item value="addrPvNumTextField"/>
+			<item value="addrStrtNumTextField"/>
+			<item value="jPanel_Detailed_Search"/>
+			<item value="tabbedPaneForFamilyInfo"/>
+			<item value="20"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="292" key="DIALOG_WIDTH"/>
+		<item value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont" key="DIALOG_FONT_NAME"/>
+		<item value="406" key="DIALOG_HEIGHT"/>
+		<item value="0" key="DIALOG_X_ORIGIN"/>
+		<item value="106" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>
