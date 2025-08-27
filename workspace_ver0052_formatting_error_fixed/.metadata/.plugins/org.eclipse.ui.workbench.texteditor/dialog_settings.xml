@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="true" key="isRegEx"/>
+		<item value="Border" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="true" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="border"/>
+			<item value="jButtonBack"/>
+			<item value="claim"/>
+			<item value=", A\.BIRTH_DATE"/>
+			<item value=", a.birth_date"/>
+			<item value="search_claim"/>
+			<item value="defaultTableModel_All_Info"/>
+			<item value="allbutton"/>
+			<item value="select"/>
+			<item value="selectCommerical"/>
+			<item value="memberdialog"/>
+			<item value="SQLException2"/>
+			<item value="SQLException"/>
+			<item value="sqlException2 "/>
+			<item value="selectHome"/>
+		</list>
+		<list key="replacehistory">
+			<item value=""/>
+			<item value="jPanel_Search_1"/>
+			<item value="resultSet"/>
+			<item value="jDialogCalendar"/>
+			<item value="birthDateTextField"/>
+			<item value="setText"/>
+			<item value="JTextField"/>
+			<item value="null;"/>
+			<item value="resultHomeSet"/>
+			<item value="resultTravelSet"/>
+			<item value="resultAutomobileSet"/>
+			<item value="resultCommercialInfoSet"/>
+			<item value=")"/>
+			<item value="addrPvNumTextField"/>
+			<item value="addrStrtNumTextField"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="292" key="DIALOG_WIDTH"/>
+		<item value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont" key="DIALOG_FONT_NAME"/>
+		<item value="406" key="DIALOG_HEIGHT"/>
+		<item value="2" key="DIALOG_X_ORIGIN"/>
+		<item value="168" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>
