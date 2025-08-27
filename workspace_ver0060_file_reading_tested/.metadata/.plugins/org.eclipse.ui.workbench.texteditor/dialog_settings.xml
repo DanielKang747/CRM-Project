@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="memberDialog" key="selection"/>
+		<item value="true" key="casesensitive"/>
+		<item value="true" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="true" key="wholeword"/>
+		<list key="findhistory">
+			<item value="memberDialog"/>
+			<item value="jButtonForNewCustomer"/>
+			<item value="buttonFor"/>
+			<item value="newmember"/>
+			<item value="customerID"/>
+			<item value="preparedStatement"/>
+			<item value="SEARCH_CUSTOMER"/>
+			<item value="preparedcustomerCare.s"/>
+			<item value="customerButton"/>
+			<item value="selectTravelInfo"/>
+			<item value="selectDetailedInfo"/>
+			<item value="selectFamilyInfo"/>
+			<item value="selectCommercialInfo"/>
+			<item value="selectHomeInfo"/>
+			<item value="selectAutomobileInfo"/>
+		</list>
+		<list key="replacehistory">
+			<item value="customerCare.customerID"/>
+			<item value="customerCare.preparedStatement"/>
+			<item value="customerCare.SEARCH_CUSTOMER"/>
+			<item value="preparedS"/>
+			<item value="customerCare.customerButton"/>
+			<item value="customerCare.selectTravelInfo"/>
+			<item value="customerCare.selectDetailedInfo"/>
+			<item value="customerCare.selectFamilyInfo"/>
+			<item value="customerCare.selectCommercialInfo"/>
+			<item value="customerCare.selectHomeInfo"/>
+			<item value="customerCare.selectAutomobileInfo"/>
+			<item value="customerCare.INSERT_MODE"/>
+			<item value="customerCare.jTable_Commercial_Info"/>
+			<item value="customerCare.defaultTableModel_Commercial_Info"/>
+			<item value="customerCare.jTable_Traveler_Info"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="292" key="DIALOG_WIDTH"/>
+		<item value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont" key="DIALOG_FONT_NAME"/>
+		<item value="406" key="DIALOG_HEIGHT"/>
+		<item value="790" key="DIALOG_X_ORIGIN"/>
+		<item value="143" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>
