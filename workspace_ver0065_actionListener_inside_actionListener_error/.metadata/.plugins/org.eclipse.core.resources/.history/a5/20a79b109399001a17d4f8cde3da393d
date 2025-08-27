@@ -1,0 +1,891 @@
+package customerCare;
+
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import javax.swing.JOptionPane;
+
+public class MemberDialog {		
+	
+	CustomerCare customerCare = new CustomerCare();
+	
+	public static int newInfoExternal;
+	public static int dialogModeExternal;
+
+	public static void callDialogs(int newInfo, int dialogMode) {
+		newInfoExternal = newInfo;
+		dialogModeExternal = dialogMode;
+		
+		switch (dialogMode) {
+			case DatabaseConstant.NEW_MODE:
+				switch (newInfo) {
+					case DatabaseConstant.CUSTOMER_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.lastNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.firstNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.cellLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.birthDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.emailLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.priCustIDLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrStNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrPvNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.postalCdLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanel);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.lastNameField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.firstNameField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.cellField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.birthDateTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.emailTextField);		
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.priCustIDTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrStrtNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrPvNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.postalCdField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanel.add(GUIForMemberDialog.idField);
+						GUIForMemberDialog.idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idField.setText(Utilities.idCheck());
+						
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.cancelButton);
+
+						GUIForMemberDialog.jDialog.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialog.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialog.getContentPane().add(GUIForMemberDialog.buttonPanel, "South");
+						
+						GUIForMemberDialog.jDialog.setVisible(true);
+						GUIForMemberDialog.jDialog.setSize(286, 456);
+						GUIForMemberDialog.jDialog.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialog.setResizable(true);
+						break;
+					case DatabaseConstant.AUTOMOBILE_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.newExpDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.plateNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.docNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.visitDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrStNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrPvNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.postalCdLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.newExpDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.plateNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.docNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.visitDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrStrtNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrPvNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.postalCdField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+											
+						GUIForMemberDialog.timeStampPanelForAuto.add(GUIForMemberDialog.timeStampField);
+						GUIForMemberDialog.timeStampField.setEnabled(false);
+						GUIForMemberDialog.timeStampField.setText(Utilities.timeStampCheck());
+																		
+						GUIForMemberDialog.idPanelForAuto.add(GUIForMemberDialog.idFieldForAuto);
+						GUIForMemberDialog.idFieldForAuto.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForAuto.setText(GUIForCustomerCare.idTextField.getText().trim());
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForAuto);
+						GUIForMemberDialog.premiumFieldForAuto.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForAuto.setText("0.00");
+						
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.cancelButton);
+						
+						GUIForMemberDialog.jDialogForAuto.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogForAuto.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogForAuto.getContentPane().add(GUIForMemberDialog.buttonPanelForAuto, "South");
+
+						GUIForMemberDialog.jDialogForAuto.pack();
+						GUIForMemberDialog.jDialogForAuto.setVisible(true);
+						GUIForMemberDialog.jDialogForAuto.setSize(301, 530);
+						GUIForMemberDialog.jDialogForAuto.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogForAuto.setResizable(false);
+						break;
+					case DatabaseConstant.HOME_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.newExpDatelabel);					
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.sigxpNoLabel);					
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.visitDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrStNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrPvNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.postalCdLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.newExpDateField);					
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.sigxpNoField);					
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.visitDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrStrtNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrPvNumTextField);			
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.postalCdField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanelForAuto.add(GUIForMemberDialog.idFieldForHome);
+						GUIForMemberDialog.idFieldForHome.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForHome.setText(GUIForCustomerCare.idTextField.getText().trim());
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForHome);
+						GUIForMemberDialog.premiumFieldForHome.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForHome.setText("0.00");
+
+						GUIForMemberDialog.timeStampPanelForAuto.add(GUIForMemberDialog.timeStampField);
+						GUIForMemberDialog.timeStampField.setEnabled(false);
+						GUIForMemberDialog.timeStampField.setText(Utilities.timeStampCheck());
+						
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.cancelButton);
+						
+						GUIForMemberDialog.jDialogForHome.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogForHome.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogForHome.getContentPane().add(GUIForMemberDialog.buttonPanelForAuto, "South");
+
+						GUIForMemberDialog.jDialogForHome.pack();
+						GUIForMemberDialog.jDialogForHome.setVisible(true);
+						GUIForMemberDialog.jDialogForHome.setSize(301, 590);
+						GUIForMemberDialog.jDialogForHome.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogForHome.setResizable(false);
+						break;
+					case DatabaseConstant.TRAVEL_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.effDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.policyNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.mailDateTimeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampPanelForAuto);			
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.effDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.policyNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.mailDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+																		
+						GUIForMemberDialog.idPanelForAuto.add(GUIForMemberDialog.idFieldForTravel);
+						GUIForMemberDialog.idFieldForTravel.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForTravel.setText(GUIForCustomerCare.idTextField.getText().trim());
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForTravel);
+						GUIForMemberDialog.premiumFieldForTravel.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForTravel.setText("0.00");
+						
+						GUIForMemberDialog.timeStampPanelForAuto.add(GUIForMemberDialog.timeStampField);
+						GUIForMemberDialog.timeStampField.setEnabled(false);
+						GUIForMemberDialog.timeStampField.setText(Utilities.timeStampCheck());
+						
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.cancelButton);
+						
+						GUIForMemberDialog.jDialogForTravel.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogForTravel.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogForTravel.getContentPane().add(GUIForMemberDialog.buttonPanelForAuto, "South");
+
+						GUIForMemberDialog.jDialogForTravel.pack();
+						GUIForMemberDialog.jDialogForTravel.setVisible(true);
+						GUIForMemberDialog.jDialogForTravel.setSize(301, 600);
+						GUIForMemberDialog.jDialogForTravel.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogForTravel.setResizable(false);
+						break;
+					case DatabaseConstant.COMMERCIAL_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.newExpDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.sigxpNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.visitDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampPanelForAuto);		
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.newExpDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.sigxpNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.visitDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanelForAuto.add(GUIForMemberDialog.idFieldForCommercial);
+						GUIForMemberDialog.idFieldForCommercial.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForCommercial.setText(GUIForCustomerCare.idTextField.getText().trim());
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForCommercial);
+						GUIForMemberDialog.premiumFieldForCommercial.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForCommercial.setText("0.00");
+						
+						GUIForMemberDialog.timeStampPanelForAuto.add(GUIForMemberDialog.timeStampField);
+						GUIForMemberDialog.timeStampField.setEnabled(false);
+						GUIForMemberDialog.timeStampField.setText(Utilities.timeStampCheck());
+						
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.cancelButton);
+						
+						GUIForMemberDialog.jDialogForCommercial.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogForCommercial.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogForCommercial.getContentPane().add(GUIForMemberDialog.buttonPanelForAuto, "South");
+
+						GUIForMemberDialog.jDialogForCommercial.pack();
+						GUIForMemberDialog.jDialogForCommercial.setVisible(true);
+						GUIForMemberDialog.jDialogForCommercial.setSize(301, 514);
+						GUIForMemberDialog.jDialogForCommercial.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogForCommercial.setResizable(false);
+						break;
+				}
+				break;
+			case DatabaseConstant.EDIT_MODE:
+				switch (newInfo) {
+					case DatabaseConstant.CUSTOMER_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.lastNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.firstNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.cellLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.birthDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.emailLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.priCustIDLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrStNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrPvNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.postalCdLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanel);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.lastNameField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.firstNameField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.cellField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.birthDateTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.emailTextField);		
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.priCustIDTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrStrtNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrPvNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.postalCdField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanel.add(GUIForMemberDialog.idField);
+						GUIForMemberDialog.idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idField.setText(String.valueOf(GUIForCustomerCare.idTextField.getText().trim()));
+						
+						try {
+							Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+							
+							Utilities.statement = Utilities.connection.createStatement();
+												
+							Utilities.resultSet = Utilities.statement.executeQuery("SELECT * FROM CCCUSTOM where CCCUSTOM.CUST_ID = \"" + GUIForMemberDialog.idField.getText().trim() + "\"");
+										
+							GUIForMemberDialog.lastNameField.removeAll();
+							GUIForMemberDialog.firstNameField.removeAll();
+							GUIForMemberDialog.cellField.removeAll();
+							GUIForMemberDialog.birthDateTextField.removeAll();
+							GUIForMemberDialog.emailTextField.removeAll();
+							GUIForMemberDialog.priCustIDTextField.removeAll();
+							GUIForMemberDialog.memoTextField.removeAll();
+							GUIForMemberDialog.postalCdField.removeAll();
+							GUIForMemberDialog.addrStrtNumTextField.removeAll();
+							GUIForMemberDialog.addrPvNumTextField.removeAll();
+							
+							while (Utilities.resultSet.next()) {
+								String lastName = Utilities.resultSet.getString(2);
+								String firstName = Utilities.resultSet.getString(3);
+								String cellNo = Utilities.resultSet.getString(4);
+								String birthDate = Utilities.resultSet.getString(5);
+								String email = Utilities.resultSet.getString(6);
+								String primaryID = Utilities.resultSet.getString(7);
+								String memo = Utilities.resultSet.getString(8);
+								String postalCD = Utilities.resultSet.getString(9);
+								String addrStrt = Utilities.resultSet.getString(10);
+								String addrPv = Utilities.resultSet.getString(11);
+
+								GUIForMemberDialog.lastNameField.setText(lastName);
+								GUIForMemberDialog.firstNameField.setText(firstName);
+								GUIForMemberDialog.cellField.setText(cellNo);
+								
+								GUIForMemberDialog.birthDateTextField.setText(birthDate);
+								GUIForMemberDialog.emailTextField.setText(email);	
+								GUIForMemberDialog.priCustIDTextField.setText(primaryID);
+								GUIForMemberDialog.memoTextField.setText(memo);
+								GUIForMemberDialog.postalCdField.setText(postalCD);
+								GUIForMemberDialog.addrStrtNumTextField.setText(addrStrt);
+								GUIForMemberDialog.addrPvNumTextField.setText(addrPv);	
+							}
+							
+							if (GUIForCustomerCare.defaultTableModel_House_Info.getRowCount() > 0) {
+								GUIForCustomerCare.jTable_House_Info.setRowSelectionInterval(0, 0);
+							}
+							
+						} catch (SQLException e) {
+							System.out.println("MemberDialog - editMode - Error" +  e.getStackTrace());
+						}
+						
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.cancelButton);
+
+						GUIForMemberDialog.jDialogUpdate.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogUpdate.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogUpdate.getContentPane().add(GUIForMemberDialog.buttonPanel, "South");
+						
+						GUIForMemberDialog.jDialogUpdate.setVisible(true);
+						GUIForMemberDialog.jDialogUpdate.setSize(286, 456);
+						GUIForMemberDialog.jDialogUpdate.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogUpdate.setResizable(true);
+						break;
+					case DatabaseConstant.AUTOMOBILE_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.newExpDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.plateNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.docNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.visitDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrStNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrPvNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.postalCdLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+						
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeFieldForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.newExpDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.plateNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.docNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.visitDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrStrtNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrPvNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.postalCdField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanelForAuto.add(GUIForMemberDialog.idFieldForAuto);
+						GUIForMemberDialog.idFieldForAuto.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForAuto.setText(String.valueOf(GUIForCustomerCare.defaultTableModel_Automobile_Info.getValueAt(GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow(), 0)));
+						
+						GUIForMemberDialog.timeStampField.setText(String.valueOf(GUIForCustomerCare.defaultTableModel_Automobile_Info.getValueAt(GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow(), 1)));
+						GUIForMemberDialog.timeStampField.setEnabled(false);//to disable further editing of ID when creating a new profile
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForAuto);
+						GUIForMemberDialog.premiumFieldForAuto.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForAuto.setText("0.00");
+
+						try {
+						
+							Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+							
+							Utilities.statement = Utilities.connection.createStatement();
+						
+							Utilities.resultAutomobileSet = Utilities.statement.executeQuery("SELECT * FROM AUTXNPRM where AUTXNPRM.CUST_ID = \"" + String.valueOf(GUIForCustomerCare.defaultTableModel_Automobile_Info.getValueAt(GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow(), 0)) + "\" AND TIME_STAMP = \"" + GUIForMemberDialog.timeStampField.getText().trim() + "\"");
+													
+							while (Utilities.resultAutomobileSet.next()) {
+								String txnType = Utilities.resultAutomobileSet.getString(3);
+								String plateNo = Utilities.resultAutomobileSet.getString(4);
+								String docNo = Utilities.resultAutomobileSet.getString(5);
+								String expDate = Utilities.resultAutomobileSet.getString(6);
+								String newExpDate = Utilities.resultAutomobileSet.getString(7);
+								String procType = Utilities.resultAutomobileSet.getString(8);
+								String premiumForAuto = Utilities.resultAutomobileSet.getString(9);
+								String textDateTime = Utilities.resultAutomobileSet.getString(10);
+								String callDateTime = Utilities.resultAutomobileSet.getString(11);
+								String visitDateTime = Utilities.resultAutomobileSet.getString(12);
+								String completeDate = Utilities.resultAutomobileSet.getString(13);
+								String companyName = Utilities.resultAutomobileSet.getString(14);
+								String owner = Utilities.resultAutomobileSet.getString(15);
+								String memoText = Utilities.resultAutomobileSet.getString(16);
+								String postalCd = Utilities.resultAutomobileSet.getString(17);
+								String addrStrtNumText = Utilities.resultAutomobileSet.getString(18);
+								String addrPvNumText = Utilities.resultAutomobileSet.getString(19);
+
+								GUIForMemberDialog.txnTypeFieldForAuto.setSelectedItem(txnType);
+								GUIForMemberDialog.plateNoField.setText(plateNo);
+								GUIForMemberDialog.docNoField.setText(docNo);
+								GUIForMemberDialog.expDateField.setText(expDate);
+								GUIForMemberDialog.newExpDateField.setText(newExpDate);	
+								GUIForMemberDialog.procTypeField.setSelectedItem(procType);
+								GUIForMemberDialog.premiumFieldForAuto.setText(premiumForAuto);
+								GUIForMemberDialog.textDateTimeField.setText(textDateTime);
+								GUIForMemberDialog.callDateTimeField.setText(callDateTime);
+								GUIForMemberDialog.visitDateTimeField.setText(visitDateTime);	
+								GUIForMemberDialog.completeDateField.setText(completeDate);
+								GUIForMemberDialog.companyNameField.setText(companyName);	
+								GUIForMemberDialog.ownerField.setText(owner);
+								GUIForMemberDialog.memoTextField.setText(memoText);
+								GUIForMemberDialog.postalCdField.setText(postalCd);
+								GUIForMemberDialog.addrStrtNumTextField.setText(addrStrtNumText);
+								GUIForMemberDialog.addrPvNumTextField.setText(addrPvNumText);	
+							}
+							
+							if (GUIForCustomerCare.defaultTableModel_House_Info.getRowCount() > 0) {
+								GUIForCustomerCare.jTable_House_Info.setRowSelectionInterval(0, 0);
+							}
+							
+						} catch (SQLException e) {
+							System.out.println("MemberDialog - editMode - auto - Error" +  e.getStackTrace());
+						}
+						
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.cancelButton);
+
+						GUIForMemberDialog.jDialogUpdateForAuto.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "East");
+						GUIForMemberDialog.jDialogUpdateForAuto.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogUpdateForAuto.getContentPane().add(GUIForMemberDialog.buttonPanel, "South");
+						
+						GUIForMemberDialog.jDialogUpdateForAuto.setVisible(true);
+						GUIForMemberDialog.jDialogUpdateForAuto.setSize(286, 456);
+						GUIForMemberDialog.jDialogUpdateForAuto.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogUpdateForAuto.setResizable(true);
+						break;
+					case DatabaseConstant.HOME_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.newExpDatelabel);					
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.sigxpNoLabel);					
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.visitDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrStNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.addrPvNumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.postalCdLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanel);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.newExpDateField);					
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.sigxpNoField);					
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.visitDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrStrtNumTextField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.addrPvNumTextField);		
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.postalCdField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanel.add(GUIForMemberDialog.idFieldForHome);
+						GUIForMemberDialog.idFieldForHome.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForHome.setText(String.valueOf(GUIForCustomerCare.idTextField.getText().trim()));
+						
+						GUIForMemberDialog.timeStampField.setText(String.valueOf(GUIForCustomerCare.defaultTableModel_House_Info.getValueAt(GUIForCustomerCare.jTable_House_Info.getSelectedRow(), 1)));
+						GUIForMemberDialog.timeStampField.setEnabled(false);
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForHome);
+						GUIForMemberDialog.premiumFieldForHome.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForHome.setText("0.00");
+						
+						try {
+						
+							Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+							
+							Utilities.statement = Utilities.connection.createStatement();
+						
+							Utilities.resultHomeSet = Utilities.statement.executeQuery("SELECT * FROM HOTXNPRM where HOTXNPRM.CUST_ID = \"" + GUIForMemberDialog.idFieldForHome.getText().trim() + "\" AND TIME_STAMP = \"" + GUIForMemberDialog.timeStampField.getText().trim() + "\"");
+													
+							while (Utilities.resultHomeSet.next()) {
+								String expDate = Utilities.resultHomeSet.getString(3);
+								String newExpDate = Utilities.resultHomeSet.getString(4);
+								String txnType = Utilities.resultHomeSet.getString(5);
+								String procType = Utilities.resultHomeSet.getString(6);
+								String sigxpNo = Utilities.resultHomeSet.getString(7);
+								String premium = Utilities.resultHomeSet.getString(8);
+								String textDateTime = Utilities.resultHomeSet.getString(9);
+								String callDateTime = Utilities.resultHomeSet.getString(10);
+								String visitDateTime = Utilities.resultHomeSet.getString(11);
+								String completeDate = Utilities.resultHomeSet.getString(12);
+								String companyName = Utilities.resultHomeSet.getString(13);
+								String owner = Utilities.resultHomeSet.getString(14);
+								String memo = Utilities.resultHomeSet.getString(15);
+								String postalCD = Utilities.resultHomeSet.getString(16);
+								String addrStNm = Utilities.resultHomeSet.getString(17);
+								String addrPvNm = Utilities.resultHomeSet.getString(18);
+
+								GUIForMemberDialog.expDateField.setText(expDate);
+								GUIForMemberDialog.newExpDateField.setText(newExpDate);
+								GUIForMemberDialog.txnTypeField.setSelectedItem(txnType);
+								GUIForMemberDialog.procTypeField.setSelectedItem(procType);
+								GUIForMemberDialog.sigxpNoField.setText(sigxpNo);
+								GUIForMemberDialog.premiumFieldForHome.setText(premium);
+								GUIForMemberDialog.completeDateField.setText(completeDate);	
+								GUIForMemberDialog.companyNameField.setText(companyName);
+								GUIForMemberDialog.ownerField.setText(owner);
+								GUIForMemberDialog.memoTextField.setText(memo);
+								
+								GUIForMemberDialog.textDateTimeField.setText(textDateTime);
+								GUIForMemberDialog.callDateTimeField.setText(callDateTime);
+								GUIForMemberDialog.visitDateTimeField.setText(visitDateTime);	
+								
+								GUIForMemberDialog.postalCdField.setText(postalCD);
+								GUIForMemberDialog.addrStrtNumTextField.setText(addrStNm);	
+								GUIForMemberDialog.addrPvNumTextField.setText(addrPvNm);
+							}
+							
+							if (GUIForCustomerCare.defaultTableModel_House_Info.getRowCount() > 0) {
+								GUIForCustomerCare.jTable_House_Info.setRowSelectionInterval(0, 0);
+							}
+							
+						} catch (SQLException e) {
+							System.out.println("MemberDialog - editMode - Home - Error" +  e.getStackTrace());
+						}
+						
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.cancelButton);
+
+						GUIForMemberDialog.jDialogUpdateForHome.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogUpdateForHome.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogUpdateForHome.getContentPane().add(GUIForMemberDialog.buttonPanel, "South");
+						
+						GUIForMemberDialog.jDialogUpdateForHome.setVisible(true);
+						GUIForMemberDialog.jDialogUpdateForHome.setSize(286, 456);
+						GUIForMemberDialog.jDialogUpdateForHome.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogUpdateForHome.setResizable(true);
+						break;
+					case DatabaseConstant.TRAVEL_MODE:
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.effDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.policyNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.mailDateTimeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanel);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampField);		
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.effDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.policyNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.mailDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+						
+						GUIForMemberDialog.idPanel.add(GUIForMemberDialog.idFieldForTravel);
+						GUIForMemberDialog.idFieldForTravel.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForTravel.setText(String.valueOf(GUIForCustomerCare.idTextField.getText().trim()));
+						
+						GUIForMemberDialog.timeStampField.setText(String.valueOf(GUIForCustomerCare.defaultTableModel_Traveler_Info.getValueAt(GUIForCustomerCare.jTable_Traveler_Info.getSelectedRow(), 1)));
+						GUIForMemberDialog.timeStampField.setEnabled(false);//to disable further editing of ID when creating a new profile
+
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForTravel);
+						GUIForMemberDialog.premiumFieldForTravel.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForTravel.setText("0.00");
+						
+						try {
+							
+							Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+							
+							Utilities.statement = Utilities.connection.createStatement();
+						
+							Utilities.resultTravelSet = Utilities.statement.executeQuery("SELECT * FROM TRTXNPRM where TRTXNPRM.CUST_ID = \"" + GUIForMemberDialog.idFieldForTravel.getText().trim() + "\" AND TIME_STAMP = \"" + GUIForMemberDialog.timeStampField.getText().trim() + "\"");
+													
+							while (Utilities.resultTravelSet.next()) {
+								String effDate = Utilities.resultTravelSet.getString(3);
+								String expDate = Utilities.resultTravelSet.getString(4);
+								String txnType = Utilities.resultTravelSet.getString(5);
+								String procType = Utilities.resultTravelSet.getString(6);
+								String premium = Utilities.resultTravelSet.getString(7);
+								String textDateTime = Utilities.resultTravelSet.getString(8);
+								String callDateTime = Utilities.resultTravelSet.getString(9);
+								String mailDateTime = Utilities.resultTravelSet.getString(10);
+								String completeDate = Utilities.resultTravelSet.getString(11);
+								String companyName = Utilities.resultTravelSet.getString(12);
+								String owner = Utilities.resultTravelSet.getString(13);
+								String memo = Utilities.resultTravelSet.getString(14);
+								String policyNo = Utilities.resultTravelSet.getString(16);
+
+								GUIForMemberDialog.effDateField.setText(effDate);
+								GUIForMemberDialog.expDateField.setText(expDate);
+								GUIForMemberDialog.txnTypeField.setSelectedItem(txnType);
+								GUIForMemberDialog.procTypeField.setSelectedItem(procType);
+								GUIForMemberDialog.premiumFieldForTravel.setText(premium);	
+								GUIForMemberDialog.textDateTimeField.setText(textDateTime);
+								GUIForMemberDialog.callDateTimeField.setText(callDateTime);
+								GUIForMemberDialog.mailDateTimeField.setText(mailDateTime);	
+								GUIForMemberDialog.completeDateField.setText(completeDate);	
+								GUIForMemberDialog.companyNameField.setText(companyName);	
+								GUIForMemberDialog.ownerField.setText(owner);	
+								GUIForMemberDialog.memoTextField.setText(memo);
+								GUIForMemberDialog.policyNoField.setText(policyNo);	
+							}
+							
+							if (GUIForCustomerCare.defaultTableModel_Traveler_Info.getRowCount() > 0) {
+								GUIForCustomerCare.jTable_Traveler_Info.setRowSelectionInterval(0, 0);
+							}
+							
+						} catch (SQLException e) {
+							System.out.println("MemberDialog - editMode - Travel - Error" +  e.getStackTrace());
+						}
+
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanel.add(GUIForMemberDialog.cancelButton);
+
+						GUIForMemberDialog.jDialogUpdateForTravel.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogUpdateForTravel.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogUpdateForTravel.getContentPane().add(GUIForMemberDialog.buttonPanel, "South");
+						
+						GUIForMemberDialog.jDialogUpdateForTravel.setVisible(true);
+						GUIForMemberDialog.jDialogUpdateForTravel.setSize(286, 456);
+						GUIForMemberDialog.jDialogUpdateForTravel.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogUpdateForTravel.setResizable(true);
+						break;
+					case DatabaseConstant.COMMERCIAL_MODE:		
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.idLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.timeStampLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.txnTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.procTypeLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.expDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.newExpDatelabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.sigxpNoLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.premiumLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.textDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.callDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.visitDateTime);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.completeDateLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.companyNameLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.onwerLabel);
+						GUIForMemberDialog.fieldNamePanel.add(GUIForMemberDialog.memoLabel);
+
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.idPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.timeStampField);		
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.txnTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.procTypeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.expDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.newExpDateField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.sigxpNoField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.premiumPanelForAuto);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.textDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.callDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.visitDateTimeField);
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.completeDateField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.companyNameField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.ownerField);	
+						GUIForMemberDialog.fieldValuePanel.add(GUIForMemberDialog.memoTextFieldArea);
+						GUIForMemberDialog.memoTextField.setLineWrap(true);
+						GUIForMemberDialog.memoTextField.setWrapStyleWord(true);
+																		
+						GUIForMemberDialog.idPanelForAuto.add(GUIForMemberDialog.idFieldForCommercial);
+						GUIForMemberDialog.idFieldForCommercial.setEnabled(false);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.idFieldForCommercial.setText(GUIForCustomerCare.idTextField.getText().trim());
+						
+						GUIForMemberDialog.premiumPanelForAuto.add(GUIForMemberDialog.premiumFieldForCommercial);
+						GUIForMemberDialog.premiumFieldForCommercial.setEnabled(true);//to disable further editing of ID when creating a new profile
+						GUIForMemberDialog.premiumFieldForCommercial.setText("0.00");
+
+						GUIForMemberDialog.timeStampField.setText(String.valueOf(GUIForCustomerCare.defaultTableModel_Commercial_Info.getValueAt(GUIForCustomerCare.jTable_Commercial_Info.getSelectedRow(), 1)));
+						GUIForMemberDialog.timeStampField.setEnabled(false);
+						
+						try {
+							
+							Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+							
+							Utilities.statement = Utilities.connection.createStatement();
+						
+							Utilities.resultCommercialInfoSet = Utilities.statement.executeQuery("SELECT * FROM COTXNPRM where CUST_ID = \"" + GUIForMemberDialog.idFieldForCommercial.getText().trim() + "\" AND TIME_STAMP = \"" + GUIForMemberDialog.timeStampField.getText().trim() + "\"");
+													
+							while (Utilities.resultCommercialInfoSet.next()) {
+								String expDate = Utilities.resultCommercialInfoSet.getString(3);
+								String newExpDate = Utilities.resultCommercialInfoSet.getString(4);
+								String txnType = Utilities.resultCommercialInfoSet.getString(5);
+								String procType = Utilities.resultCommercialInfoSet.getString(6);
+								String premium = Utilities.resultCommercialInfoSet.getString(7);
+								String textDateTime = Utilities.resultCommercialInfoSet.getString(8);
+								String callDateTime = Utilities.resultCommercialInfoSet.getString(9);
+								String visitDateTime = Utilities.resultCommercialInfoSet.getString(10);
+								String completeDate = Utilities.resultCommercialInfoSet.getString(11);
+								String companyName = Utilities.resultCommercialInfoSet.getString(12);
+								String owner = Utilities.resultCommercialInfoSet.getString(13);
+								String memo = Utilities.resultCommercialInfoSet.getString(14);
+								String sigxpNo = Utilities.resultCommercialInfoSet.getString(16);
+
+								GUIForMemberDialog.expDateField.setText(expDate);
+								GUIForMemberDialog.newExpDateField.setText(newExpDate);
+								GUIForMemberDialog.txnTypeField.setSelectedItem(txnType);
+								GUIForMemberDialog.procTypeField.setSelectedItem(procType);
+								GUIForMemberDialog.premiumFieldForCommercial.setText(premium);
+								GUIForMemberDialog.textDateTimeField.setText(textDateTime);
+								GUIForMemberDialog.callDateTimeField.setText(callDateTime);
+								GUIForMemberDialog.visitDateTimeField.setText(visitDateTime);
+								GUIForMemberDialog.completeDateField.setText(completeDate);	
+								GUIForMemberDialog.companyNameField.setText(companyName);
+								GUIForMemberDialog.ownerField.setText(owner);
+								GUIForMemberDialog.memoTextField.setText(memo);
+								GUIForMemberDialog.sigxpNoField.setText(sigxpNo);
+							}
+							
+							if (GUIForCustomerCare.defaultTableModel_House_Info.getRowCount() > 0) {
+								GUIForCustomerCare.jTable_House_Info.setRowSelectionInterval(0, 0);
+							}
+							
+						} catch (SQLException e) {
+							System.out.println("MemberDialog - editMode - Commercial - Error" +  e.getStackTrace());
+						}
+						
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.submitButton);
+						GUIForMemberDialog.buttonPanelForAuto.add(GUIForMemberDialog.cancelButton);
+						
+						GUIForMemberDialog.jDialogUpdateForCommercial.getContentPane().add(GUIForMemberDialog.fieldValuePanel, "Center");
+						GUIForMemberDialog.jDialogUpdateForCommercial.getContentPane().add(GUIForMemberDialog.fieldNamePanel, "West");
+						GUIForMemberDialog.jDialogUpdateForCommercial.getContentPane().add(GUIForMemberDialog.buttonPanelForAuto, "South");
+
+						GUIForMemberDialog.jDialogUpdateForCommercial.pack();
+						GUIForMemberDialog.jDialogUpdateForCommercial.setVisible(true);
+						GUIForMemberDialog.jDialogUpdateForCommercial.setSize(301, 514);
+						GUIForMemberDialog.jDialogUpdateForCommercial.setLocationRelativeTo(GUIForCustomerCare.jFrame);
+						GUIForMemberDialog.jDialogUpdateForCommercial.setResizable(true);
+						break;
+				}
+				break;
+			case DatabaseConstant.INSERT_MODE:
+				switch (newInfo) {
+					case DatabaseConstant.AUTOMOBILE_MODE:
+						if (CustomerCare.insertMemberForOther(DatabaseConstant.AUTOMOBILE_MODE, String.valueOf(GUIForCustomerCare.defaultTableModel_Automobile_Info.getValueAt(GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow(), 0)), String.valueOf(GUIForCustomerCare.defaultTableModel_Automobile_Info.getValueAt(GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow(), 1)))) {
+							JOptionPane.showMessageDialog(GUIForMemberDialog.jDialogUpdate, "Succesfully Created!");
+							CustomerCare.selectAutomobileInfo(GUIForCustomerCare.idTextField.getText().trim());
+						}
+						break;
+					case DatabaseConstant.HOME_MODE:	
+						if (CustomerCare.insertMemberForOther(DatabaseConstant.HOME_MODE, String.valueOf(GUIForCustomerCare.defaultTableModel_House_Info.getValueAt(GUIForCustomerCare.jTable_House_Info.getSelectedRow(), 0)), String.valueOf(GUIForCustomerCare.defaultTableModel_House_Info.getValueAt(GUIForCustomerCare.jTable_House_Info.getSelectedRow(), 1)))) {
+							JOptionPane.showMessageDialog(GUIForMemberDialog.jDialogUpdate, "Succesfully Created!");
+							CustomerCare.selectHomeInfo(GUIForCustomerCare.idTextField.getText().trim());
+						}
+						break;
+					case DatabaseConstant.COMMERCIAL_MODE:
+						if (CustomerCare.insertMemberForOther(DatabaseConstant.COMMERCIAL_MODE, String.valueOf(GUIForCustomerCare.defaultTableModel_Commercial_Info.getValueAt(GUIForCustomerCare.jTable_Commercial_Info.getSelectedRow(), 0)), String.valueOf(GUIForCustomerCare.defaultTableModel_Commercial_Info.getValueAt(GUIForCustomerCare.jTable_Commercial_Info.getSelectedRow(), 1)))) {
+							JOptionPane.showMessageDialog(GUIForMemberDialog.jDialogUpdate, "Succesfully Created!");
+							CustomerCare.selectCommercialInfo(GUIForCustomerCare.idTextField.getText().trim());
+						}
+						break;
+				}
+				GUIForMemberDialog.jDialogUpdate.dispose();
+				break;
+		}
+	}
+}

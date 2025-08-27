@@ -1,0 +1,986 @@
+package customerCare;
+
+import java.sql.DriverManager;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.JOptionPane;
+
+public class CustomerCare {	
+	
+	public static String customerID;
+	public static String priCustID;
+	
+	public static void searchMember(int searchMode, String keyWord) {
+		try {
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+			 			
+			GUIForCustomerCare.totalTextField.setText("0");
+
+			System.out.println("searchMode = " + searchMode);
+			
+			switch (searchMode) {
+				case DatabaseConstant.SEARCH_CUSTOMER:
+					String keyWord2 = keyWord.replaceAll("\\s+","");
+					Utilities.resultSet = Utilities.statement.executeQuery("SELECT A.CUST_ID, A.LAST_NAME, A.FIRST_NAME, A.CELL_NO, A.MEMO FROM (SELECT B.* ,concat(replace(B.FIRST_NAME, ' ',''), replace(B.LAST_NAME, ' ','')) NAME_STR_1, concat(replace(B.LAST_NAME, ' ',''), replace(B.FIRST_NAME, ' ','')) NAME_STR_2 FROM CCCUSTOM B) A where A.NAME_STR_1 LIKE '%" + keyWord2 + "%' OR A.NAME_STR_2 LIKE '%" + keyWord2 + "%' or A.CUST_ID LIKE '%" + keyWord2 + "%' or A.CELL_NO LIKE '%" + keyWord2 + "%'");
+					System.out.println("1searchMode = ");
+
+				case DatabaseConstant.SEARCH_ALL:
+					Utilities.resultSet = Utilities.statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, 'AUTO' INS_KIND, B.EXP_DATE, B.PROC_TYPE, B.COMPANY_NAME, B.COMPLETE_DATE FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.EXP_DATE LIKE '" + keyWord + "%' UNION ALL SELECT  C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, 'HOME' INS_KIND, C.EXP_DATE, C.PROC_TYPE, C.COMPANY_NAME, C.COMPLETE_DATE FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.EXP_DATE LIKE '" + keyWord + "%' UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME,'COMM' INS_KIND, E.EXP_DATE, E.PROC_TYPE, E.COMPANY_NAME, E.COMPLETE_DATE FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.EXP_DATE LIKE '" + keyWord + "%' ORDER BY 5,6");
+					System.out.println("2searchMode = ");
+
+				case DatabaseConstant.SEARCH_RESERVED:
+					Utilities.resultSet = Utilities.statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.VISIT_DATE_TIME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.PROC_TYPE IN ('RESERVED') AND B.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, 'HOME' INS_KIND, C.COMPANY_NAME, C.VISIT_DATE_TIME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.PROC_TYPE IN ('RESERVED') AND C.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, 'COMM' INS_KIND, E.COMPANY_NAME, E.VISIT_DATE_TIME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.PROC_TYPE IN ('RESERVED') AND E.TXN_TYPE NOT IN ('CLAIM')  UNION ALL SELECT  F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.MAIL_DATE_TIME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.PROC_TYPE IN ('RESERVED') AND F.TXN_TYPE NOT IN ('CLAIM')  ORDER BY 7, 3, 2");
+					System.out.println("3searchMode = ");
+
+				case DatabaseConstant.SEARCH_IN_PROGRESS:
+					Utilities.resultSet = Utilities.statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, B.PROC_TYPE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND B.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, C.PROC_TYPE, 'HOME' INS_KIND, C.COMPANY_NAME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND C.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, E.PROC_TYPE, 'COMM' INS_KIND, E.COMPANY_NAME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND E.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, F.PROC_TYPE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND F.TXN_TYPE NOT IN ('CLAIM') ORDER BY 4,5");
+					System.out.println("4searchMode = ");
+
+				case DatabaseConstant.SEARCH_IN_COMPLETE:
+					Utilities.resultSet = Utilities.statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.PROC_TYPE = 'COMPLETE' UNION ALL "
+							+ "SELECT C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, 'HOME' INS_KIND, C.COMPANY_NAME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.PROC_TYPE = 'COMPLETE' UNION ALL "
+							+ "SELECT E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, 'COMM' INS_KIND, E.COMPANY_NAME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.PROC_TYPE = 'COMPLETE' UNION ALL "
+							+ "SELECT F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.PROC_TYPE = 'COMPLETE' ORDER BY 5, 7");
+					System.out.println("5searchMode = ");
+
+				case DatabaseConstant.SEARCH_CLAIM:
+					Utilities.resultSet = Utilities.statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, B.PROC_TYPE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.TXN_TYPE = 'CLAIM' AND B.PROC_TYPE NOT IN ('CLOSE') UNION ALL SELECT C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, C.PROC_TYPE, 'HOME' INS_KIND, C.COMPANY_NAME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.TXN_TYPE = 'CLAIM' AND C.PROC_TYPE NOT IN ('CLOSE') UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, E.PROC_TYPE, 'COMM' INS_KIND, E.COMPANY_NAME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.TXN_TYPE = 'CLAIM' AND E.PROC_TYPE NOT IN ('CLOSE') UNION ALL SELECT  F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, F.PROC_TYPE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.TXN_TYPE = 'CLAIM' AND F.PROC_TYPE NOT IN ('CLOSE') ORDER BY 4,5");
+					System.out.println("6qsearchMode = ");
+
+			}
+
+			GUIForCustomerCare.defaultTableModel_Personal_Info.setRowCount(0);
+			GUIForCustomerCare.defaultTableModel_In_Progress_Info.setRowCount(0);
+			GUIForCustomerCare.defaultTableModel_Complete_Info.setRowCount(0);
+			GUIForCustomerCare.defaultTableModel_All_Info.setRowCount(0);
+			GUIForCustomerCare.defaultTableModel_Reserved_Info.setRowCount(0);
+			GUIForCustomerCare.defaultTableModel_Claim_Info.setRowCount(0);
+			
+			while (Utilities.resultSet.next()) {	
+				String customerID = "";
+				String lastName = "";
+				String firstName = "";
+				String expDate = "";
+				String companyName = "";
+				String ownership = "";
+				String rs = "";
+				
+				switch (searchMode) {
+					case DatabaseConstant.SEARCH_IN_PROGRESS:
+						
+						customerID = Utilities.resultSet.getString(1);
+						lastName = Utilities.resultSet.getString(2);
+						firstName = Utilities.resultSet.getString(3);
+						expDate = Utilities.resultSet.getString(4);
+						
+						String procType = Utilities.resultSet.getString(5);
+						String insType = Utilities.resultSet.getString(6);
+						
+						companyName = Utilities.resultSet.getString(7);
+						ownership = Utilities.resultSet.getString(9);
+								
+					    String[] row = {customerID, lastName, firstName, expDate, procType, insType, companyName, ownership};
+					    
+					    for (int i = 0; i < 9; i++) {
+					    	System.out.println("search in progress row = " + row[i]);
+					    }
+					    
+					    if (GUIForCustomerCare.tabbedPaneForCustomerInfo.getSelectedIndex() == 2) {
+				    		GUIForCustomerCare.defaultTableModel_In_Progress_Info.addRow(row);
+				    		rs = String.valueOf(GUIForCustomerCare.defaultTableModel_In_Progress_Info.getRowCount());
+							GUIForCustomerCare.totalTextField.setText(rs);
+					    }
+					case DatabaseConstant.SEARCH_RESERVED:
+						customerID = Utilities.resultSet.getString(1);
+						lastName = Utilities.resultSet.getString(2);
+						firstName = Utilities.resultSet.getString(3);
+						expDate = Utilities.resultSet.getString(4);
+						
+						String inskind = Utilities.resultSet.getString(5);
+						
+						companyName = Utilities.resultSet.getString(6);
+						
+						String visitDateTime = Utilities.resultSet.getString(7);
+						
+						ownership = Utilities.resultSet.getString(9); //>>>>>>>>>>>>>>> bad
+						
+					    String[] rowForReserved = {customerID, lastName, firstName, expDate, inskind, companyName, visitDateTime, ownership};
+						
+					    for (int i = 0; i < 9; i++) {
+					    	System.out.println("search in rowForReserved = " + rowForReserved[i]);
+					    }
+					    
+					    if (GUIForCustomerCare.tabbedPaneForCustomerInfo.getSelectedIndex() == 3) {
+				    		GUIForCustomerCare.defaultTableModel_Reserved_Info.addRow(rowForReserved);
+							rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Reserved_Info.getRowCount());
+							GUIForCustomerCare.totalTextField.setText(rs);
+					    }
+					case DatabaseConstant.SEARCH_CLAIM:
+						customerID = Utilities.resultSet.getString(1);
+						lastName = Utilities.resultSet.getString(2);
+						firstName = Utilities.resultSet.getString(3);
+						expDate = Utilities.resultSet.getString(4);
+						procType = Utilities.resultSet.getString(5);
+						
+						String insKind = Utilities.resultSet.getString(6);
+						
+						companyName = Utilities.resultSet.getString(7);
+						ownership = Utilities.resultSet.getString(9); //>>>>>>>>>>>>>>> bad
+						
+					    String[] rowForClaim = {customerID, lastName, firstName, expDate, procType, insKind, companyName, ownership};
+						
+					    for (int i = 0; i < 9; i++) {
+					    	System.out.println("search in rowForReserved = " + rowForClaim[i]);
+					    }
+					    
+					    if (GUIForCustomerCare.tabbedPaneForCustomerInfo.getSelectedIndex() == 0) {
+				    		GUIForCustomerCare.defaultTableModel_Claim_Info.addRow(rowForClaim);
+							rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Claim_Info.getRowCount());
+							GUIForCustomerCare.tabbedPaneForCustomerInfo.setSelectedIndex(0);
+							GUIForCustomerCare.totalTextField.setText(rs);
+					    }
+					case DatabaseConstant.SEARCH_CUSTOMER:
+						customerID = Utilities.resultSet.getString(1);
+						lastName = Utilities.resultSet.getString(2);
+						firstName = Utilities.resultSet.getString(3);
+						
+						String phoneNum = Utilities.resultSet.getString(4);
+						String memo = Utilities.resultSet.getString(5);
+						
+					    String[] rowForCustomer = {customerID, lastName, firstName, phoneNum, memo};
+						GUIForCustomerCare.tabbedPaneForCustomerInfo.setSelectedIndex(5);
+						GUIForCustomerCare.defaultTableModel_Personal_Info.addRow(rowForCustomer);
+						
+						rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Personal_Info.getRowCount());
+						GUIForCustomerCare.totalTextField.setText(rs);
+					case DatabaseConstant.SEARCH_IN_COMPLETE:
+						customerID = Utilities.resultSet.getString(1);
+						lastName = Utilities.resultSet.getString(2);
+						firstName = Utilities.resultSet.getString(3);
+						expDate = Utilities.resultSet.getString(4);
+						insType = Utilities.resultSet.getString(5);
+						companyName = Utilities.resultSet.getString(6);
+						
+						String completeDate = Utilities.resultSet.getString(7);
+						
+						ownership = Utilities.resultSet.getString(8); //>>>>>>>>>>>>>>  good
+						
+					    String[] rowForComplete = {customerID, lastName, firstName, expDate, insType, companyName, completeDate, ownership};
+					    if (GUIForCustomerCare.tabbedPaneForCustomerInfo.getSelectedIndex() == 1) {
+				    		GUIForCustomerCare.defaultTableModel_Complete_Info.addRow(rowForComplete);
+							GUIForCustomerCare.tabbedPaneForCustomerInfo.setSelectedIndex(1);
+							rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Complete_Info.getRowCount());
+							GUIForCustomerCare.totalTextField.setText(rs);
+					    }
+					case DatabaseConstant.SEARCH_ALL:
+						customerID = Utilities.resultSet.getString(1);
+						lastName = Utilities.resultSet.getString(2);
+						firstName = Utilities.resultSet.getString(3);
+						insType = Utilities.resultSet.getString(4);
+						expDate = Utilities.resultSet.getString(5);
+						procType = Utilities.resultSet.getString(6);
+						companyName = Utilities.resultSet.getString(7);
+						
+					    String[] rowForAll = {customerID, lastName, firstName, expDate, procType, insType, companyName};
+					    GUIForCustomerCare.defaultTableModel_All_Info.addRow(rowForAll);
+						GUIForCustomerCare.tabbedPaneForCustomerInfo.setSelectedIndex(4);
+						rs = String.valueOf(GUIForCustomerCare.defaultTableModel_All_Info.getRowCount());
+						GUIForCustomerCare.totalTextField.setText(rs);
+				}
+			}
+			
+			if (GUIForCustomerCare.defaultTableModel_Personal_Info.getRowCount() > 0) {
+				GUIForCustomerCare.jTable_Personal_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException - CustomerCare - searchMember" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	
+	public static void selectAutomobileInfo(String customerID) {
+		try {								
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+		
+			Utilities.resultAutomobileSet = Utilities.statement.executeQuery("SELECT * FROM AUTXNPRM where AUTXNPRM.CUST_ID = \"" + customerID + "\"ORDER BY TIME_STAMP DESC");
+			
+			GUIForCustomerCare.defaultTableModel_Automobile_Info.setRowCount(0);			
+			
+			while (Utilities.resultAutomobileSet.next()) {
+				String customerId = Utilities.resultAutomobileSet.getString(1);
+				String timeStamp = Utilities.resultAutomobileSet.getString(2);
+				String txnType = Utilities.resultAutomobileSet.getString(3);
+				String plateNo = Utilities.resultAutomobileSet.getString(4);
+				String docNo= Utilities.resultAutomobileSet.getString(5);
+				String expDate = Utilities.resultAutomobileSet.getString(6);
+				String newExpDate = Utilities.resultAutomobileSet.getString(7);
+				String procType = Utilities.resultAutomobileSet.getString(8);
+				String premium = Utilities.resultAutomobileSet.getString(9);
+				String textDate = Utilities.resultAutomobileSet.getString(10);
+				String callDate = Utilities.resultAutomobileSet.getString(11);
+				String companyName = Utilities.resultAutomobileSet.getString(14);
+				String owner = Utilities.resultAutomobileSet.getString(15);
+				String memo = Utilities.resultAutomobileSet.getString(16);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, expDate, newExpDate, plateNo, docNo, premium, textDate, callDate, companyName, owner, memo};
+				
+				GUIForCustomerCare.defaultTableModel_Automobile_Info.addRow(row);
+			}
+			String rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Automobile_Info.getRowCount());
+			GUIForCustomerCare.AutoTextField.setText(rs);
+			
+			if (GUIForCustomerCare.defaultTableModel_Automobile_Info.getRowCount() > 0)
+			{
+				GUIForCustomerCare.jTable_Automobile_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException select Auto" + e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	public static void selectTravelInfo(String customerID) {
+		try {								
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+		
+			Utilities.resultTravelSet = Utilities.statement.executeQuery("SELECT * FROM trtxnprm where trtxnprm.CUST_ID = \"" + customerID + "\" ORDER BY TIME_STAMP DESC");
+			
+			GUIForCustomerCare.defaultTableModel_Traveler_Info.setRowCount(0);			
+					
+			while (Utilities.resultTravelSet.next()) {
+				String customerId = Utilities.resultTravelSet.getString(1);
+				String timeStamp = Utilities.resultTravelSet.getString(2);
+				String effDate = Utilities.resultTravelSet.getString(3);
+				String expDate = Utilities.resultTravelSet.getString(4);
+				String txnType = Utilities.resultTravelSet.getString(5);
+				String procType = Utilities.resultTravelSet.getString(6);
+				String premium = Utilities.resultTravelSet.getString(7);
+				String textDate = Utilities.resultTravelSet.getString(8);
+				String callDate = Utilities.resultTravelSet.getString(9);
+				String companyName = Utilities.resultTravelSet.getString(12);
+				String owner = Utilities.resultTravelSet.getString(13);
+				String memo = Utilities.resultTravelSet.getString(14);
+				String policyNo = Utilities.resultTravelSet.getString(16);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, effDate, expDate, policyNo, premium, textDate, callDate, companyName, owner, memo};
+				
+				GUIForCustomerCare.defaultTableModel_Traveler_Info.addRow(row);
+			}
+			String rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Traveler_Info.getRowCount());
+			GUIForCustomerCare.TravelTextField.setText(rs);
+			
+			if (GUIForCustomerCare.defaultTableModel_Traveler_Info.getRowCount() > 0) {
+				GUIForCustomerCare.jTable_Traveler_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException Travel Info" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	public static void selectHomeInfo(String customerID) {
+		try {									
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+					
+			Utilities.resultHomeSet = Utilities.statement.executeQuery("SELECT * FROM HOTXNPRM where HOTXNPRM.CUST_ID = \"" + customerID + "\" ORDER BY TIME_STAMP DESC");
+	
+			GUIForCustomerCare.defaultTableModel_House_Info.setRowCount(0);			
+			
+			while (Utilities.resultHomeSet.next()) {
+				String customerId = Utilities.resultHomeSet.getString(1);
+				String timeStamp = Utilities.resultHomeSet.getString(2);
+				String expDate = Utilities.resultHomeSet.getString(3);
+				String newExpDate = Utilities.resultHomeSet.getString(4);
+				String txnType = Utilities.resultHomeSet.getString(5);
+				String procType = Utilities.resultHomeSet.getString(6);
+				String sigxpNo = Utilities.resultHomeSet.getString(7);
+				String premium = Utilities.resultHomeSet.getString(8);
+				String textDateTime = Utilities.resultHomeSet.getString(9);
+				String callDateTime = Utilities.resultHomeSet.getString(10);
+				String companyName = Utilities.resultHomeSet.getString(13);
+				String owner = Utilities.resultHomeSet.getString(14);
+				String memo = Utilities.resultHomeSet.getString(15);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, expDate, newExpDate, sigxpNo, premium, textDateTime, callDateTime, companyName, owner, memo};
+			    
+				GUIForCustomerCare.defaultTableModel_House_Info.addRow(row);
+			}
+			String rs = String.valueOf(GUIForCustomerCare.defaultTableModel_House_Info.getRowCount());
+			GUIForCustomerCare.HouseTextField.setText(rs);
+			
+			if (GUIForCustomerCare.defaultTableModel_House_Info.getRowCount() > 0) {
+				GUIForCustomerCare.jTable_House_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException House Info" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+
+	public static void selectDetailedInfo(String customerID) {
+		try {									
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+		
+			Utilities.resultDetailedInfoSet = Utilities.statement.executeQuery("SELECT * FROM CCCUSTOM where CCCUSTOM.CUST_ID = \"" + customerID + "\"");
+	
+			GUIForCustomerCare.idTextField.removeAll();			
+			GUIForCustomerCare.firstNameTextField.removeAll();			
+			GUIForCustomerCare.LastNameTextField.removeAll();			
+			GUIForCustomerCare.phoneNumField.removeAll();			
+			GUIForCustomerCare.birthDateField.removeAll();			
+			GUIForCustomerCare.emailField.removeAll();			
+			GUIForCustomerCare.priCustIDField.removeAll();			
+			GUIForCustomerCare.memoField.removeAll();					
+			GUIForCustomerCare.addrStrtField.removeAll();					
+	
+			while (Utilities.resultDetailedInfoSet.next()) {
+				String id = Utilities.resultDetailedInfoSet.getString(1);
+				String lastName = Utilities.resultDetailedInfoSet.getString(2);
+				String firstName = Utilities.resultDetailedInfoSet.getString(3);
+				String phoneNum = Utilities.resultDetailedInfoSet.getString(4);
+				String birthDate = Utilities.resultDetailedInfoSet.getString(5);
+				String email = Utilities.resultDetailedInfoSet.getString(6);
+				String priCustID = Utilities.resultDetailedInfoSet.getString(7);
+				String memo = Utilities.resultDetailedInfoSet.getString(8);
+				String postalCd = Utilities.resultDetailedInfoSet.getString(9);
+				String addrStrtNum = Utilities.resultDetailedInfoSet.getString(10);
+				String addrPvNum = Utilities.resultDetailedInfoSet.getString(11);
+								
+				GUIForCustomerCare.idTextField.setText(id);
+				GUIForCustomerCare.firstNameTextField.setText(firstName);
+				GUIForCustomerCare.LastNameTextField.setText(lastName);
+				GUIForCustomerCare.phoneNumField.setText(phoneNum);
+				
+				while (true) {
+	 				if (!phoneNum.isEmpty()) {
+						StringBuilder phoneNumArranged = new StringBuilder(phoneNum);
+						phoneNumArranged.insert(3, '-');
+						phoneNumArranged.insert(7, '-');
+						GUIForCustomerCare.phoneNumRearrangedField.setText(phoneNumArranged.toString());
+						break;
+					}
+					else {
+						GUIForCustomerCare.phoneNumRearrangedField.setText(null); 
+						break;
+					}
+				}
+				
+				GUIForCustomerCare.birthDateField.setText(birthDate);
+				
+				DateFormat formatter = new SimpleDateFormat("yyyyMMdd"); 
+				Date date;
+				
+				try {
+					while (true) {
+						if (!birthDate.isEmpty()) {
+							date = (Date)formatter.parse(birthDate);
+							SimpleDateFormat newFormat = new SimpleDateFormat("ddMMyyyy");
+							String finalString = newFormat.format(date);
+							GUIForCustomerCare.birthDateRearrangedField.setText(finalString);
+							break;
+						}
+						else {
+							GUIForCustomerCare.birthDateRearrangedField.setText(null);
+							break;
+						}
+					}
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				GUIForCustomerCare.emailField.setText(email);
+				GUIForCustomerCare.priCustIDField.setText(priCustID);
+				GUIForCustomerCare.memoField.setText(memo);
+				GUIForCustomerCare.addrStrtField.setText(addrStrtNum + "\n" + addrPvNum + "\n" + postalCd);	
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException Detailed Info" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	
+	public static void selectFamilyInfo(String customerID) {
+		try {									
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+						
+			Utilities.resultFamilyInfoSet = Utilities.statement.executeQuery("SELECT * FROM CCCUSTOM A WHERE A.CUST_ID = \"" + customerID + "\" OR A.PRI_CUST_ID = \"" + customerID + "\" UNION SELECT * FROM CCCUSTOM A WHERE A.CUST_ID IN (SELECT B.PRI_CUST_ID FROM CCCUSTOM B WHERE B.CUST_ID = \"" + customerID + "\") UNION SELECT * FROM CCCUSTOM A WHERE A.PRI_CUST_ID IN (SELECT B.PRI_CUST_ID FROM CCCUSTOM B WHERE B.CUST_ID = \"" + customerID + "\") ORDER BY 1;");
+			
+			GUIForCustomerCare.defaultTableModel_Family_Info.setRowCount(0);			
+
+			while (Utilities.resultFamilyInfoSet.next()) {				
+				String custID = Utilities.resultFamilyInfoSet.getString(1);
+				String lastName = Utilities.resultFamilyInfoSet.getString(2);
+				String firstName = Utilities.resultFamilyInfoSet.getString(3);
+				String birthDate = Utilities.resultFamilyInfoSet.getString(5);
+				
+			    Object[] row = {custID, lastName, firstName, birthDate};
+				
+				GUIForCustomerCare.defaultTableModel_Family_Info.addRow(row);
+			}
+			
+			if (GUIForCustomerCare.defaultTableModel_Family_Info.getRowCount() > 0) {
+				GUIForCustomerCare.jTable_Family_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException - selectFamilyInfo" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	
+	public static void selectCommercialInfo(String customerID) {
+		
+		try {									
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			Utilities.statement = Utilities.connection.createStatement();
+			
+			Utilities.resultCommercialInfoSet = Utilities.statement.executeQuery("SELECT * FROM COTXNPRM where COTXNPRM.CUST_ID = \"" + customerID + "\"ORDER BY TIME_STAMP DESC");
+			
+			GUIForCustomerCare.defaultTableModel_Commercial_Info.setRowCount(0);			
+
+			while (Utilities.resultCommercialInfoSet.next()) {				
+				String customerId = Utilities.resultCommercialInfoSet.getString(1);
+				String timeStamp = Utilities.resultCommercialInfoSet.getString(2);
+				String expDate = Utilities.resultCommercialInfoSet.getString(3);
+				String newExpDate = Utilities.resultCommercialInfoSet.getString(4);
+				String txnType = Utilities.resultCommercialInfoSet.getString(5);
+				String procType = Utilities.resultCommercialInfoSet.getString(6);
+				String premium = Utilities.resultCommercialInfoSet.getString(7);
+				String textDate = Utilities.resultCommercialInfoSet.getString(8);
+				String callDate = Utilities.resultCommercialInfoSet.getString(9);
+				String companyName = Utilities.resultCommercialInfoSet.getString(12);
+				String owner = Utilities.resultCommercialInfoSet.getString(13);
+				String memo = Utilities.resultCommercialInfoSet.getString(14);
+				String sigxpNo = Utilities.resultCommercialInfoSet.getString(16);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, expDate, newExpDate, sigxpNo, premium, textDate, callDate, companyName, owner, memo};
+				
+				GUIForCustomerCare.defaultTableModel_Commercial_Info.addRow(row);			
+			}
+			String rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Commercial_Info.getRowCount());
+			GUIForCustomerCare.CommercialTextField.setText(rs);
+			
+			if (GUIForCustomerCare.defaultTableModel_Commercial_Info.getRowCount() > 0) {
+				GUIForCustomerCare.jTable_Commercial_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException - selectCommercialInfo" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	
+	public static void selectCalendarInfo(String customerID) {
+		
+		try {											
+		    String sql =
+		    
+		    "SELECT  \n" + 
+		     "date_format(Z.EXPIRY, \"%Y-%m-%d\") AS '만기일', \n" +
+		    		"concat(concat(A.LAST_NAME, ',  '), A.FIRST_NAME) AS '이름', \n" +
+					"Z.INSURANCE	AS '보험종류', \n" +
+					"Z.COMPANY		AS '보험회사', \n" +              
+				"concat('$', format(Z.PREMIUM, 2)) AS '보험료', \n" +
+					"Z.POLICY_NO		AS '증서번호', \n" +
+	 				"Z.TXNTYPE		AS '처리구분'  \n" + 	 				
+		    	"FROM 	(	SELECT CUST_ID, LAST_NAME, FIRST_NAME FROM CCCUSTOM A \n" +
+						"WHERE A.CUST_ID = \'" + customerID + "\' OR A.PRI_CUST_ID = \'" + customerID + "\' \n" +
+						"UNION \n" +
+						"SELECT CUST_ID, LAST_NAME, FIRST_NAME FROM CCCUSTOM A \n" +
+						"WHERE A.CUST_ID IN (SELECT B.PRI_CUST_ID FROM CCCUSTOM B WHERE B.CUST_ID = \'" + customerID + "\') \n" +
+						"UNION \n" +
+						"SELECT CUST_ID, LAST_NAME, FIRST_NAME FROM CCCUSTOM A \n" +
+						"WHERE A.PRI_CUST_ID IN (SELECT B.PRI_CUST_ID FROM CCCUSTOM B WHERE B.CUST_ID = \'" + customerID + "\') \n" +
+					") A,\n" +
+					"(  \n" +
+						"SELECT 	'AUTO'                      	    AS 'INSURANCE', \n" +
+										"B.TXN_TYPE					AS 'TXNTYPE', \n" +
+										"B.CUST_ID						AS 'CUST_ID', \n" +
+										"B.PLATE_NO				    AS 'POLICY_NO', \n" +
+										"B.NEW_EXP_DATE		AS 'EXPIRY', \n" +
+										"B.COMPANY_NAME		AS 'COMPANY', \n" +
+										"B.PREMIUM					AS 'PREMIUM' \n" +
+						"FROM    	AUTXNPRM B \n" +
+						"WHERE  B.TXN_TYPE IN ('NEW PLATE', 'RENEWAL') \n" +
+						"AND       	B.NEW_EXP_DATE >= date_format(now(), \"%Y%m%d\") \n"+
+						"UNION ALL \n" +
+		                "SELECT 'HOME'                        	AS 'INSURANCE', \n" +
+										"C.TXN_TYPE					AS 'TXNTYPE', \n" +
+										"C.CUST_ID						AS 'CUST_ID', \n" +
+										"C.SIGXP_NO					AS 'POLICY_NO', \n" +
+										"C.NEW_EXP_DATE		AS 'EXPIRY', \n" +
+										"C.COMPANY_NAME		AS 'COMPANY', \n" +
+										"C.PREMIUM					AS 'PREMIUM' \n" +
+						"FROM    HOTXNPRM C \n" +
+						"WHERE  C.TXN_TYPE IN ('NEW BIZ', 'RENEWAL') \n"+
+						"AND        C.NEW_EXP_DATE >= date_format(now(), \"%Y%m%d\") \n" +
+		                "UNION ALL \n" +
+		                "SELECT 'COMM'                        	AS 'INSURANCE', \n" +
+										"D.TXN_TYPE					AS 'TXNTYPE', \n" +                                                            
+										"D.CUST_ID						AS 'CUST_ID', \n" +
+										"D.SIGXP_NO					AS 'POLICY_NO', \n" +
+										"D.NEW_EXP_DATE		AS 'EXPIRY', \n" +
+										"D.COMPANY_NAME		AS 'COMPANY', \n" +
+										"D.PREMIUM					AS 'PREMIUM' \n" +
+						"FROM     COTXNPRM D \n" +
+						"WHERE  D.TXN_TYPE IN ('NEW BIZ', 'RENEWAL') \n" +
+						"AND        D.NEW_EXP_DATE >= date_format(now(), \"%Y%m%d\") \n" + 
+						"UNION ALL \n" +
+		                "SELECT 'TRAV'                        		AS 'INSURANCE', \n" +
+										"E.TXN_TYPE					AS 'TXNTYPE', \n" +                            
+										"E.CUST_ID						AS 'CUST_ID', \n" +
+										"E.POLICY_NO				AS 'POLICY_NO', \n" +
+										"E.EXP_DATE		            AS 'EXPIRY', \n" +
+										"E.COMPANY_NAME		AS 'COMPANY', \n" +
+										"E.PREMIUM					AS 'PREMIUM' \n" +
+						"FROM     TRTXNPRM E \n" +
+						"WHERE  E.TXN_TYPE IN ('NEW BIZ', 'RENEWAL') \n" +
+						"AND        E.EXP_DATE >= date_format(now(), \"%Y%m%d\") \n" +
+					") Z \n" +
+			"WHERE A.CUST_ID = Z.CUST_ID \n" +
+			"ORDER BY EXPIRY \n"; 
+		    
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			PreparedStatement statement = Utilities.connection.prepareStatement(sql);
+			
+			Utilities.resultCalendarInfoSet = statement.executeQuery();
+			
+			GUIForCustomerCare.defaultTableModel_Calendar_Info.setRowCount(0);			
+
+			while (Utilities.resultCalendarInfoSet.next()) {				
+				
+				String expiryDate = Utilities.resultCalendarInfoSet.getString(1);
+				String lastName = Utilities.resultCalendarInfoSet.getString(2);
+				String firstName = Utilities.resultCalendarInfoSet.getString(3);
+				String insKind = Utilities.resultCalendarInfoSet.getString(4);
+				String companyName = Utilities.resultCalendarInfoSet.getString(5);
+				String procType = Utilities.resultCalendarInfoSet.getString(6);
+				String premium = Utilities.resultCalendarInfoSet.getString(7);
+
+			    Object[] row = { expiryDate, lastName, firstName, insKind, companyName, procType, premium };
+				
+			    GUIForCustomerCare.defaultTableModel_Calendar_Info.addRow(row);			
+			}
+			String rs = String.valueOf(GUIForCustomerCare.defaultTableModel_Calendar_Info.getRowCount());
+			GUIForCustomerCare.CalendarTextField.setText(rs);
+			
+			if (GUIForCustomerCare.defaultTableModel_Calendar_Info.getRowCount() > 0) {
+				GUIForCustomerCare.jTable_Calendar_Info.setRowSelectionInterval(0, 0);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException - CustomerCare - selectCalendarInfo" +  e.getStackTrace());
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+	}
+	
+	public boolean submitMember(int dialogMode, String tempID, String LastName, String FirstName, 
+								String cellNum, String birthDate, String email, String priCustID, 
+								String memo, String postalCd, String addrStNum, String addrPvNum) {
+		
+		int result = 0;
+		
+		try {
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+ 
+			switch (dialogMode) {
+				case DatabaseConstant.NEW_MODE: 
+					String id = String.format("%010d", Integer.parseInt(tempID));
+					
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO CCCUSTOM (CUST_ID, LAST_NAME, FIRST_NAME, CELL_NO, BIRTH_DATE, EMAIL, PRI_CUST_ID, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'));");
+									
+					Utilities.preparedStatement.setString(1, id);
+					Utilities.preparedStatement.setString(2, LastName);
+					Utilities.preparedStatement.setString(3, FirstName);
+					Utilities.preparedStatement.setString(4, cellNum);
+					Utilities.preparedStatement.setString(5, birthDate);
+					Utilities.preparedStatement.setString(6, email);
+					Utilities.preparedStatement.setString(7, priCustID);
+					Utilities.preparedStatement.setString(8, memo);
+					Utilities.preparedStatement.setString(9, postalCd);
+					Utilities.preparedStatement.setString(10, addrStNum);
+					Utilities.preparedStatement.setString(11, addrPvNum);
+				case DatabaseConstant.EDIT_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE CCCUSTOM SET LAST_NAME=?, FIRST_NAME=?, CELL_NO=?, BIRTH_DATE=?, EMAIL=?, PRI_CUST_ID = ?, MEMO = ?, POSTAL_CD = ?, ADDR_ST_NM = ?, ADDR_PV_NM = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s') WHERE CUST_ID=?");
+					Utilities.preparedStatement.setString(1, LastName);
+					Utilities.preparedStatement.setString(2, FirstName);
+					Utilities.preparedStatement.setString(3, cellNum);
+					Utilities.preparedStatement.setString(4, birthDate);
+					Utilities.preparedStatement.setString(5, email);
+					Utilities.preparedStatement.setString(6, priCustID);
+					Utilities.preparedStatement.setString(7, memo);
+					Utilities.preparedStatement.setString(8, postalCd);
+					Utilities.preparedStatement.setString(9, addrStNum);
+					Utilities.preparedStatement.setString(10, addrPvNum);
+					Utilities.preparedStatement.setString(11, tempID);
+			}
+			result = Utilities.preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("CustomerCare - submitMember" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "CustomerCare - submitMember - Error");
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+		
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForAuto(int dialogMode, String tempID, String time_stamp, String txnType, 
+									   String plateNo, String docNo, String expDate, String newExpDate, String procType, 
+									   String premium, String textDateTime, String callDateTime, String visitDateTime, 
+									   String completeDate, String companyName, String ownerShip, String memo, String postalCD, 
+									   String addrStNum, String addrPvNum) {
+		
+		int result = 0;
+		Float premiumForAuto = Float.parseFloat(premium);
+
+		try {
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+ 
+			switch (dialogMode) {
+				case DatabaseConstant.NEW_MODE:
+					
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO AUTXNPRM (CUST_ID, TIME_STAMP, TXN_TYPE, PLATE_NO, DOC_NO, EXP_DATE, NEW_EXP_DATE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'))"); // 19
+					
+					Utilities.preparedStatement.setString(1, tempID);
+					Utilities.preparedStatement.setString(2, time_stamp);
+					Utilities.preparedStatement.setString(3, txnType);
+					Utilities.preparedStatement.setString(4, plateNo);
+					Utilities.preparedStatement.setString(5, docNo);
+					Utilities.preparedStatement.setString(6, expDate);
+					Utilities.preparedStatement.setString(7, newExpDate);
+					Utilities.preparedStatement.setString(8, procType);
+					Utilities.preparedStatement.setFloat(9, premiumForAuto);
+					Utilities.preparedStatement.setString(10, textDateTime);
+					Utilities.preparedStatement.setString(11, callDateTime);
+					Utilities.preparedStatement.setString(12, visitDateTime);
+					Utilities.preparedStatement.setString(13, completeDate);
+					Utilities.preparedStatement.setString(14, companyName);
+					Utilities.preparedStatement.setString(15, ownerShip);
+					Utilities.preparedStatement.setString(16, memo);
+					Utilities.preparedStatement.setString(17, postalCD);
+					Utilities.preparedStatement.setString(18, addrStNum);
+					Utilities.preparedStatement.setString(19, addrPvNum);
+				case DatabaseConstant.EDIT_MODE:
+					
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE AUTXNPRM SET TXN_TYPE=?, PLATE_NO = ?, DOC_NO = ?, EXP_DATE = ?, NEW_EXP_DATE = ?, PROC_TYPE = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, VISIT_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, POSTAL_CD = ?, ADDR_ST_NM = ?, ADDR_PV_NM = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s') WHERE TIME_STAMP = ? AND CUST_ID = ?");
+					Utilities.preparedStatement.setString(1, txnType);
+					Utilities.preparedStatement.setString(2, plateNo);
+					Utilities.preparedStatement.setString(3, docNo);
+					Utilities.preparedStatement.setString(4, expDate);
+					Utilities.preparedStatement.setString(5, newExpDate);
+					Utilities.preparedStatement.setString(6, procType);
+					Utilities.preparedStatement.setFloat(7, premiumForAuto);
+					Utilities.preparedStatement.setString(8, textDateTime);
+					Utilities.preparedStatement.setString(9, callDateTime);
+					Utilities.preparedStatement.setString(10, visitDateTime);
+					Utilities.preparedStatement.setString(11, completeDate);
+					Utilities.preparedStatement.setString(12, companyName);
+					Utilities.preparedStatement.setString(13, ownerShip);
+					Utilities.preparedStatement.setString(14, memo);
+					Utilities.preparedStatement.setString(15, postalCD);
+					Utilities.preparedStatement.setString(16, addrStNum);
+					Utilities.preparedStatement.setString(17, addrPvNum);
+					Utilities.preparedStatement.setString(18, time_stamp);
+					Utilities.preparedStatement.setString(19, tempID);
+			}
+			result = Utilities.preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("Customer Care - submitMemberForAuto" + " " +  e.getStackTrace());
+			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "CustomerCare - submitMemberForAuto - Error");
+		}
+		
+		finally {
+			Utilities.closeDatabase();
+		}
+		
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForHome(int dialogMode, String tempID, String time_stamp, String expDate,
+									   String newExpDate, String txnType, String procType, String sigxpNo, String premium, 
+									   String textDateTime, String callDateTime, String visitDateTime, String completeDate, 
+									   String companyName, String ownerShip, String memo, String postalCd, String addrStNum, 
+									   String addrPvNum) {
+
+		int result = 0;
+		Float premiumForHome = Float.parseFloat(premium);
+
+		try {
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+			switch(dialogMode) {
+				case DatabaseConstant.NEW_MODE:
+
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO HOTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, SIGXP_NO, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'))"); // 18
+
+					Utilities.preparedStatement.setString(1, tempID);
+					Utilities.preparedStatement.setString(2, time_stamp);
+					Utilities.preparedStatement.setString(3, expDate);
+					Utilities.preparedStatement.setString(4, newExpDate);
+					Utilities.preparedStatement.setString(5, txnType);
+					Utilities.preparedStatement.setString(6, procType);
+					Utilities.preparedStatement.setString(7, sigxpNo);
+					Utilities.preparedStatement.setFloat(8, premiumForHome);
+					Utilities.preparedStatement.setString(9, textDateTime);
+					Utilities.preparedStatement.setString(10, callDateTime);
+					Utilities.preparedStatement.setString(11, visitDateTime);
+					Utilities.preparedStatement.setString(12, completeDate);
+					Utilities.preparedStatement.setString(13, companyName);
+					Utilities.preparedStatement.setString(14, ownerShip);
+					Utilities.preparedStatement.setString(15, memo);
+					Utilities.preparedStatement.setString(16, postalCd);
+					Utilities.preparedStatement.setString(17, addrStNum);
+					Utilities.preparedStatement.setString(18, addrPvNum);
+					
+				case DatabaseConstant.EDIT_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE HOTXNPRM SET EXP_DATE=?, NEW_EXP_DATE = ?, TXN_TYPE = ?, PROC_TYPE = ?, SIGXP_NO = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, VISIT_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, POSTAL_CD = ?, ADDR_ST_NM = ?, ADDR_PV_NM = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s') WHERE TIME_STAMP = ? AND CUST_ID = ?");
+					Utilities.preparedStatement.setString(1, expDate);
+					Utilities.preparedStatement.setString(2, newExpDate);
+					Utilities.preparedStatement.setString(3, txnType);
+					Utilities.preparedStatement.setString(4, procType);
+					Utilities.preparedStatement.setString(5, sigxpNo);
+					Utilities.preparedStatement.setFloat(6, premiumForHome);
+					Utilities.preparedStatement.setString(7, textDateTime);
+					Utilities.preparedStatement.setString(8, callDateTime);
+					Utilities.preparedStatement.setString(9, visitDateTime);
+					Utilities.preparedStatement.setString(10, completeDate);
+					Utilities.preparedStatement.setString(11, companyName);
+					Utilities.preparedStatement.setString(12, ownerShip);
+					Utilities.preparedStatement.setString(13, memo);
+					Utilities.preparedStatement.setString(14, postalCd);
+					Utilities.preparedStatement.setString(15, addrStNum);
+					Utilities.preparedStatement.setString(16, addrPvNum);
+					Utilities.preparedStatement.setString(17, time_stamp);
+					Utilities.preparedStatement.setString(18, tempID);
+			}
+			result = Utilities.preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("CustomerCare - submitMemberForHome" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "CustomerCare - submitMemberForHome - error");
+		}
+
+		finally {
+			Utilities.closeDatabase();
+		}
+
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForTravel(int dialogMode, String tempID, String time_stamp, String effDate, 
+									     String expDate, String txnType, String procType, String policyNo, 
+										 String premium, String textDateTime, String callDateTime, String mailDateTime, 
+										 String completeDate, String companyName, String ownerShip, String memo) {
+	
+		int result = 0;
+		Float premiumForTravel = Float.parseFloat(premium);
+
+		try {
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		
+			switch (dialogMode) {
+				case DatabaseConstant.NEW_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO TRTXNPRM (CUST_ID, TIME_STAMP, EFF_DATE, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, MAIL_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, POLICY_NO)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s') , ?)"); // 19
+					
+					Utilities.preparedStatement.setString(1, tempID);
+					Utilities.preparedStatement.setString(2, time_stamp);
+					Utilities.preparedStatement.setString(3, effDate);
+					Utilities.preparedStatement.setString(4, expDate);
+					Utilities.preparedStatement.setString(5, txnType);
+					Utilities.preparedStatement.setString(6, procType);
+					Utilities.preparedStatement.setFloat(7, premiumForTravel);
+					Utilities.preparedStatement.setString(8, textDateTime);
+					Utilities.preparedStatement.setString(9, callDateTime);
+					Utilities.preparedStatement.setString(10, mailDateTime);
+					Utilities.preparedStatement.setString(11, completeDate);
+					Utilities.preparedStatement.setString(12, companyName);
+					Utilities.preparedStatement.setString(13, ownerShip);
+					Utilities.preparedStatement.setString(14, memo);
+					Utilities.preparedStatement.setString(15, policyNo);
+					
+				case DatabaseConstant.EDIT_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE TRTXNPRM SET EFF_DATE = ?, EXP_DATE = ?, TXN_TYPE = ?, PROC_TYPE = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, MAIL_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s'), POLICY_NO = ? WHERE TIME_STAMP =? AND CUST_ID = ?");
+					Utilities.preparedStatement.setString(1, effDate);
+					Utilities.preparedStatement.setString(2, expDate);
+					Utilities.preparedStatement.setString(3, txnType);
+					Utilities.preparedStatement.setString(4, procType);
+					Utilities.preparedStatement.setFloat(5, premiumForTravel);
+					Utilities.preparedStatement.setString(6, textDateTime);
+					Utilities.preparedStatement.setString(7, callDateTime);
+					Utilities.preparedStatement.setString(8, mailDateTime);
+					Utilities.preparedStatement.setString(9, completeDate);
+					Utilities.preparedStatement.setString(10, companyName);
+					Utilities.preparedStatement.setString(11, ownerShip);
+					Utilities.preparedStatement.setString(12, memo);
+					Utilities.preparedStatement.setString(13, policyNo);
+					Utilities.preparedStatement.setString(14, time_stamp);
+					Utilities.preparedStatement.setString(15, tempID);
+			}
+			result = Utilities.preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("CustomerCare - submitMemberForTravel" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "CustomerCare - submitMemberForTravel - Error");
+		}
+	
+		finally {
+			Utilities.closeDatabase();
+		}
+	
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForCommercial(int dialogMode, String tempID, String time_stamp, String expDate, 
+			  								 String newExpDate, String txnType, String procType, String sigxpNo, 
+			  								 String premium, String textDateTime, String callDateTime, String visitDateTime, 	
+			  								 String completeDate, String companyName, String ownerShip, String memo) {
+	
+		int result = 0;
+		Float premiumForCommercial = Float.parseFloat(premium);
+
+		try {
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		
+			switch (dialogMode) {
+				case DatabaseConstant.NEW_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO COTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, SIGXP_NO)"+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), ?)"); // 14
+					
+					Utilities.preparedStatement.setString(1, tempID);
+					Utilities.preparedStatement.setString(2, time_stamp);
+					Utilities.preparedStatement.setString(3, expDate);
+					Utilities.preparedStatement.setString(4, newExpDate);
+					Utilities.preparedStatement.setString(5, txnType);
+					Utilities.preparedStatement.setString(6, procType);
+					Utilities.preparedStatement.setFloat(7, premiumForCommercial);
+					Utilities.preparedStatement.setString(8, textDateTime);
+					Utilities.preparedStatement.setString(9, callDateTime);
+					Utilities.preparedStatement.setString(10, visitDateTime);
+					Utilities.preparedStatement.setString(11, completeDate);
+					Utilities.preparedStatement.setString(12, companyName);
+					Utilities.preparedStatement.setString(13, ownerShip);
+					Utilities.preparedStatement.setString(14, memo);
+					Utilities.preparedStatement.setString(15, sigxpNo);
+				case DatabaseConstant.EDIT_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE COTXNPRM SET EXP_DATE = ?, NEW_EXP_DATE = ?, TXN_TYPE = ?, PROC_TYPE = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, VISIT_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s'), SIGXP_NO = ? WHERE TIME_STAMP =? AND CUST_ID = ?");
+					Utilities.preparedStatement.setString(1, expDate);
+					Utilities.preparedStatement.setString(2, newExpDate);
+					Utilities.preparedStatement.setString(3, txnType);
+					Utilities.preparedStatement.setString(4, procType);
+					Utilities.preparedStatement.setFloat(5, premiumForCommercial);
+					Utilities.preparedStatement.setString(6, textDateTime);
+					Utilities.preparedStatement.setString(7, callDateTime);
+					Utilities.preparedStatement.setString(8, visitDateTime);
+					Utilities.preparedStatement.setString(9, completeDate);
+					Utilities.preparedStatement.setString(10, companyName);
+					Utilities.preparedStatement.setString(11, ownerShip);
+					Utilities.preparedStatement.setString(12, memo);
+					Utilities.preparedStatement.setString(13, sigxpNo);
+					Utilities.preparedStatement.setString(14, time_stamp);
+					Utilities.preparedStatement.setString(15, tempID);
+			}
+			result = Utilities.preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("CustomerCare - submitMemberForCommercial" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "CustomerCare - submitMemberForCommercial - Error");
+		}
+	
+		finally {
+			Utilities.closeDatabase();
+		}
+	
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean insertMemberForOther(int dialogMode, String tempID, String time_stamp) {
+		int result = 0;
+	
+		try	{
+			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			switch (dialogMode) {
+				case DatabaseConstant.AUTOMOBILE_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO AUTXNPRM (CUST_ID, TIME_STAMP, PLATE_NO, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, COMPANY_NAME, OWNERSHIP, CHG_DATE_TIME) SELECT CUST_ID, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), PLATE_NO, NEW_EXP_DATE, 'RENEWAL', 'READY', 0.00, COMPANY_NAME, OWNERSHIP, DATE_FORMAT(now(),'%Y%m%d%H%i%s') FROM AUTXNPRM WHERE CUST_ID = ? AND TIME_STAMP = ?;");
+				case DatabaseConstant.HOME_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO HOTXNPRM (CUST_ID, TIME_STAMP, SIGXP_NO, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, COMPANY_NAME, OWNERSHIP, CHG_DATE_TIME) SELECT CUST_ID, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), SIGXP_NO, NEW_EXP_DATE, 'RENEWAL', 'READY', 0.00, COMPANY_NAME, OWNERSHIP, DATE_FORMAT(now(),'%Y%m%d%H%i%s') FROM HOTXNPRM WHERE CUST_ID = ? AND TIME_STAMP = ?;");
+				case DatabaseConstant.COMMERCIAL_MODE:
+					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO COTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, COMPANY_NAME, OWNERSHIP, CHG_DATE_TIME) SELECT CUST_ID, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), NEW_EXP_DATE, 'RENEWAL', 'READY', 0.00, COMPANY_NAME, OWNERSHIP, DATE_FORMAT(now(),'%Y%m%d%H%i%s') FROM COTXNPRM WHERE CUST_ID = ? AND TIME_STAMP = ?;"); // 14
+			}
+			
+			Utilities.preparedStatement.setString(1, tempID);
+			Utilities.preparedStatement.setString(2, time_stamp);
+			
+			result = Utilities.preparedStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("CustomerCare - insertMemberForOther - " +  e.getStackTrace());
+			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "CustomerCare - insertMemberForOther - Error");
+		}
+	
+		finally {
+			Utilities.closeDatabase();
+		}
+	
+		return (result > 0) ? true : false;
+	}
+	
+	public static void main(String[] args) {
+		new CustomerCare();
+		new GUIForCustomerCare();
+		new MousePerformer();
+		new ActionCommand();
+	}
+}
