@@ -1,0 +1,47 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.util.Scanner;
+
+public class Filereader {
+
+	public static void main (String[] args) throws IOException {
+		
+	    FileReader in = new FileReader("backup.csv");
+	    BufferedReader br = new BufferedReader(in);
+	    
+	    Scanner fileScanner = new Scanner(br);
+	    fileScanner.nextLine();
+	    
+	    while (fileScanner.hasNextLine()) {
+	      String line = fileScanner.nextLine();
+
+	      Scanner lineScanner = new Scanner(line);
+	      
+	      lineScanner.useDelimiter(",");
+	      
+	      while (lineScanner.hasNext()) {
+	        
+    			String custID = lineScanner.next();
+    			String lastName = lineScanner.next();
+    			String firstName = lineScanner.next();
+    			String phoneNum = lineScanner.next();
+    			String birthDate = lineScanner.next();
+    			String email =  lineScanner.next();
+    			String priCustID = lineScanner.next();
+    			String memo = lineScanner.next();
+    			String postalCD = lineScanner.next();
+    			String addrStNm = lineScanner.next();
+    			String addrPvNm = lineScanner.next();
+    			String chgDateTime = lineScanner.next());
+    			
+    			
+	      }
+	      lineScanner.close();
+	      
+	      System.out.println("\n");
+	    }
+	    fileScanner.close();
+ 	}
+}

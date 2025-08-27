@@ -1,0 +1,4350 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Scanner;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.border.LineBorder;
+import javax.swing.border.BevelBorder;
+import java.awt.Component;
+import javax.swing.border.SoftBevelBorder;
+
+public class CustomerCare 
+{	
+	Connection connection;
+	PreparedStatement preparedStatement;
+	PreparedStatement preparedStatementForPriCustID;
+	Statement statement;
+	ResultSet resultSet;
+	ResultSet resultAutomobileSet;
+	ResultSet resultTravelSet;
+	ResultSet resultHomeSet;
+	ResultSet resultDetailedInfoSet;
+	ResultSet resultFamilyInfoSet;
+	ResultSet resultCommercialInfoSet;
+	
+	public Dimension jFrameX;
+	public int jFrameY;
+	
+	public final int SEARCH_CUSTOMER = 1;
+	public final int SEARCH_ALL = 2;
+	public final int SEARCH_RESERVED = 3;
+	public final int SEARCH_IN_PROGRESS = 4;
+	public final int SEARCH_IN_COMPLETE = 5;
+	public final int SEARCH_CLAIM = 6;
+
+	public final int NEW_MODE = 1;
+	public final int EDIT_MODE = 2;
+	public final int INSERT_MODE = 3;
+	
+	public final int AUTOMOBILE_MODE = 0;
+	public final int HOME_MODE = 1;
+	public final int TRAVEL_MODE = 2;
+	public final int CUSTOMER_MODE = 3;
+	public final int COMMERCIAL_MODE = 4;
+	
+	public String customerID;
+	public String priCustID;
+	public boolean customInfo;
+	public boolean autoInfo;
+	public String insType;			
+	
+	public JProgressBar progressBar;
+	
+	JFrame jFrame = new JFrame("Queen Bee Diary");
+	
+	DefaultTableModel defaultTableModel_Claim_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Last Name", "First Name", "Exp Date", 
+				"Proc Type", "Ins Kind", "Company", "Ownership"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+	
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_Personal_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Last Name", "First Name", "Phone #", "Memo"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_In_Progress_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Last Name", "First Name", "Exp Date", 
+				"Proc Type", "Ins Kind", "Company", "Ownership"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+
+	DefaultTableModel defaultTableModel_Complete_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Last Name", "First Name", "Exp Date", 
+				"Ins Kind", "Company", "Complete Date", "Ownership"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_Reserved_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Last Name", "First Name", "Exp Date", 
+				"Ins Kind", "Company", "Visit Date Time", "Ownership"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+	
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_All_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Last Name", "First Name", "Exp Date", 
+				"Proc Type", "Ins Kind", "Company Name"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_Automobile_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Time Stamp", "Txn Type", "Proc Type", "Exp Date", 
+											  "New Exp Date", "Plate #", "Doc #", "Premium",
+											  "Text Date", "Call Date", "Company", "Ownership", "Memo"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+
+	DefaultTableModel defaultTableModel_House_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Time Stamp", "Txn Type", "Proc Type", "Exp Date", "New Exp Date", 
+											  "Sigxp #", "Premium",  "Text Date", "Call Date",
+											  "Company", "Ownership", "Memo"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+
+	DefaultTableModel defaultTableModel_Traveler_Info 
+		= new DefaultTableModel(new String[] { "Customer ID", "Time Stamp", "Txn Type", "Proc Type", "Eff Date", "Exp Date", "Policy #",
+											  "Premium", "Text Date", "Call Date", "Company", "Ownership", "Memo"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_Family_Info 
+	= new DefaultTableModel(new String[] {"Customer ID", "Last Name", "First Name", "Birth Date"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+	};
+	
+	DefaultTableModel defaultTableModel_Commercial_Info 
+	= new DefaultTableModel(new String[] {"Customer ID", "Time Stamp", "Txn Type", "Proc Type",  "Exp Date", "New Exp Date", "Sigxp #",
+										 "Premium", "Text Date", "Call Date","Company", "Ownership", "Memo"}, 0)
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isCellEditable(int row, int column)
+		{
+			return true;
+		}
+	};
+	
+	JLabel AutomobileInfo = new JLabel("AutoMobile = "); 
+	JLabel TravelInfo = new JLabel("Travel = "); 
+	JLabel HouseInfo = new JLabel("House = "); 
+	JLabel CommercialInfo = new JLabel("Commercial = "); 
+	JLabel totalInfo = new JLabel("Total = "); 
+	
+	JTextField AutoTextField = new JTextField(5);
+	JTextField TravelTextField = new JTextField(5);
+	JTextField HouseTextField = new JTextField(5);
+	JTextField CommercialTextField = new JTextField(5);
+	JTextField totalTextField = new JTextField(5);
+	
+	JLabel idInfo = new JLabel("ID"); 
+	JLabel firstNameInfo = new JLabel("First Name"); 
+	JLabel lastNameInfo = new JLabel("Last Name"); 
+	JLabel phoneNumInfo = new JLabel("Phone #"); 
+	JLabel birthDateInfo = new JLabel("Birth Date");
+	JLabel emailInfo = new JLabel("Email"); 
+	JLabel postalCdInfo = new JLabel("Postal Cd");  
+	JLabel memoInfo = new JLabel("Memo"); 
+	JLabel addrStrtLabel= new JLabel("Address"); 
+	JLabel addrPvLabel = new JLabel("City/Prov"); 
+	
+	JTextField idTextField = new JTextField();
+	JTextField LastNameTextField = new JTextField(10);
+	JTextField firstNameTextField = new JTextField(10);
+	JTextField phoneNumField = new JTextField(10);
+	JTextField birthDateField = new JTextField(10);
+	JTextField emailField = new JTextField(10);
+	JTextField postalCDTextField = new JTextField(10);
+	JTextField priCustIDField = new JTextField(10);
+	JTextArea memoField = new JTextArea();
+	JTextField addrStrtField = new JTextField(10);
+	JTextField addrPvField = new JTextField(10);
+	
+	JTabbedPane tabbedPane = new JTabbedPane();
+	JTabbedPane tabbedPaneForCustomerInfo = new JTabbedPane();
+	JTabbedPane tabbedPaneForFamilyInfo = new JTabbedPane();
+	
+	JTable jTable_Personal_Info = new JTable(defaultTableModel_Personal_Info);
+	JTable jTable_In_Progress_Info = new JTable(defaultTableModel_In_Progress_Info);
+	JTable jTable_All_Info = new JTable(defaultTableModel_All_Info);
+	JTable jTable_Complete_Info = new JTable(defaultTableModel_Complete_Info);
+	JTable jTable_Automobile_Info = new JTable(defaultTableModel_Automobile_Info);
+	JTable jTable_House_Info = new JTable(defaultTableModel_House_Info);
+	JTable jTable_Traveler_Info = new JTable(defaultTableModel_Traveler_Info);
+	JTable jTable_Family_Info = new JTable(defaultTableModel_Family_Info);
+	JTable jTable_Commercial_Info = new JTable(defaultTableModel_Commercial_Info);
+	JTable jTable_Reserved_Info = new JTable(defaultTableModel_Reserved_Info);
+	JTable jTable_Claim_Info = new JTable(defaultTableModel_Claim_Info);
+
+	JScrollPane jScrollPane_Personal_Info = new JScrollPane(jTable_Personal_Info);
+	JScrollPane jScrollPane_All_Info = new JScrollPane(jTable_All_Info);
+	JScrollPane jScrollPane_In_Progress_Info = new JScrollPane(jTable_In_Progress_Info);
+	JScrollPane jScrollPane_Complete_Info = new JScrollPane(jTable_Complete_Info);
+	JScrollPane jScrollPane_Automobile_Info = new JScrollPane(jTable_Automobile_Info);
+	JScrollPane jScrollPane_House_Info = new JScrollPane(jTable_House_Info);
+	JScrollPane jScrollPane_Traveler_Info = new JScrollPane(jTable_Traveler_Info);
+	JScrollPane jScrollPane_Family_Info = new JScrollPane(jTable_Family_Info);
+	JScrollPane jScrollPane_Commercial_Info = new JScrollPane(jTable_Commercial_Info);
+    JScrollPane jScrollPane_Reserved_Info = new JScrollPane(jTable_Reserved_Info);
+    JScrollPane jScrollPane_Claim_Info = new JScrollPane(jTable_Claim_Info);
+
+	JComponent panel_Personal_Info = jScrollPane_Personal_Info;
+	JComponent panel_All_Info = jScrollPane_All_Info;
+	JComponent panel_In_Progress_Info = jScrollPane_In_Progress_Info;
+	JComponent panel_Complete_Info = jScrollPane_Complete_Info;
+	JComponent panel_Automobile_Info = jScrollPane_Automobile_Info;
+	JComponent panel_House_Info = jScrollPane_House_Info;
+	JComponent panel_Traveler_Info = jScrollPane_Traveler_Info;
+	JComponent panel_Family_Info = jScrollPane_Family_Info;
+	JComponent panel_Commercial_Info = jScrollPane_Commercial_Info;
+	JComponent panel_Reserved_Info = jScrollPane_Reserved_Info;
+	JComponent panel_Claim_Info = jScrollPane_Claim_Info;
+	
+	JTextField jTextField = new JTextField(20);
+	
+	JButton jButton = new JButton("Search");
+	
+	JToggleButton jButtonForNewCustomer = new JToggleButton("New ID", true);
+	JButton jButtonForNewOther = new JButton("New");
+	
+	JButton jButtonUpdateForCustomer = new JButton("Update");
+	JButton jButtonUpdateForOther = new JButton("Update");
+	JButton jButtonRenewalForOther = new JButton("Renewal");
+	JButton jButtonBackUp = new JButton("Backup");
+	JButton jButtonRestore = new JButton("Restore");
+	
+	JMenuBar menuBar = new JMenuBar();
+	
+	JPanel jPanel_Search_Result = new JPanel();
+	JPanel jPanel_Detailed_Search = new JPanel();
+	JPanel jPanel_Memo_Field = new JPanel();
+	JPanel jPanel_Family_Search = new JPanel();
+	JPanel jPanel_Search = new JPanel();
+	JPanel jPanel_Search_2 = new JPanel();
+	JPanel jPanel_Search_3 = new JPanel();
+	JPanel jPanel_Customer_Search = new JPanel();
+	JPanel jPanel_New_Info = new JPanel(new GridLayout(0,1));
+	JPanel jPanel_Update = new JPanel(new GridLayout(0, 1));
+	JPanel jPanel_Other_Info = new JPanel();
+	JPanel jPanel_Top_Section = new JPanel();
+		
+    JRadioButton customerButton = new JRadioButton("Customer - Name, ID, Phone Num");
+    JRadioButton allButton = new JRadioButton("All");
+	
+	public CustomerCare()
+	{
+		 
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+				
+		jFrame.setJMenuBar(menuBar);
+		jTextField.setBounds(377, 6, 168, 26);
+
+		idTextField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		firstNameTextField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		LastNameTextField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		phoneNumField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		birthDateField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		emailField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		postalCDTextField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		priCustIDField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		addrStrtField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		addrPvField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		memoField.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		jTextField.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+			    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (jTextField.getText().trim().length() > 0)
+					{
+						if (customerButton.isSelected()) {
+							searchMember(SEARCH_CUSTOMER, jTextField.getText().trim());
+						}
+						else if (allButton.isSelected()) {
+							searchMember(SEARCH_ALL, jTextField.getText().trim());
+						}
+						jButton.setText("Search");
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(jFrame, "Please enter search word!");
+					}
+			    }
+			}
+		});
+		
+		jButtonBackUp.addActionListener(new ActionListener() {
+	        	@Override
+	        	public void actionPerformed(ActionEvent e)
+	        	{	
+
+	        		try
+	        		{
+	        			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			statement = connection.createStatement();
+	        			
+	        			resultSet = statement.executeQuery("SELECT * FROM CCCUSTOM;");
+
+        				File file = new File("backup.csv");
+        				        				
+        			    FileWriter writer = new FileWriter(file); 
+	        			
+        				writer.write("Customer ID" + "," + "Last Name" + "," + "First Name" + "," + "Phone Num" + "," + "Birth Date" + "," + "Email" +"," + "PriCustID" + "," + "Memo" + "," + "Postal Cd" + "," + "AddrStNm"+ "," + "AddrPvNm" + "," + "Chg Date Time" + "\r\n");
+	    	        		        					    	        			    	        		
+	        			while (resultSet.next()) {			
+	            				
+	    					String customerID = resultSet.getString(1);
+	    					String lastName = resultSet.getString(2);
+	    					String firstName = resultSet.getString(3);
+	    					String phoneNum = resultSet.getString(4);
+	    					String birthDate = resultSet.getString(5);
+	    					String email = resultSet.getString(6);
+	    					String priCustID = resultSet.getString(7);
+	    					String memo = resultSet.getString(8);
+	    					String postalCD = resultSet.getString(9);
+	    					String addrStNm = resultSet.getString(10);
+	    					String addrPvNm = resultSet.getString(11);
+	    					String chgDateTime = resultSet.getString(12);
+	    					
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + lastName + "," + firstName + "," + phoneNum + "," + birthDate + "," + email + "," + priCustID + "," + memo + "," + postalCD + "," + addrStNm + "," + addrPvNm + "," + chgDateTime + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("SQLException - back up Button 1 " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+        			    writer.flush();
+        			    writer.close();        			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("SQLException - back up Button  - customer " +  e5.getStackTrace());
+	        		}
+	        		
+	        		try
+	        		{
+	        			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			statement = connection.createStatement();
+	        			
+	        			resultAutomobileSet = statement.executeQuery("SELECT * FROM AUTXNPRM ORDER BY 1,2;");
+
+        				File file = new File("backupforAuto.csv");
+        				        				
+        			    FileWriter writer = new FileWriter(file); 
+	        			
+        			    writer.write("Customer ID" + "," + "Time Stamp" + "," + "Txn Type" + "," + "Plate No" + "," + "Doc No" + "," + "Exp Date" +"," + "New Exp Date" + "," + "Proc Type" + "," + "Premium" + "," + "Text Date Time"+ "," + "Call Date Time" + "," + "Visit Date Time" +  "," + "Complete Date" +  "," + "Company Name" + "," + "Ownership" + "," + "Memo" + "," + "Postal Cd" + "," + "Addr St Nm" +"," + "Addr Pv Nm" +"," + "Chg Date Time" + "\r\n");
+        					        			
+	        			while (resultAutomobileSet.next()) {			
+            				
+	    					String customerID = resultAutomobileSet.getString(1);
+	    					String timeStamp = resultAutomobileSet.getString(2);
+	    					String txnType = resultAutomobileSet.getString(3);
+	    					String plateNo = resultAutomobileSet.getString(4);
+	    					String docNo = resultAutomobileSet.getString(5);
+	    					String expDate = resultAutomobileSet.getString(6);
+	    					String newExpDate = resultAutomobileSet.getString(7);
+	    					String procType = resultAutomobileSet.getString(8);
+	    					Double premium = resultAutomobileSet.getDouble(9);
+	    					String textDateTime = resultAutomobileSet.getString(10);
+	    					String callDateTime = resultAutomobileSet.getString(11);
+	    					String visitDateTime = resultAutomobileSet.getString(12);
+	    					String completeDate = resultAutomobileSet.getString(13);
+	    					String companyname = resultAutomobileSet.getString(14);
+	    					String ownership = resultAutomobileSet.getString(15);
+	    					String memo = resultAutomobileSet.getString(16);
+	    					String postalCd = resultAutomobileSet.getString(17);
+	    					String addrStNm = resultAutomobileSet.getString(18);
+	    					String addrPvNm = resultAutomobileSet.getString(19);
+	    					String chgDateTime = resultAutomobileSet.getString(20);
+	    					
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + txnType + "," + plateNo + "," + docNo + "," + expDate + "," + newExpDate + "," + procType + "," + premium + "," + textDateTime + "," + callDateTime + "," + visitDateTime + "," + completeDate +"," + companyname + "," + ownership + "," + memo +"," + postalCd + "," + addrStNm + "," + addrPvNm +"," + chgDateTime + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("SQLException - back up Button  " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+        			    writer.flush();
+        			    writer.close();        			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("SQLException - back up Button - AutomobileSet " +  e5.getStackTrace());
+	        		}
+	        		//---------------------------------------------Travel
+	        		try
+	        		{
+	        			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			statement = connection.createStatement();
+
+	        			resultTravelSet = statement.executeQuery("SELECT * FROM TRTXNPRM ORDER BY 1,2;");
+	        			
+        				File file = new File("backupForTravel.csv");
+        				        				
+        			    FileWriter writer = new FileWriter(file); 
+	        			   				
+        				writer.write("Customer ID" + "," + "Time Stamp" + "," + "Eff Date" + "," + "Exp Date" + "," + "Txn Type" + "," + "Proc Type" +"," + "Premium" + "," + "Text Date Time" + "," + "Call Date Time" + "," + "Mail Date Time"+ "," + "Complete Date" + "," + "Company Name" + "," + "Ownership" +"," + "Memo" +"," + "Chg Date Time" +"," + "Policy No" + "\r\n");
+        					    	        			        			
+	        			while (resultTravelSet.next()) {			
+            				
+	    					String customerID = resultTravelSet.getString(1);
+	    					String timeStamp = resultTravelSet.getString(2);
+	    					String effDate = resultTravelSet.getString(3);
+	    					String expDate = resultTravelSet.getString(4);
+	    					String txnType = resultTravelSet.getString(5);
+	    					String procType = resultTravelSet.getString(6);
+	    					Double premium = resultTravelSet.getDouble(7);
+	    					String textDateTime = resultTravelSet.getString(8);
+	    					String callDateTime = resultTravelSet.getString(9);
+	    					String mailDateTime = resultTravelSet.getString(10);
+	    					String completeDate = resultTravelSet.getString(11);
+	    					String companyname = resultTravelSet.getString(12);
+	    					String ownership = resultTravelSet.getString(13);
+	    					String memo = resultTravelSet.getString(14);
+	    					String chgDateTime = resultTravelSet.getString(15);
+	    					String policyNo = resultTravelSet.getString(16);
+	    					
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + effDate + "," + expDate + "," + txnType + "," + procType + "," + premium + "," + textDateTime + "," + callDateTime + "," + mailDateTime + "," + completeDate + "," + companyname + "," + ownership +"," + memo +"," + chgDateTime +"," + policyNo + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("SQLException - back up Button  " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+        			    writer.flush();
+        			    writer.close();        			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("SQLException - back up Button - Travel " +  e5.getStackTrace());
+	        		}
+	        		//---------------------------------------------------- Home
+	        		try
+	        		{
+	        			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			statement = connection.createStatement();
+	        			
+	        			resultHomeSet = statement.executeQuery("SELECT * FROM HOTXNPRM ORDER BY 1,2;");
+
+        				File file = new File("backupforHome.csv");
+        				        				
+        			    FileWriter writer = new FileWriter(file); 
+	        			        				
+        				writer.write("Customer ID" + "," + "Time Stamp" + "," + "Exp Date" + "," + "New Exp Date" + "," + "Txn Type" + "," + "Proc Type" +"," + "Sigxp No" + "," + "Premium" + "," + "Text Date Time" + "," + "Call Date Time"+ "," + "Visit Date Time" + "," + "Complete Date" + "," + "Company Name" +"," + "Ownership" +"," + "Memo" + "," + "Postal Code" + "," + "Addr St Nm" +"," + "Addr Pv Nm" +"," + "Chg Date Time" + "\r\n");        				
+	    	        			        			
+	        			while (resultHomeSet.next()) {			
+            				
+	    					String customerID = resultHomeSet.getString(1);
+	    					String timeStamp = resultHomeSet.getString(2);
+	    					String expDate = resultHomeSet.getString(3);
+	    					String newExpDate = resultHomeSet.getString(4);
+	    					String txnType = resultHomeSet.getString(5);
+	    					String procType = resultHomeSet.getString(6);
+	    					String sigxpNo = resultHomeSet.getString(7);
+	    					Double premium = resultHomeSet.getDouble(8);
+	    					String textDateTime = resultHomeSet.getString(9);
+	    					String callDateTime = resultHomeSet.getString(10);
+	    					String visitDateTime = resultHomeSet.getString(11);
+	    					String completeDate = resultHomeSet.getString(12);
+	    					String companyname = resultHomeSet.getString(13);
+	    					String ownership = resultHomeSet.getString(14);
+	    					String memo = resultHomeSet.getString(15);
+	    					String postalCD = resultHomeSet.getString(16);
+	    					String addrStNm = resultHomeSet.getString(17);
+	    					String addrPvNm = resultHomeSet.getString(18);
+	    					String chgDateTime = resultHomeSet.getString(19);
+	    					
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + expDate + "," + newExpDate + "," + txnType + "," + procType + "," + sigxpNo + "," + premium + "," + textDateTime + "," + callDateTime + "," + visitDateTime + "," + completeDate + "," + companyname + "," + ownership + "," + memo + "," + postalCD + "," + addrStNm + "," + addrPvNm + "," + chgDateTime + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("SQLException - back up Button  " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+        			    writer.flush();
+        			    writer.close();
+        			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("SQLException - back up Button  - home" +  e5.getStackTrace());
+	        		}
+	        		// --------------------------------------------------------------- Commercial
+	        		try
+	        		{
+	        			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			statement = connection.createStatement();
+	        			
+	        			resultCommercialInfoSet = statement.executeQuery("SELECT * FROM COTXNPRM ORDER BY 1,2;");
+
+        				File file = new File("backupforCommercial.csv");
+        				        				
+        			    FileWriter writer = new FileWriter(file); 
+	        			
+        				writer.write("Customer ID" + "," + "Time Stamp" + "," + "Exp Date" + "," + "New Exp Date" + "," + "Txn Type" + "," + "Proc Type" +"," + "Premium" + "," + "Text Date Time" + "," + "Call Date Time" + "," + "Visit Date Time"+ "," + "Complete Date" + "," + "Company Name" + "," + "Ownership" +"," + "Memo" +"," + "Chg Date Time" +"," + "Sigxp No" + "\r\n");
+	    	        			        			
+	        			while (resultCommercialInfoSet.next()) {			
+            				
+	    					String customerID = resultCommercialInfoSet.getString(1);
+	    					String timeStamp = resultCommercialInfoSet.getString(2);
+	    					String expDate = resultCommercialInfoSet.getString(3);
+	    					String newExpDate = resultCommercialInfoSet.getString(4);
+	    					String txnType = resultCommercialInfoSet.getString(5);
+	    					String procType = resultCommercialInfoSet.getString(6);
+	    					Double premium = resultCommercialInfoSet.getDouble(7);
+	    					String textDateTime = resultCommercialInfoSet.getString(8);
+	    					String callDateTime = resultCommercialInfoSet.getString(9);
+	    					String visitDateTime = resultCommercialInfoSet.getString(10);
+	    					String completeDate = resultCommercialInfoSet.getString(11);
+	    					String companyname = resultCommercialInfoSet.getString(12);
+	    					String ownership = resultCommercialInfoSet.getString(13);
+	    					String memo = resultCommercialInfoSet.getString(14);
+	    					String chgDateTime = resultCommercialInfoSet.getString(15);
+	    					String sigxpNo = resultCommercialInfoSet.getString(16);
+
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + expDate + "," + newExpDate + "," + txnType + "," + procType + "," + premium + "," + textDateTime + "," + callDateTime + "," + visitDateTime + "," + completeDate + "," + companyname + "," + ownership + "," + memo + "," + chgDateTime + "," + sigxpNo + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("SQLException - back up Button - Commercial " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+        			    writer.flush();
+        			    writer.close();
+        			            			    
+	        			JOptionPane.showMessageDialog(jFrame, "Backup Sucessfull");
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("SQLException - back up Button " +  e5.getStackTrace());
+	        		}
+	        		
+	        		finally
+	        		{
+	        			closeDatabase();
+	        		}
+	        	}			
+	    });
+		
+		jButtonRestore.addActionListener(new ActionListener() {
+		    	@Override
+		    	public void actionPerformed(ActionEvent e)
+		    	{	
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backup.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    System.out.println("Hello1");
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+			    	    
+			    	    System.out.println("Hello2");
+			    	    
+		    			Connection connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+				    	    System.out.println("Hello3");
+		    		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    		     		String custID = lineScanner.next();
+		    		    			String lastName = lineScanner.next();
+		    		    			String firstName = lineScanner.next();
+		    		    			String phoneNum = lineScanner.next();
+		    		    			String birthDate = lineScanner.next();
+		    		    			String email =  lineScanner.next();
+		    		    			String priCustID = lineScanner.next();
+		    		    			String memo = lineScanner.next();
+		    		    			String postalCD = lineScanner.next();
+		    		    			String addrStNm = lineScanner.next();
+		    		    			String addrPvNm = lineScanner.next();
+		    		    			String chgDateTime = lineScanner.next();
+		    		    				    					    			
+		    					String id = String.format("%010d", Integer.parseInt(custID));
+		    	    				
+					    	    System.out.println("Hello4");
+		    					
+		    	    		     	PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO CCCUSTOM (CUST_ID, LAST_NAME, FIRST_NAME, CELL_NO, BIRTH_DATE, EMAIL, PRI_CUST_ID, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+		    	    				
+						    	System.out.println("Hello5");
+
+		    					preparedStatement.setString(1, id);
+		    					preparedStatement.setString(2, lastName);
+		    					preparedStatement.setString(3, firstName);
+		    					preparedStatement.setString(4, phoneNum);
+		    					preparedStatement.setString(5, birthDate);
+		    					preparedStatement.setString(6, email);
+		    					preparedStatement.setString(7, priCustID);
+		    					preparedStatement.setString(8, memo);
+		    					preparedStatement.setString(9, postalCD);
+		    					preparedStatement.setString(10, addrStNm);
+		    					preparedStatement.setString(11, addrPvNm);
+		    					preparedStatement.setString(12, chgDateTime);		
+		    					
+		    					preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e4)
+		    		{
+		    			System.out.println("restore - customer" +  e4.getStackTrace());
+		    		}
+		    		
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforAuto.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+			    	    System.out.println("Hello1");
+			    	    
+		    			Connection connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String plateNo = lineScanner.next();
+		    					String docNo = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String newExpDate = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String visitDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String postalCd = lineScanner.next();
+		    					String addrStNm = lineScanner.next();
+		    					String addrPvNm = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    					
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    							    					
+		    					preparedStatement = connection.prepareStatement("INSERT INTO AUTXNPRM (CUST_ID, TIME_STAMP, TXN_TYPE, PLATE_NO, DOC_NO, EXP_DATE, NEW_EXP_DATE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 19
+		    				    
+		    					preparedStatement.setString(1, id);
+		    					preparedStatement.setString(2, timeStamp);
+		    					preparedStatement.setString(3, txnType);
+		    					preparedStatement.setString(4, plateNo);
+		    					preparedStatement.setString(5, docNo);
+		    					preparedStatement.setString(6, expDate);
+		    					preparedStatement.setString(7, newExpDate);
+		    					preparedStatement.setString(8, procType);
+		    					preparedStatement.setFloat(9, premiumForAuto);
+		    					preparedStatement.setString(10, textDateTime);
+		    					preparedStatement.setString(11, callDateTime);
+		    					preparedStatement.setString(12, visitDateTime);
+		    					preparedStatement.setString(13, completeDate);
+		    					preparedStatement.setString(14, companyname);
+		    					preparedStatement.setString(15, ownership);
+		    					preparedStatement.setString(16, memo);
+		    					preparedStatement.setString(17, postalCd);
+		    					preparedStatement.setString(18, addrStNm);
+		    					preparedStatement.setString(19, addrPvNm);	
+		    					preparedStatement.setString(20, chgDateTime);	
+		    					
+		    					preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("restore - Automobile" +  e6.getStackTrace());
+		    		}
+		    		//---------------------------------------------Travel
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforTravel.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+		    			Connection connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        	
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String effDate = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String mailDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    					String policyNo = lineScanner.next();
+		    					
+	    						customerID.replace("null", null);
+	    						customerID.replace("null", null);
+		    								    						
+		    					System.out.println(policyNo);
+		    					
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    	    				
+		    					preparedStatement = connection.prepareStatement("INSERT INTO TRTXNPRM (CUST_ID, TIME_STAMP, EFF_DATE, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, MAIL_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, POLICY_NO)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 19
+		    					
+		    					preparedStatement.setString(1, id);
+		    					preparedStatement.setString(2, timeStamp);
+		    					preparedStatement.setString(3, effDate);
+		    					preparedStatement.setString(4, expDate);
+		    					preparedStatement.setString(5, txnType);
+		    					preparedStatement.setString(6, procType);
+		    					preparedStatement.setFloat(7, premiumForAuto);
+		    					preparedStatement.setString(8, textDateTime);
+		    					preparedStatement.setString(9, callDateTime);
+		    					preparedStatement.setString(10, mailDateTime);
+		    					preparedStatement.setString(11, completeDate);
+		    					preparedStatement.setString(12, companyname);
+		    					preparedStatement.setString(13, ownership);
+		    					preparedStatement.setString(14, memo);
+		    					preparedStatement.setString(15, chgDateTime);	
+		    					preparedStatement.setString(16, policyNo);	
+		    					
+		    					preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("restore - travel" +  e6.getStackTrace());
+		    		}
+		    		//---------------------------------------------------- Home
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforHome.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+		    			Connection connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String newExpDate = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String sigxpNo = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String visitDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String postalCD = lineScanner.next();
+		    					String addrStNm = lineScanner.next();
+		    					String addrPvNm = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    		    				    					    			
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    	    				
+		    					preparedStatement = connection.prepareStatement("INSERT INTO HOTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, SIGXP_NO, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "); // 19
+
+		    					preparedStatement.setString(1, id);
+		    					preparedStatement.setString(2, timeStamp);
+		    					preparedStatement.setString(3, expDate);
+		    					preparedStatement.setString(4, newExpDate);
+		    					preparedStatement.setString(5, txnType);
+		    					preparedStatement.setString(6, procType);
+		    					preparedStatement.setString(7, sigxpNo);
+		    					preparedStatement.setFloat(8, premiumForAuto);
+		    					preparedStatement.setString(9, textDateTime);
+		    					preparedStatement.setString(10, callDateTime);
+		    					preparedStatement.setString(11, visitDateTime);
+		    					preparedStatement.setString(12, completeDate);
+		    					preparedStatement.setString(13, companyname);
+		    					preparedStatement.setString(14, ownership);
+		    					preparedStatement.setString(15, memo);
+		    					preparedStatement.setString(16, postalCD);
+		    					preparedStatement.setString(17, addrStNm);
+		    					preparedStatement.setString(18, addrPvNm);
+		    					preparedStatement.setString(19, chgDateTime);
+		    					
+		    					preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("restore - Home" +  e6.getStackTrace());
+		    		}
+	        		// --------------------------------------------------------------- Commercial
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforCommercial.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+		    			Connection connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String newExpDate = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String visitDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    					String sigxpNo = lineScanner.next();
+		    		    				    					    			
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    	    				
+		    					preparedStatement = connection.prepareStatement("INSERT INTO COTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, SIGXP_NO)"+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 14
+		    							    					
+		    					preparedStatement.setString(1, id);
+		    					preparedStatement.setString(2, timeStamp);
+		    					preparedStatement.setString(3, expDate);
+		    					preparedStatement.setString(4, newExpDate);
+		    					preparedStatement.setString(5, txnType);
+		    					preparedStatement.setString(6, procType);
+		    					preparedStatement.setFloat(7, premiumForAuto);
+		    					preparedStatement.setString(8, textDateTime);
+		    					preparedStatement.setString(9, callDateTime);
+		    					preparedStatement.setString(10, visitDateTime);
+		    					preparedStatement.setString(11, completeDate);
+		    					preparedStatement.setString(12, companyname);
+		    					preparedStatement.setString(13, ownership);
+		    					preparedStatement.setString(14, memo);
+		    					preparedStatement.setString(15, chgDateTime);
+		    					preparedStatement.setString(16, sigxpNo);
+		    					
+		    					preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		    
+	        			JOptionPane.showMessageDialog(jFrame, "Restore Sucessfull");
+
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("restore - Commercial" +  e6.getStackTrace());
+		    		}
+		    		
+		    		finally
+		    		{
+		    			closeDatabase();
+		    		}
+		    	}			
+		});
+	    
+		jTable_Personal_Info.getTableHeader().setReorderingAllowed(false);
+		jTable_House_Info.getTableHeader().setReorderingAllowed(false);
+		jTable_Traveler_Info.getTableHeader().setReorderingAllowed(false);
+		jTable_Reserved_Info.getTableHeader().setReorderingAllowed(false);
+		jTable_Claim_Info.getTableHeader().setReorderingAllowed(false);
+		
+		jTable_Claim_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_Claim_Info.getSelectedColumn() != -1) {
+		            	
+	            			customerID = (String) jTable_Claim_Info.getValueAt(jTable_Claim_Info.getSelectedRow(), 0);
+	            			
+	            			// click complete
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectFamilyInfo(customerID);
+		    				selectCommercialInfo(customerID);
+								    						    				
+		    				if ((boolean)jTable_Claim_Info.getValueAt(jTable_Claim_Info.getSelectedRow(), 5).equals("AUTO")) {
+		    					tabbedPane.setSelectedIndex(0);
+		    				}
+		    				else if ((boolean)jTable_Claim_Info.getValueAt(jTable_Claim_Info.getSelectedRow(), 5).equals("HOME")) {
+		    					tabbedPane.setSelectedIndex(1);
+		    				}
+		    				else if ((boolean)jTable_Claim_Info.getValueAt(jTable_Claim_Info.getSelectedRow(), 5).equals("COMM")) {
+		    					tabbedPane.setSelectedIndex(3);
+		    				}
+		    				else if ((boolean)jTable_Claim_Info.getValueAt(jTable_Claim_Info.getSelectedRow(), 5).equals("TRAV")) {
+		    					tabbedPane.setSelectedIndex(2);
+		    				}
+	            		}
+		         }
+		     }
+		});
+		jTable_Reserved_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_Reserved_Info.getSelectedColumn() != -1) {
+		            	
+	            			customerID = (String) jTable_Reserved_Info.getValueAt(jTable_Reserved_Info.getSelectedRow(), 0);
+	            			
+	            			// click complete
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectFamilyInfo(customerID);
+		    				selectCommercialInfo(customerID);
+								    						    				
+		    				if ((boolean)jTable_Reserved_Info.getValueAt(jTable_Reserved_Info.getSelectedRow(), 4).equals("AUTO")) {
+		    					tabbedPane.setSelectedIndex(0);
+		    				}
+		    				else if ((boolean)jTable_Reserved_Info.getValueAt(jTable_Reserved_Info.getSelectedRow(), 4).equals("HOME")) {
+		    					tabbedPane.setSelectedIndex(1);
+		    				}
+		    				else if ((boolean)jTable_Reserved_Info.getValueAt(jTable_Reserved_Info.getSelectedRow(), 4).equals("COMM")) {
+		    					tabbedPane.setSelectedIndex(3);
+		    				}
+		    				else if ((boolean)jTable_Reserved_Info.getValueAt(jTable_Reserved_Info.getSelectedRow(), 4).equals("TRAV")) {
+		    					tabbedPane.setSelectedIndex(2);
+		    				}
+	            		}
+		         }
+		     }
+		});
+		jTable_Complete_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_Complete_Info.getSelectedColumn() != -1) {
+		            	
+	            			customerID = (String) jTable_Complete_Info.getValueAt(jTable_Complete_Info.getSelectedRow(), 0);
+	            			
+	            			// click complete
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectFamilyInfo(customerID);
+		    				selectCommercialInfo(customerID);
+								    						    				
+		    				if ((boolean)jTable_Complete_Info.getValueAt(jTable_Complete_Info.getSelectedRow(), 4).equals("AUTO")) {
+		    					tabbedPane.setSelectedIndex(0);
+		    				}
+		    				else if ((boolean)jTable_Complete_Info.getValueAt(jTable_Complete_Info.getSelectedRow(), 4).equals("HOME")) {
+		    					tabbedPane.setSelectedIndex(1);
+		    				}
+		    				else if ((boolean)jTable_Complete_Info.getValueAt(jTable_Complete_Info.getSelectedRow(), 4).equals("COMM")) {
+		    					tabbedPane.setSelectedIndex(3);
+		    				}
+		    				else if ((boolean)jTable_Complete_Info.getValueAt(jTable_Complete_Info.getSelectedRow(), 4).equals("TRAV")) {
+		    					tabbedPane.setSelectedIndex(2);
+		    				}
+	            		}
+		         }
+		     }
+		});
+		
+		jTable_In_Progress_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_In_Progress_Info.getSelectedColumn() != -1) {
+		            	
+	            			customerID = (String) jTable_In_Progress_Info.getValueAt(jTable_In_Progress_Info.getSelectedRow(), 0);
+	            			
+	            			// click complete
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectFamilyInfo(customerID);
+		    				selectCommercialInfo(customerID);
+		    				
+		    				if ((boolean)jTable_In_Progress_Info.getValueAt(jTable_In_Progress_Info.getSelectedRow(), 5).equals("AUTO")) {
+		    					tabbedPane.setSelectedIndex(0);
+		    				}
+		    				else if ((boolean)jTable_In_Progress_Info.getValueAt(jTable_In_Progress_Info.getSelectedRow(), 5).equals("HOME")) {
+		    					tabbedPane.setSelectedIndex(1);
+		    				}
+		    				else if ((boolean)jTable_In_Progress_Info.getValueAt(jTable_In_Progress_Info.getSelectedRow(), 5).equals("TRAV")) {
+		    					tabbedPane.setSelectedIndex(2);
+		    				}
+		    				else if ((boolean)jTable_In_Progress_Info.getValueAt(jTable_In_Progress_Info.getSelectedRow(), 5).equals("COMM")) {
+		    					tabbedPane.setSelectedIndex(3);
+		    				}
+		    			}
+		         }
+		     }
+		});
+		
+		jTable_Personal_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_Personal_Info.getSelectedColumn() != -1) {
+		            	
+	            			customerID =  (String) jTable_Personal_Info.getValueAt(jTable_Personal_Info.getSelectedRow(), 0);
+	            			priCustID = (String) priCustIDField.getText().trim();
+	            			
+	            			// click complete
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectFamilyInfo(customerID);
+		    				selectCommercialInfo(customerID);
+		            	}
+		         }
+		     }
+		});
+		
+		jTable_All_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_All_Info.getSelectedColumn() != -1) {
+	            			customerID = (String) jTable_All_Info.getValueAt(jTable_All_Info.getSelectedRow(), 0);
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectFamilyInfo(customerID);
+		    				selectCommercialInfo(customerID);
+		    				
+		    				if ((boolean)jTable_All_Info.getValueAt(jTable_All_Info.getSelectedRow(), 5).equals("AUTO")) {
+		    					tabbedPane.setSelectedIndex(0);
+		    				}
+		    				else if ((boolean)jTable_All_Info.getValueAt(jTable_All_Info.getSelectedRow(), 5).equals("HOME")) {
+		    					tabbedPane.setSelectedIndex(1);
+		    				}
+		    				else if ((boolean)jTable_All_Info.getValueAt(jTable_All_Info.getSelectedRow(), 5).equals("TRAV")) {
+		    					tabbedPane.setSelectedIndex(2);
+		    				}
+		    				else if ((boolean)jTable_All_Info.getValueAt(jTable_All_Info.getSelectedRow(), 5).equals("COMM")) {
+		    					tabbedPane.setSelectedIndex(3);
+		    				}
+		            }
+		         }
+		     }
+		});
+        tabbedPaneForCustomerInfo.setBounds(0, 0, 758, 310);
+		
+        tabbedPaneForCustomerInfo.addTab("Claim", null, panel_Claim_Info,
+                "Claim Information");
+
+        tabbedPaneForCustomerInfo.addTab("Complete", null, panel_Complete_Info,
+                "Complete Information");
+        
+        tabbedPaneForCustomerInfo.addTab("In Progress", null, panel_In_Progress_Info,
+                "InProgress Information");
+		
+        tabbedPaneForCustomerInfo.addTab("Reserved", null, panel_Reserved_Info,
+                "Reserved Information");
+        
+        tabbedPaneForCustomerInfo.addTab("All", null, panel_All_Info,
+                "All Information");
+        
+        tabbedPaneForCustomerInfo.addTab("Customer List", null, panel_Personal_Info,
+                "Personal Information");
+        jTable_Automobile_Info.getTableHeader().setReorderingAllowed(false);
+        
+        tabbedPane.addTab("Automobile", null, panel_Automobile_Info,
+                "Automobile Information");
+        
+        tabbedPane.addTab("House", null, panel_House_Info,
+                "House Information");
+
+        tabbedPane.addTab("Travel", null, panel_Traveler_Info,
+                "Traveler Information");
+        
+        tabbedPane.addTab("Commercial", null, panel_Commercial_Info,
+                "Commercial Information");
+        
+        tabbedPaneForCustomerInfo.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+	        		if (tabbedPaneForCustomerInfo.getSelectedIndex() == 0) {
+	        			
+	        			searchMember(SEARCH_CLAIM, "");
+	        			
+					String rs = String.valueOf(defaultTableModel_Claim_Info.getRowCount());
+					totalTextField.setText(rs);
+					idTextField.setText("");
+					LastNameTextField.setText("");
+					firstNameTextField.setText("");
+					phoneNumField.setText("");
+					birthDateField.setText("");
+					emailField.setText("");
+					priCustIDField.setText("");
+					memoField.setText("");
+					postalCDTextField.setText("");
+					addrStrtField.setText("");
+					addrPvField.setText("");
+					selectFamilyInfo(null);
+					selectAutomobileInfo("");
+					selectTravelInfo("");
+					selectCommercialInfo("");
+					selectHomeInfo("");
+	        		}
+            		if (tabbedPaneForCustomerInfo.getSelectedIndex() == 1) {
+            			
+	        			searchMember(SEARCH_IN_COMPLETE, "");
+            			
+    					String rs = String.valueOf(defaultTableModel_Complete_Info.getRowCount());
+    					totalTextField.setText(rs);
+    					idTextField.setText("");
+					LastNameTextField.setText("");
+					firstNameTextField.setText("");
+					phoneNumField.setText("");
+					birthDateField.setText("");
+					emailField.setText("");
+					priCustIDField.setText("");
+					memoField.setText("");
+					postalCDTextField.setText("");
+					addrStrtField.setText("");
+					addrPvField.setText("");
+					selectFamilyInfo(null);
+					selectAutomobileInfo("");
+					selectTravelInfo("");
+					selectCommercialInfo("");
+					selectHomeInfo("");
+            		}
+            		else if (tabbedPaneForCustomerInfo.getSelectedIndex() == 2) {
+            			
+	        			searchMember(SEARCH_IN_PROGRESS, "");
+            			
+    					String rs = String.valueOf(defaultTableModel_In_Progress_Info.getRowCount());    					
+    					totalTextField.setText(rs);	
+    					idTextField.setText("");
+					LastNameTextField.setText("");
+					firstNameTextField.setText("");
+					phoneNumField.setText("");
+					birthDateField.setText("");
+					emailField.setText("");
+					priCustIDField.setText("");
+					memoField.setText("");
+					postalCDTextField.setText("");
+					addrStrtField.setText("");
+					addrPvField.setText("");
+					selectFamilyInfo(null);
+					selectAutomobileInfo("");
+					selectTravelInfo("");
+					selectCommercialInfo("");
+					selectHomeInfo("");
+            		}
+            		else if (tabbedPaneForCustomerInfo.getSelectedIndex() == 3) {
+            			
+	        			searchMember(SEARCH_RESERVED, "");
+            			
+    					String rs = String.valueOf(defaultTableModel_Reserved_Info.getRowCount());    					
+    					totalTextField.setText(rs);	
+    					idTextField.setText("");
+					LastNameTextField.setText("");
+					firstNameTextField.setText("");
+					phoneNumField.setText("");
+					birthDateField.setText("");
+					emailField.setText("");
+					priCustIDField.setText("");
+					memoField.setText("");
+					postalCDTextField.setText("");
+					addrStrtField.setText("");
+					addrPvField.setText("");
+					selectFamilyInfo(null);
+					selectAutomobileInfo("");
+					selectTravelInfo("");
+					selectCommercialInfo("");
+					selectHomeInfo("");
+            		}
+            		else if (tabbedPaneForCustomerInfo.getSelectedIndex() == 4) {
+            			
+            			allButton.setSelected(true);
+            			customerButton.setSelected(false);
+            			jTextField.requestFocus();
+            			
+    					String rs = String.valueOf(defaultTableModel_All_Info.getRowCount());
+    					totalTextField.setText(rs);
+    					idTextField.setText("");
+					LastNameTextField.setText("");
+					firstNameTextField.setText("");
+					phoneNumField.setText("");
+					birthDateField.setText("");
+					emailField.setText("");
+					priCustIDField.setText("");
+					memoField.setText("");
+					postalCDTextField.setText("");
+					addrStrtField.setText("");
+					addrPvField.setText("");
+					selectFamilyInfo(null);
+					selectAutomobileInfo("");
+					selectTravelInfo("");
+					selectCommercialInfo("");
+					selectHomeInfo("");
+            		}
+            		else if (tabbedPaneForCustomerInfo.getSelectedIndex() == 5) {
+            			
+            			customerButton.setSelected(true);
+            			allButton.setSelected(false);
+            			jTextField.requestFocus();
+            			
+    					String rs = String.valueOf(defaultTableModel_Personal_Info.getRowCount());
+    					totalTextField.setText(rs);
+    					idTextField.setText("");
+					LastNameTextField.setText("");
+					firstNameTextField.setText("");
+					phoneNumField.setText("");
+					birthDateField.setText("");
+					emailField.setText("");
+					priCustIDField.setText("");
+					memoField.setText("");
+					postalCDTextField.setText("");
+					addrStrtField.setText("");
+					addrPvField.setText("");
+					selectFamilyInfo(null);
+					selectAutomobileInfo("");
+					selectTravelInfo("");
+					selectCommercialInfo("");
+					selectHomeInfo("");
+            		}
+            }
+        });
+
+        allButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                customerButton.setSelected(false);
+                tabbedPaneForCustomerInfo.setSelectedIndex(4);
+            }
+        }); 
+        customerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabbedPaneForCustomerInfo.setSelectedIndex(5);
+                allButton.setSelected(false);
+                jTextField.requestFocus();
+            }
+        }); 
+                
+        tabbedPaneForCustomerInfo.setPreferredSize(new Dimension(-200, 243));
+        tabbedPane.setPreferredSize(new Dimension(1436, 350));
+        jPanel_Detailed_Search.setBounds(762, 0, 317, 297);
+                        
+        Dimension ndForFamilyInfo = new Dimension(screenSize.width/3 - 126, screenSize.height / 2 - 100);
+        
+        //The following line enables to use scrolling tabs.
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPaneForCustomerInfo.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        
+        customerButton.setBounds(110, 7, 255, 23);
+        
+        Border raisedBorder = BorderFactory.createRaisedBevelBorder();
+        jButtonForNewCustomer.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+        jButtonForNewOther.setBorder(raisedBorder);
+        jButtonUpdateForCustomer.setBorder(raisedBorder);
+        jButtonUpdateForOther.setBorder(raisedBorder);
+        jButtonRenewalForOther.setBorder(raisedBorder);
+        jButtonBackUp.setBorder(raisedBorder);
+        jButtonRestore.setBorder(raisedBorder);
+        
+        jPanel_Detailed_Search.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        
+        Border border = jPanel_Detailed_Search.getBorder();
+        Border margin = new EmptyBorder(10,10,1,10);
+        jPanel_Detailed_Search.setBorder(new CompoundBorder(border, margin));
+        idInfo.setBounds(72, 27, 14, 16);
+        
+        idInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        firstNameInfo.setBounds(20, 72, 68, 16);
+        firstNameInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        lastNameInfo.setBounds(22, 50, 66, 16);
+        lastNameInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        phoneNumInfo.setBounds(38, 116, 50, 16);
+        phoneNumInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        birthDateInfo.setBounds(25, 94, 62, 16);
+        birthDateInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        emailInfo.setBounds(54, 138, 34, 16);
+        emailInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        postalCdInfo.setBounds(29, 160, 59, 16);
+        postalCdInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        addrStrtLabel.setBounds(37, 182, 56, 16);
+        addrStrtLabel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        addrPvLabel.setBounds(27, 204, 65, 16);
+        addrPvLabel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        memoInfo.setBounds(50, 230, 38, 16);
+        memoInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+        jPanel_Detailed_Search.setLayout(null);
+//        memoField.setSize (300,600) ;  // this line silently ignored
+        jPanel_Detailed_Search.add(idInfo);
+        idTextField.setBounds(99, 24, 103, 22);
+        jPanel_Detailed_Search.add(idTextField);
+		priCustIDField.setBounds(204, 24, 102, 22);
+		priCustIDField.setEditable(false);
+		jPanel_Detailed_Search.add(priCustIDField);
+        jPanel_Detailed_Search.add(lastNameInfo);
+        LastNameTextField.setBounds(99, 48, 207, 20);
+        LastNameTextField.setEditable(false);
+        jPanel_Detailed_Search.add(LastNameTextField);
+        jPanel_Detailed_Search.add(firstNameInfo);
+        firstNameTextField.setBounds(99, 70, 207, 20);
+        firstNameTextField.setEditable(false);
+        jPanel_Detailed_Search.add(firstNameTextField);
+        jPanel_Detailed_Search.add(birthDateInfo);
+        birthDateField.setBounds(99, 92, 117, 20);
+        birthDateField.setEditable(false);
+        jPanel_Detailed_Search.add(birthDateField);
+        jPanel_Detailed_Search.add(phoneNumInfo);
+        phoneNumField.setBounds(99, 114, 117, 20);
+        phoneNumField.setEditable(false);
+        jPanel_Detailed_Search.add(phoneNumField);
+        jPanel_Detailed_Search.add(emailInfo);
+        emailField.setBounds(99, 136, 207, 20);
+        emailField.setEditable(false);
+        jPanel_Detailed_Search.add(emailField);
+		jPanel_Detailed_Search.add(postalCdInfo);
+		postalCDTextField.setBounds(99, 158, 117, 20);
+		postalCDTextField.setEditable(false);
+		jPanel_Detailed_Search.add(postalCDTextField);
+		jPanel_Detailed_Search.add(addrStrtLabel);
+		addrStrtField.setBounds(99, 180, 207, 20);
+		addrStrtField.setEditable(false);
+		jPanel_Detailed_Search.add(addrStrtField);
+		jPanel_Detailed_Search.add(addrPvLabel);
+		addrPvField.setBounds(99, 202, 207, 20);
+		addrPvField.setEditable(false);
+		jPanel_Detailed_Search.add(addrPvField);
+		jPanel_Detailed_Search.add(memoInfo);
+        jPanel_Search_Result.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        				
+        //Add the tabbed pane to this panel.
+        jPanel_Search_Result.add(tabbedPane);
+        jPanel_Customer_Search.setBounds(0, 0, 1450, 315);
+        jPanel_Customer_Search.setLayout(null);
+        jPanel_Customer_Search.add(tabbedPaneForCustomerInfo);
+        jPanel_Customer_Search.add(jPanel_Detailed_Search);
+        jPanel_Other_Info.setBounds(0, 320, 1430, 72);
+
+        jPanel_Other_Info.setLayout(null);
+        
+        totalInfo.setBounds(11, 6, 90, 16);
+        totalTextField.setBounds(60, 0, 58, 29);
+        totalTextField.setEditable(false);
+        jPanel_Other_Info.add(totalInfo);
+        jPanel_Other_Info.add(totalTextField);
+        AutomobileInfo.setBounds(210, 6, 90, 16);
+        AutoTextField.setBounds(301, 0, 45, 29);
+        AutoTextField.setEditable(false);
+        jPanel_Other_Info.add(AutomobileInfo);
+        jPanel_Other_Info.add(AutoTextField);
+        HouseInfo.setBounds(355, 6, 58, 16);
+        HouseTextField.setBounds(415, 0, 45, 29);
+        HouseTextField.setEditable(false);
+        jPanel_Other_Info.add(HouseInfo);
+        jPanel_Other_Info.add(HouseTextField);
+        TravelInfo.setBounds(465, 6, 56, 16);
+        TravelTextField.setBounds(520, 0, 45, 29);
+        TravelTextField.setEditable(false);
+        jPanel_Other_Info.add(TravelInfo);
+        jPanel_Other_Info.add(TravelTextField);
+        CommercialInfo.setBounds(570, 6, 93, 16);
+        CommercialTextField.setBounds(660, 0, 45, 29);
+        CommercialTextField.setEditable(false);
+        jPanel_Other_Info.add(CommercialInfo);
+        jPanel_Other_Info.add(CommercialTextField);
+        jButtonForNewOther.setBounds(790, 0, 75, 29);
+        jPanel_Other_Info.add(jButtonForNewOther);
+        jButtonUpdateForOther.setBounds(883, 0, 75, 29);
+        jPanel_Other_Info.add(jButtonUpdateForOther);
+        jButtonRenewalForOther.setBounds(976, 0, 75, 29);
+        jPanel_Other_Info.add(jButtonRenewalForOther);
+        jButtonBackUp.setBounds(1184, 0, 75, 29);
+        jPanel_Other_Info.add(jButtonBackUp);
+        jButtonRestore.setBounds(1270, 0, 75, 29);
+        jPanel_Other_Info.add(jButtonRestore);
+                
+        jButtonForNewOther.addActionListener(new ActionListener()
+        {
+	        	@Override
+	        	public void actionPerformed(ActionEvent e)
+	        	{
+	        		 if (!idTextField.getText().trim().isEmpty()) {
+        				System.out.println("tabbedPane = " + tabbedPane.getSelectedIndex());
+        				if (tabbedPane.getSelectedIndex() == 0) {
+        					customerID = (String)idTextField.getText().trim();
+        					new MemberDialog(AUTOMOBILE_MODE, NEW_MODE);
+        				}
+        				else if (tabbedPane.getSelectedIndex() == 1) {
+        					customerID = (String)idTextField.getText().trim();
+        					new MemberDialog(HOME_MODE, NEW_MODE);
+        				}
+        				else if (tabbedPane.getSelectedIndex() == 2) {
+        					customerID = (String)idTextField.getText().trim();
+        					new MemberDialog(TRAVEL_MODE, NEW_MODE);
+        				}
+        				else if (tabbedPane.getSelectedIndex() == 3) {
+        					System.out.println("Commercial_Mode");
+        					customerID = (String)idTextField.getText().trim();
+        					new MemberDialog(COMMERCIAL_MODE, NEW_MODE);
+        				}
+	        		}
+	        		else {
+	        			JOptionPane.showMessageDialog(jFrame, "No data to insert Automobile");
+	        		}
+	        	}			
+        });
+        
+        //Update
+        jButtonUpdateForOther.addActionListener(new ActionListener() {
+	        	@Override
+	        	public void actionPerformed(ActionEvent e) {
+	        		System.out.println("getSelectedRow = " + jTable_Automobile_Info.getSelectedRow());
+	        		if (tabbedPane.getSelectedIndex() == 0) {
+	        			if (jTable_Automobile_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(AUTOMOBILE_MODE, EDIT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        		else if (tabbedPane.getSelectedIndex() == 1) {
+	        			if (jTable_House_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(HOME_MODE, EDIT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        		else if (tabbedPane.getSelectedIndex() == 2) {
+	        			if (jTable_Traveler_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(TRAVEL_MODE, EDIT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        		else if (tabbedPane.getSelectedIndex() == 3) {
+	        			if (jTable_Commercial_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(COMMERCIAL_MODE, EDIT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        	}			
+        });
+		
+        jButtonRenewalForOther.addActionListener(new ActionListener() {
+	        	@Override
+	        	public void actionPerformed(ActionEvent e) {
+	        		if (tabbedPane.getSelectedIndex() == 0) {
+	        			if (jTable_Automobile_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(AUTOMOBILE_MODE, INSERT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        		else if (tabbedPane.getSelectedIndex() == 1) {
+	        			if (jTable_House_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(HOME_MODE, INSERT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        		else if (tabbedPane.getSelectedIndex() == 2) {
+        				JOptionPane.showMessageDialog(jFrame, "Travel is not renewable");
+	        		}
+	        		else if (tabbedPane.getSelectedIndex() == 3) {
+	        			if (jTable_Commercial_Info.getSelectedRow() != -1) {
+	        				new MemberDialog(COMMERCIAL_MODE, INSERT_MODE);
+	        			}
+	        			else {
+	        				JOptionPane.showMessageDialog(jFrame, "No data to be updated");
+	        			}
+	        		}
+	        	}			
+	    });
+        jTable_Automobile_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_House_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_Traveler_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_Commercial_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_Personal_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_In_Progress_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_Reserved_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_Claim_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable_Complete_Info.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        
+        TableColumnModel tcmForInProgress = jTable_In_Progress_Info.getColumnModel();
+        tcmForInProgress.getColumn(0).setPreferredWidth(100);     //Name
+        tcmForInProgress.getColumn(1).setPreferredWidth(80);    //Title
+        tcmForInProgress.getColumn(2).setPreferredWidth(100);    //Surname
+        tcmForInProgress.getColumn(3).setPreferredWidth(80);    //expDate
+        tcmForInProgress.getColumn(4).setPreferredWidth(80);    //Proc Type
+        tcmForInProgress.getColumn(5).setPreferredWidth(70);    //Ins Kind
+        tcmForInProgress.getColumn(6).setPreferredWidth(100);    //company
+        tcmForInProgress.getColumn(7).setPreferredWidth(100);    //company
+        
+        TableColumnModel tcmForReserved = jTable_Reserved_Info.getColumnModel();
+        tcmForReserved.getColumn(0).setPreferredWidth(100);     //Name
+        tcmForReserved.getColumn(1).setPreferredWidth(80);    //Title
+        tcmForReserved.getColumn(2).setPreferredWidth(120);    //Surname
+        tcmForReserved.getColumn(3).setPreferredWidth(80);    //expDate
+        tcmForReserved.getColumn(4).setPreferredWidth(70);    //ins type
+        tcmForReserved.getColumn(5).setPreferredWidth(100);    //company
+        tcmForReserved.getColumn(6).setPreferredWidth(100);    //visitDateTime
+        tcmForReserved.getColumn(7).setPreferredWidth(80);    //visitDateTime
+        
+        TableColumnModel tcmForClaim = jTable_Claim_Info.getColumnModel();
+        tcmForClaim.getColumn(0).setPreferredWidth(100);     //Name
+        tcmForClaim.getColumn(1).setPreferredWidth(80);    //Title
+        tcmForClaim.getColumn(2).setPreferredWidth(100);    //Surname
+        tcmForClaim.getColumn(3).setPreferredWidth(80);    //expDate
+        tcmForClaim.getColumn(4).setPreferredWidth(80);    //Proc Type
+        tcmForClaim.getColumn(5).setPreferredWidth(60);    //ins kind
+        tcmForClaim.getColumn(6).setPreferredWidth(100);    //company Name
+        tcmForClaim.getColumn(7).setPreferredWidth(100);    //ownership
+        
+        TableColumnModel tcmForComplete = jTable_Complete_Info.getColumnModel();
+        tcmForComplete.getColumn(0).setPreferredWidth(100);     //Name
+        tcmForComplete.getColumn(1).setPreferredWidth(80);    //Title
+        tcmForComplete.getColumn(2).setPreferredWidth(100);    //Surname
+        tcmForComplete.getColumn(3).setPreferredWidth(80);    //expDate
+        tcmForComplete.getColumn(4).setPreferredWidth(70);    //Proc Type
+        tcmForComplete.getColumn(5).setPreferredWidth(80);    //company Name
+        tcmForComplete.getColumn(6).setPreferredWidth(100);    //
+        tcmForComplete.getColumn(7).setPreferredWidth(100);    //
+        
+        TableColumnModel tcmForPersonal = jTable_Personal_Info.getColumnModel();
+        tcmForPersonal.getColumn(0).setPreferredWidth(100);     //Name
+        tcmForPersonal.getColumn(1).setPreferredWidth(90);    //Title
+        tcmForPersonal.getColumn(2).setPreferredWidth(120);    //Surname
+        tcmForPersonal.getColumn(3).setPreferredWidth(100);    //expDate
+        tcmForPersonal.getColumn(4).setPreferredWidth(360);    //Proc Type
+        
+        TableColumnModel tcmForAuto = jTable_Automobile_Info.getColumnModel();
+        tcmForAuto.getColumn(0).setPreferredWidth(100);   //CustID
+        tcmForAuto.getColumn(1).setPreferredWidth(100);    //time stamp
+        tcmForAuto.getColumn(2).setPreferredWidth(70);    //txn Type
+        tcmForAuto.getColumn(3).setPreferredWidth(80);    //Proc Type
+        tcmForAuto.getColumn(4).setPreferredWidth(80);    //exp Date
+        tcmForAuto.getColumn(5).setPreferredWidth(100);    //new exp date
+        tcmForAuto.getColumn(6).setPreferredWidth(65);    //plate #
+        tcmForAuto.getColumn(7).setPreferredWidth(65);    //doc#
+        tcmForAuto.getColumn(8).setPreferredWidth(80);    //premium
+        tcmForAuto.getColumn(9).setPreferredWidth(80);   //text Date
+        tcmForAuto.getColumn(10).setPreferredWidth(70);   //call Date
+        tcmForAuto.getColumn(11).setPreferredWidth(85);   //company
+        tcmForAuto.getColumn(12).setPreferredWidth(85);   //ownership
+        tcmForAuto.getColumn(13).setPreferredWidth(350);   //Memo
+        
+        TableColumnModel tcmForHouse = jTable_House_Info.getColumnModel();
+        tcmForHouse.getColumn(0).setPreferredWidth(100);   //CustID
+        tcmForHouse.getColumn(1).setPreferredWidth(100);    //time stamp
+        tcmForHouse.getColumn(2).setPreferredWidth(70);    //txn Type
+        tcmForHouse.getColumn(3).setPreferredWidth(80);    //Proc Type
+        tcmForHouse.getColumn(4).setPreferredWidth(80);    //exp Date
+        tcmForHouse.getColumn(5).setPreferredWidth(100);    //new exp date
+        tcmForHouse.getColumn(6).setPreferredWidth(65);    //sigxp #
+        tcmForHouse.getColumn(7).setPreferredWidth(85);    //premium#
+        tcmForHouse.getColumn(8).setPreferredWidth(90);    //text Date
+        tcmForHouse.getColumn(9).setPreferredWidth(90);   //call Date
+        tcmForHouse.getColumn(10).setPreferredWidth(80);   //company
+        tcmForHouse.getColumn(11).setPreferredWidth(90);   //ownership
+        tcmForHouse.getColumn(12).setPreferredWidth(380);   //memo
+        
+        TableColumnModel tcmForTravel = jTable_Traveler_Info.getColumnModel();
+        tcmForTravel.getColumn(0).setPreferredWidth(100);   //CustID
+        tcmForTravel.getColumn(1).setPreferredWidth(100);    //time stamp
+        tcmForTravel.getColumn(2).setPreferredWidth(70);    //txn Type
+        tcmForTravel.getColumn(3).setPreferredWidth(80);    //Proc Type
+        tcmForTravel.getColumn(4).setPreferredWidth(80);    //eff Date
+        tcmForTravel.getColumn(5).setPreferredWidth(80);    //exp date
+        tcmForTravel.getColumn(6).setPreferredWidth(100);    //policy #
+        tcmForTravel.getColumn(7).setPreferredWidth(75);    //premium#
+        tcmForTravel.getColumn(8).setPreferredWidth(80);    //text Date
+        tcmForTravel.getColumn(9).setPreferredWidth(80);   //call Date
+        tcmForTravel.getColumn(10).setPreferredWidth(90);   //company
+        tcmForTravel.getColumn(11).setPreferredWidth(85);   //ownership
+        tcmForTravel.getColumn(12).setPreferredWidth(390);   //memo
+        
+        TableColumnModel tcmForCommercial = jTable_Commercial_Info.getColumnModel();
+        tcmForCommercial.getColumn(0).setPreferredWidth(100);   //CustID
+        tcmForCommercial.getColumn(1).setPreferredWidth(80);    //time stamp
+        tcmForCommercial.getColumn(2).setPreferredWidth(90);    //txn Type
+        tcmForCommercial.getColumn(3).setPreferredWidth(80);    //Proc Type
+        tcmForCommercial.getColumn(4).setPreferredWidth(80);    //exp Date
+        tcmForCommercial.getColumn(5).setPreferredWidth(100);    //new exp date
+        tcmForCommercial.getColumn(6).setPreferredWidth(65);    //sigxp #
+        tcmForCommercial.getColumn(7).setPreferredWidth(65);    //premium
+        tcmForCommercial.getColumn(8).setPreferredWidth(90);    //text Date
+        tcmForCommercial.getColumn(9).setPreferredWidth(90);   //call Date
+        tcmForCommercial.getColumn(10).setPreferredWidth(90);   //company
+        tcmForCommercial.getColumn(11).setPreferredWidth(80);   //ownership
+        tcmForCommercial.getColumn(12).setPreferredWidth(400);   //memo
+        
+		idTextField.setEditable(false);
+		memoField.setLineWrap(true);
+		memoField.setWrapStyleWord(true);
+		memoField.setBounds(99, 224, 207, 62);
+		jPanel_Detailed_Search.add(memoField);
+		memoField.setEditable(false);
+		
+		jPanel_Search_2.add(allButton);
+		jPanel_Search_2.add(customerButton);
+		jPanel_Search_2.add(jTextField);
+		jPanel_Search_2.add(jButton);
+		jPanel_Search_2.setBorder(new LineBorder(new Color(0, 0, 0)));
+		jPanel_Search_2.setLayout(null);
+		
+		allButton.setBounds(50, 7, 60, 23);
+
+		jButton.setBounds(557, 6, 85, 29);
+		jPanel_Search_3.setLayout(null);
+		jButtonForNewCustomer.setBounds(42, 5, 75, 29);
+		
+		jPanel_Search_3.add(jButtonForNewCustomer);
+		jButtonUpdateForCustomer.setBounds(135, 5, 75, 29);
+		jPanel_Search_3.add(jButtonUpdateForCustomer);
+				
+		jPanel_Search.setPreferredSize(new Dimension(1257, 50));
+		jPanel_Search.setLayout(null);
+		
+		jPanel_Search.add(jPanel_Search_2);
+		jPanel_Search.add(jPanel_Search_3);
+				
+		jPanel_Search.getInsets();
+		jPanel_Search_2.getPreferredSize();
+		jPanel_Search_2.setBounds(6, 6, 745, 39);
+		jPanel_Search_3.getPreferredSize();
+		jPanel_Search_3.setBounds(796, 6, 357, 39);
+		
+		jPanel_Top_Section.setLayout(null);
+						
+		jPanel_Top_Section.add(jPanel_Customer_Search);
+		
+		jTable_Family_Info.addMouseListener(new MouseAdapter(){
+		    public void mouseClicked(MouseEvent evnt) {
+		        if (evnt.getClickCount() == 1) {
+		            if (jTable_Family_Info.getSelectedColumn() != -1) {
+		            		int prevRow = jTable_Family_Info.getSelectedRow();
+		            		int prevCol = jTable_Family_Info.getSelectedColumn();
+	            			customerID = (String) jTable_Family_Info.getValueAt(jTable_Family_Info.getSelectedRow(), 0);
+			            	selectAutomobileInfo(customerID);
+			            	selectHomeInfo(customerID);
+			            	selectTravelInfo(customerID);
+		    				selectFamilyInfo(customerID);
+			            	selectDetailedInfo(customerID);
+		    				selectCommercialInfo(customerID);
+		    				//Resets list, so as the default, switches to top row
+		    				System.out.println("jTable_Family_Info.getSelectedRow = " + prevRow + " getSelectedColumn = " + prevCol);
+		    				jTable_Family_Info.changeSelection(prevRow, prevCol, false, false);
+		            }
+		         }
+		     }
+		});
+		tabbedPaneForFamilyInfo.setBounds(1086, 0, 350, 310);
+		jPanel_Customer_Search.add(tabbedPaneForFamilyInfo);
+		
+		tabbedPaneForFamilyInfo.addTab("Family", null, panel_Family_Info);
+		tabbedPaneForFamilyInfo.setPreferredSize(ndForFamilyInfo);
+		tabbedPaneForFamilyInfo.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);    
+		jPanel_Top_Section.add(jPanel_Other_Info);
+		
+		jFrame.getContentPane().add(jPanel_Top_Section, "Center");
+		jFrame.getContentPane().add(jPanel_Search_Result, "South");
+		jFrame.getContentPane().add(jPanel_Search, "North");
+		jFrame.getContentPane().add(jPanel_New_Info, "East");
+		jFrame.getContentPane().add(jPanel_Update, "West");
+			    
+		jFrame.pack();
+		jFrame.setSize(screenSize.width, screenSize.height);
+        jFrame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                // This is only called when the user releases the mouse button.
+                System.out.println("componentResized");
+                Component c = (Component)e.getSource();
+                System.out.println("c.getWidth = " + c.getWidth() + "c.getHeight = " + c.getHeight());
+            }
+        });
+		jFrame.setResizable(true);
+		jFrame.setVisible(true);
+		jFrame.setLocationRelativeTo(null);
+		
+		jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("/Users/Kang/Documents/workspace_calendar_error/CustomerCare/assets/bee.png"));
+		
+		jFrame.addWindowListener( new WindowAdapter() {
+		    public void windowOpened( WindowEvent e ){
+		        jTextField.requestFocus();
+		        tabbedPaneForCustomerInfo.setSelectedIndex(3);
+		        customerButton.setSelected(true);
+		        searchMember(SEARCH_RESERVED, jTextField.getText().trim());
+		    }
+		}); 
+				
+		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+	    
+		//New
+		jButtonForNewCustomer.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				new MemberDialog(CUSTOMER_MODE, NEW_MODE);
+			}			
+		});
+		
+		//Update
+		jButtonUpdateForCustomer.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				System.out.println("idinfo = " + idTextField.getText().trim());
+				new MemberDialog(CUSTOMER_MODE, EDIT_MODE);
+			}			
+		});
+		
+		jButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if(jTextField.getText().trim().length() > 0)
+				{
+					if (customerButton.isSelected()) {
+						searchMember(SEARCH_CUSTOMER, jTextField.getText().trim());
+					}
+					else if (allButton.isSelected()) {
+						searchMember(SEARCH_ALL, jTextField.getText().trim());
+					}
+					
+					jButton.setText("Search");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(jFrame, "Please enter search word!");
+				}
+			}
+		});
+	}
+ 	
+	protected static ImageIcon createImageIcon(String path) {
+	    java.net.URL imgURL = CustomerCare.class.getResource(path);
+	    return new ImageIcon(imgURL);
+	}
+	
+	public void closeDatabase()
+	{
+		try
+		{
+			if (connection != null)
+			{
+				connection.close();
+			}
+			 
+			if (statement != null)
+			{
+				statement.close();
+			}
+			 
+			if (resultSet != null)
+			{
+				resultSet.close();
+			}
+		}
+		catch (SQLException e)
+		{
+			System.out.println("closeDatabase" +  e.getStackTrace());
+		}
+	}
+	
+	public String idCheck()
+	{
+		String result = null;
+
+		try
+		{	
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+			statement = connection.createStatement();
+ 
+			resultSet = statement.executeQuery("SELECT IFNULL(MAX(CUST_ID),0)  +1 FROM cccustom;");
+			
+			if (resultSet.next())
+			{
+				result = resultSet.getString(1);
+				System.out.println("result =" + result);
+			}
+		}
+		catch (SQLException e)
+		{
+			System.out.println("IDCheck" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+		return result;
+	}
+	
+	public String timeStampCheck()
+	{
+		String result = null;
+		
+		try
+		{	
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+			statement = connection.createStatement();
+ 
+			resultSet = statement.executeQuery("SELECT DATE_FORMAT(now(),'%Y%m%d%H%i%s')");
+			
+			if (resultSet.next())
+			{
+				result = resultSet.getString(1);
+				System.out.println("result = " + result);
+			}
+		}
+		catch (SQLException e)
+		{
+			System.out.println("timeStampCheck" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+		return result;
+	}
+	
+	public void searchMember(int searchMode, String keyWord)
+	{
+	
+		System.out.println(searchMode);
+		
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+			 			
+			totalTextField.setText("0");
+						
+			switch (searchMode) {
+				
+				case SEARCH_CUSTOMER:
+					
+					String keyWord2 = keyWord.replaceAll("\\s+","");
+					
+					resultSet = statement.executeQuery("SELECT A.CUST_ID, A.LAST_NAME, A.FIRST_NAME, A.CELL_NO, A.MEMO FROM (SELECT B.* ,concat(replace(B.FIRST_NAME, ' ',''), replace(B.LAST_NAME, ' ','')) NAME_STR_1, concat(replace(B.LAST_NAME, ' ',''), replace(B.FIRST_NAME, ' ','')) NAME_STR_2 FROM CCCUSTOM B) A where A.NAME_STR_1 LIKE '%" + keyWord2 + "%' OR A.NAME_STR_2 LIKE '%" + keyWord2 + "%' or A.CUST_ID LIKE '%" + keyWord2 + "%' or A.CELL_NO LIKE '%" + keyWord2 + "%'");
+				break;
+				
+				case SEARCH_ALL:
+					resultSet = statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, 'AUTO' INS_KIND, B.EXP_DATE, B.PROC_TYPE, B.COMPANY_NAME, B.COMPLETE_DATE FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.EXP_DATE LIKE '" + keyWord + "%' UNION ALL SELECT  C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, 'HOME' INS_KIND, C.EXP_DATE, C.PROC_TYPE, C.COMPANY_NAME, C.COMPLETE_DATE FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.EXP_DATE LIKE '" + keyWord + "%' UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME,'COMM' INS_KIND, E.EXP_DATE, E.PROC_TYPE, E.COMPANY_NAME, E.COMPLETE_DATE FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.EXP_DATE LIKE '" + keyWord + "%' ORDER BY 5,6");
+				break;	
+				
+				case SEARCH_RESERVED:
+					resultSet = statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.VISIT_DATE_TIME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.PROC_TYPE IN ('RESERVED') AND B.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, 'HOME' INS_KIND, C.COMPANY_NAME, C.VISIT_DATE_TIME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.PROC_TYPE IN ('RESERVED') AND C.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, 'COMM' INS_KIND, E.COMPANY_NAME, E.VISIT_DATE_TIME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.PROC_TYPE IN ('RESERVED') AND E.TXN_TYPE NOT IN ('CLAIM')  UNION ALL SELECT  F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.MAIL_DATE_TIME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.PROC_TYPE IN ('RESERVED') AND F.TXN_TYPE NOT IN ('CLAIM')  ORDER BY 7, 3, 2");
+				break;
+				
+				case SEARCH_IN_PROGRESS:
+					resultSet = statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, B.PROC_TYPE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND B.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, C.PROC_TYPE, 'HOME' INS_KIND, C.COMPANY_NAME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND C.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, E.PROC_TYPE, 'COMM' INS_KIND, E.COMPANY_NAME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND E.TXN_TYPE NOT IN ('CLAIM') UNION ALL SELECT F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, F.PROC_TYPE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.PROC_TYPE NOT IN ('SUCCESS', 'FAIL', 'NEXT', 'COMPLETE', 'CLOSE') AND F.TXN_TYPE NOT IN ('CLAIM') ORDER BY 4,5");
+				break;
+				
+				case SEARCH_IN_COMPLETE:
+					resultSet = statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.PROC_TYPE = 'COMPLETE' UNION ALL SELECT C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, 'HOME' INS_KIND, C.COMPANY_NAME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.PROC_TYPE = 'COMPLETE' UNION ALL SELECT E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, 'COMM' INS_KIND, E.COMPANY_NAME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.PROC_TYPE = 'COMPLETE' UNION ALL SELECT F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.PROC_TYPE = 'COMPLETE' ORDER BY 4,5");
+				break;	
+				
+				case SEARCH_CLAIM:
+					resultSet = statement.executeQuery("SELECT B.CUST_ID, A.LAST_NAME, A.FIRST_NAME, B.EXP_DATE, B.PROC_TYPE, 'AUTO' INS_KIND, B.COMPANY_NAME, B.COMPLETE_DATE, B.OWNERSHIP FROM CCCUSTOM A, AUTXNPRM B WHERE A.CUST_ID = B.CUST_ID AND B.TXN_TYPE = 'CLAIM' AND B.PROC_TYPE NOT IN ('CLOSE') UNION ALL SELECT C.CUST_ID, A.LAST_NAME, A.FIRST_NAME, C.EXP_DATE, C.PROC_TYPE, 'HOME' INS_KIND, C.COMPANY_NAME, C.COMPLETE_DATE, C.OWNERSHIP FROM CCCUSTOM A, HOTXNPRM C WHERE A.CUST_ID = C.CUST_ID AND C.TXN_TYPE = 'CLAIM' AND C.PROC_TYPE NOT IN ('CLOSE') UNION ALL SELECT  E.CUST_ID, A.LAST_NAME, A.FIRST_NAME, E.EXP_DATE, E.PROC_TYPE, 'COMM' INS_KIND, E.COMPANY_NAME, E.COMPLETE_DATE, E.OWNERSHIP FROM CCCUSTOM A, COTXNPRM E WHERE A.CUST_ID = E.CUST_ID AND E.TXN_TYPE = 'CLAIM' AND E.PROC_TYPE NOT IN ('CLOSE') UNION ALL SELECT  F.CUST_ID, A.LAST_NAME, A.FIRST_NAME, F.EXP_DATE, F.PROC_TYPE, 'TRAV' INS_KIND, F.COMPANY_NAME, F.COMPLETE_DATE, F.OWNERSHIP FROM CCCUSTOM A, TRTXNPRM F WHERE A.CUST_ID = F.CUST_ID AND F.TXN_TYPE = 'CLAIM' AND F.PROC_TYPE NOT IN ('CLOSE') ORDER BY 4,5");
+				break;	
+			}
+
+			defaultTableModel_Personal_Info.setRowCount(0);
+			defaultTableModel_In_Progress_Info.setRowCount(0);
+			defaultTableModel_Complete_Info.setRowCount(0);
+			defaultTableModel_All_Info.setRowCount(0);
+			defaultTableModel_Reserved_Info.setRowCount(0);
+			defaultTableModel_Claim_Info.setRowCount(0);
+			
+			while (resultSet.next())
+			{	
+				
+				if (searchMode == SEARCH_IN_PROGRESS) {
+										
+					String customerID = resultSet.getString(1);
+					String lastName = resultSet.getString(2);
+					String firstName = resultSet.getString(3);
+					String expDate = resultSet.getString(4);
+					String procType = resultSet.getString(5);
+					String insType = resultSet.getString(6);
+					String companyName = resultSet.getString(7);
+					String ownership = resultSet.getString(9);
+							
+					System.out.println(ownership);
+					
+				    Object[] row = {customerID, lastName, firstName, expDate, procType, insType, companyName, ownership};
+				    
+				    if (tabbedPaneForCustomerInfo.getSelectedIndex() == 2) {
+						defaultTableModel_In_Progress_Info.addRow(row);
+						String rs = String.valueOf(defaultTableModel_In_Progress_Info.getRowCount());
+						totalTextField.setText(rs);
+				    }
+				}
+				else if (searchMode == SEARCH_RESERVED) {
+					
+					String customerID = resultSet.getString(1);
+					String lastName = resultSet.getString(2);
+					String firstName = resultSet.getString(3);
+					String expDate = resultSet.getString(4);
+					String inskind = resultSet.getString(5);
+					String companyName = resultSet.getString(6);
+					String visitDateTime = resultSet.getString(7);
+					String ownership = resultSet.getString(9); //>>>>>>>>>>>>>>> bad
+					
+				    Object[] row = {customerID, lastName, firstName, expDate, inskind, companyName, visitDateTime, ownership};
+					
+				    if (tabbedPaneForCustomerInfo.getSelectedIndex() == 3) {
+						defaultTableModel_Reserved_Info.addRow(row);
+						String rs = String.valueOf(defaultTableModel_Reserved_Info.getRowCount());
+						totalTextField.setText(rs);
+				    }
+				}
+				else if (searchMode == SEARCH_CLAIM) {
+					
+					String customerID = resultSet.getString(1);
+					String lastName = resultSet.getString(2);
+					String firstName = resultSet.getString(3);
+					String expDate = resultSet.getString(4);
+					String procType = resultSet.getString(5);
+					String insKind = resultSet.getString(6);
+					String companyName = resultSet.getString(7);
+					String ownership = resultSet.getString(9); //>>>>>>>>>>>>>>> bad
+					
+				    Object[] row = {customerID, lastName, firstName, expDate, procType, insKind, companyName, ownership};
+					
+				    if (tabbedPaneForCustomerInfo.getSelectedIndex() == 0) {
+						defaultTableModel_Claim_Info.addRow(row);
+						String rs = String.valueOf(defaultTableModel_Claim_Info.getRowCount());
+						tabbedPaneForCustomerInfo.setSelectedIndex(0);
+						totalTextField.setText(rs);
+				    }
+				}
+				else if (searchMode == SEARCH_CUSTOMER) {
+					String customerID = resultSet.getString(1);
+					String lastName = resultSet.getString(2);
+					String firstName = resultSet.getString(3);
+					String phoneNum = resultSet.getString(4);
+					String memo = resultSet.getString(5);
+					
+				    Object[] row = {customerID, lastName, firstName, phoneNum, memo};
+					tabbedPaneForCustomerInfo.setSelectedIndex(5);
+					defaultTableModel_Personal_Info.addRow(row);
+					String rs = String.valueOf(defaultTableModel_Personal_Info.getRowCount());
+					totalTextField.setText(rs);
+				}
+				else if (searchMode == SEARCH_IN_COMPLETE) {
+					String customerID = resultSet.getString(1);
+					String lastName = resultSet.getString(2);
+					String firstName = resultSet.getString(3);
+					String expDate = resultSet.getString(4);
+					String insType = resultSet.getString(5);
+					String companyName = resultSet.getString(6);
+					String completeDate = resultSet.getString(7);
+					String ownership = resultSet.getString(8); //>>>>>>>>>>>>>>  good
+					
+				    Object[] row = {customerID, lastName, firstName, expDate, insType, companyName, completeDate, ownership};
+				    if (tabbedPaneForCustomerInfo.getSelectedIndex() == 1) {
+				    		defaultTableModel_Complete_Info.addRow(row);
+						tabbedPaneForCustomerInfo.setSelectedIndex(1);
+						String rs = String.valueOf(defaultTableModel_Complete_Info.getRowCount());
+						totalTextField.setText(rs);
+				    }
+				}
+				else if (searchMode == SEARCH_ALL) {
+					String customerID = resultSet.getString(1);
+					String lastName = resultSet.getString(2);
+					String firstName = resultSet.getString(3);
+					String insType = resultSet.getString(4);
+					String expDate = resultSet.getString(5);
+					String procType = resultSet.getString(6);
+					String companyName = resultSet.getString(7);
+					
+				    Object[] row = {customerID, lastName, firstName, expDate, procType, insType, companyName};
+				    defaultTableModel_All_Info.addRow(row);
+					tabbedPaneForCustomerInfo.setSelectedIndex(4);
+					String rs = String.valueOf(defaultTableModel_All_Info.getRowCount());
+					totalTextField.setText(rs);
+				}
+			}
+			
+			if (defaultTableModel_Personal_Info.getRowCount() > 0)
+			{
+				jTable_Personal_Info.setRowSelectionInterval(0, 0);
+			}
+			//CustomerInfo end
+			
+		}
+		catch (SQLException e)
+		{
+			System.out.println("SQLException - searchMember" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+	}
+	
+	public void selectAutomobileInfo(String customerID) {
+		try
+		{								
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+		
+			resultAutomobileSet = statement.executeQuery("SELECT * FROM AUTXNPRM where AUTXNPRM.CUST_ID = \"" + customerID + "\"ORDER BY TIME_STAMP DESC");
+			
+			defaultTableModel_Automobile_Info.setRowCount(0);			
+			
+			while (resultAutomobileSet.next())
+			{
+				String customerId = resultAutomobileSet.getString(1);
+				String timeStamp = resultAutomobileSet.getString(2);
+				String txnType = resultAutomobileSet.getString(3);
+				String plateNo = resultAutomobileSet.getString(4);
+				String docNo= resultAutomobileSet.getString(5);
+				String expDate = resultAutomobileSet.getString(6);
+				String newExpDate = resultAutomobileSet.getString(7);
+				String procType = resultAutomobileSet.getString(8);
+				String premium = resultAutomobileSet.getString(9);
+				String textDate = resultAutomobileSet.getString(10);
+				String callDate = resultAutomobileSet.getString(11);
+				String companyName = resultAutomobileSet.getString(14);
+				String owner = resultAutomobileSet.getString(15);
+				String memo = resultAutomobileSet.getString(16);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, expDate, newExpDate, plateNo, docNo, premium, textDate, callDate, companyName, owner, memo};
+				
+				defaultTableModel_Automobile_Info.addRow(row);
+			}
+			String rs = String.valueOf(defaultTableModel_Automobile_Info.getRowCount());
+			AutoTextField.setText(rs);
+			
+			if (defaultTableModel_Automobile_Info.getRowCount() > 0)
+			{
+				jTable_Automobile_Info.setRowSelectionInterval(0, 0);
+			}
+			//AutomobileInfo end
+		}
+		catch (SQLException e)
+		{
+			System.out.println("SQLException select Auto" + e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+	}
+	public void selectTravelInfo(String customerID) {
+		try
+		{								
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+		
+			resultTravelSet = statement.executeQuery("SELECT * FROM trtxnprm where trtxnprm.CUST_ID = \"" + customerID + "\" ORDER BY TIME_STAMP DESC");
+			
+			defaultTableModel_Traveler_Info.setRowCount(0);			
+					
+			while (resultTravelSet.next())
+			{
+				String customerId = resultTravelSet.getString(1);
+				String timeStamp = resultTravelSet.getString(2);
+				String effDate = resultTravelSet.getString(3);
+				String expDate = resultTravelSet.getString(4);
+				String txnType = resultTravelSet.getString(5);
+				String procType = resultTravelSet.getString(6);
+				String premium = resultTravelSet.getString(7);
+				String textDate = resultTravelSet.getString(8);
+				String callDate = resultTravelSet.getString(9);
+				String companyName = resultTravelSet.getString(12);
+				String owner = resultTravelSet.getString(13);
+				String memo = resultTravelSet.getString(14);
+				String policyNo = resultTravelSet.getString(16);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, effDate, expDate, policyNo, premium, textDate, callDate, companyName, owner, memo};
+				
+				defaultTableModel_Traveler_Info.addRow(row);
+			}
+			String rs = String.valueOf(defaultTableModel_Traveler_Info.getRowCount());
+			TravelTextField.setText(rs);
+			
+			if (defaultTableModel_Traveler_Info.getRowCount() > 0)
+			{
+				jTable_Traveler_Info.setRowSelectionInterval(0, 0);
+			}
+			//AutomobileInfo end
+		}
+		catch (SQLException e)
+		{
+			System.out.println("SQLException Travel Info" +  e.getStackTrace());
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+	}
+	public void selectHomeInfo(String customerID) {
+		try
+		{									
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+		
+			System.out.println("selectHomeInfo = " + customerID);
+			
+			resultHomeSet = statement.executeQuery("SELECT * FROM HOTXNPRM where HOTXNPRM.CUST_ID = \"" + customerID + "\" ORDER BY TIME_STAMP DESC");
+	
+			//AutomobileInfo				
+			defaultTableModel_House_Info.setRowCount(0);			
+			
+			while (resultHomeSet.next()) {
+				String customerId = resultHomeSet.getString(1);
+				String timeStamp = resultHomeSet.getString(2);
+				String expDate = resultHomeSet.getString(3);
+				String newExpDate = resultHomeSet.getString(4);
+				String txnType = resultHomeSet.getString(5);
+				String procType = resultHomeSet.getString(6);
+				String sigxpNo = resultHomeSet.getString(7);
+				String premium = resultHomeSet.getString(8);
+				String textDateTime = resultHomeSet.getString(9);
+				String callDateTime = resultHomeSet.getString(10);
+				String companyName = resultHomeSet.getString(13);
+				String owner = resultHomeSet.getString(14);
+				String memo = resultHomeSet.getString(15);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, expDate, newExpDate, sigxpNo, premium, textDateTime, callDateTime, companyName, owner, memo};
+			    
+				defaultTableModel_House_Info.addRow(row);
+			}
+			String rs = String.valueOf(defaultTableModel_House_Info.getRowCount());
+			HouseTextField.setText(rs);
+			
+			if (defaultTableModel_House_Info.getRowCount() > 0) {
+				jTable_House_Info.setRowSelectionInterval(0, 0);
+			}
+			//AutomobileInfo end
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException House Info" +  e.getStackTrace());
+		}
+		
+		finally {
+			closeDatabase();
+		}
+	}
+
+	public void selectDetailedInfo(String customerID) {
+		try
+		{									
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+		
+			resultDetailedInfoSet = statement.executeQuery("SELECT * FROM CCCUSTOM where CCCUSTOM.CUST_ID = \"" + customerID + "\"");
+	
+			//DetailedInfo				
+			idTextField.removeAll();			
+			firstNameTextField.removeAll();			
+			LastNameTextField.removeAll();			
+			phoneNumField.removeAll();			
+			birthDateField.removeAll();			
+			emailField.removeAll();			
+			postalCDTextField.removeAll();			
+			priCustIDField.removeAll();			
+			memoField.removeAll();					
+			addrStrtField.removeAll();					
+			addrPvField.removeAll();					
+	
+			while (resultDetailedInfoSet.next()) {
+				String id = resultDetailedInfoSet.getString(1);
+				String lastName = resultDetailedInfoSet.getString(2);
+				String firstName = resultDetailedInfoSet.getString(3);
+				String phoneNum = resultDetailedInfoSet.getString(4);
+				String birthDate = resultDetailedInfoSet.getString(5);
+				String email = resultDetailedInfoSet.getString(6);
+				String priCustID = resultDetailedInfoSet.getString(7);
+				String memo = resultDetailedInfoSet.getString(8);
+				String postalCd = resultDetailedInfoSet.getString(9);
+				String addrStrtNum = resultDetailedInfoSet.getString(10);
+				String addrPvNum = resultDetailedInfoSet.getString(11);
+								
+				idTextField.setText(id);
+				firstNameTextField.setText(firstName);
+				LastNameTextField.setText(lastName);
+				phoneNumField.setText(phoneNum);
+				birthDateField.setText(birthDate);
+				emailField.setText(email);
+				postalCDTextField.setText(postalCd);
+				priCustIDField.setText(priCustID);
+				memoField.setText(memo);
+				addrStrtField.setText(addrStrtNum);	
+				addrPvField.setText(addrPvNum);	
+			}
+			
+			//AutomobileInfo end
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException Detailed Info" +  e.getStackTrace());
+		}
+		
+		finally {
+			closeDatabase();
+		}
+	}
+	
+	public void selectFamilyInfo(String customerID) {
+		try
+		{									
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+			
+			resultFamilyInfoSet = statement.executeQuery("SELECT * FROM CCCUSTOM A WHERE A.CUST_ID = \"" + customerID + "\" OR A.PRI_CUST_ID = \"" + customerID + "\" UNION SELECT * FROM CCCUSTOM A WHERE A.CUST_ID IN (SELECT B.PRI_CUST_ID FROM CCCUSTOM B WHERE B.CUST_ID = \"" + customerID + "\") UNION SELECT * FROM CCCUSTOM A WHERE A.PRI_CUST_ID IN (SELECT B.PRI_CUST_ID FROM CCCUSTOM B WHERE B.CUST_ID = \"" + customerID + "\") ORDER BY 1;");
+			
+			defaultTableModel_Family_Info.setRowCount(0);			
+
+			while (resultFamilyInfoSet.next())
+			{				
+				String custID = resultFamilyInfoSet.getString(1);
+				String lastName = resultFamilyInfoSet.getString(2);
+				String firstName = resultFamilyInfoSet.getString(3);
+				String birthDate = resultFamilyInfoSet.getString(5);
+				
+			    Object[] row = {custID, lastName, firstName, birthDate};
+				
+				defaultTableModel_Family_Info.addRow(row);
+			}
+			
+			if (defaultTableModel_Family_Info.getRowCount() > 0) {
+				jTable_Family_Info.setRowSelectionInterval(0, 0);
+			}
+			//AutomobileInfo end
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException4" +  e.getStackTrace());
+		}
+		
+		finally {
+			closeDatabase();
+		}
+	}
+	
+	public void selectCommercialInfo(String customerID) {
+		
+		try
+		{									
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			statement = connection.createStatement();
+			
+			resultCommercialInfoSet = statement.executeQuery("SELECT * FROM COTXNPRM where COTXNPRM.CUST_ID = \"" + customerID + "\"ORDER BY TIME_STAMP DESC");
+			
+			defaultTableModel_Commercial_Info.setRowCount(0);			
+
+			while (resultCommercialInfoSet.next())
+			{				
+				String customerId = resultCommercialInfoSet.getString(1);
+				String timeStamp = resultCommercialInfoSet.getString(2);
+				String expDate = resultCommercialInfoSet.getString(3);
+				String newExpDate = resultCommercialInfoSet.getString(4);
+				String txnType = resultCommercialInfoSet.getString(5);
+				String procType = resultCommercialInfoSet.getString(6);
+				String premium = resultCommercialInfoSet.getString(7);
+				String textDate = resultCommercialInfoSet.getString(8);
+				String callDate = resultCommercialInfoSet.getString(9);
+				String companyName = resultCommercialInfoSet.getString(12);
+				String owner = resultCommercialInfoSet.getString(13);
+				String memo = resultCommercialInfoSet.getString(14);
+				String sigxpNo = resultCommercialInfoSet.getString(16);
+
+			    Object[] row = { customerId, timeStamp, txnType, procType, expDate, newExpDate, sigxpNo, premium, textDate, callDate, companyName, owner, memo};
+				
+				defaultTableModel_Commercial_Info.addRow(row);			
+			}
+			String rs = String.valueOf(defaultTableModel_Commercial_Info.getRowCount());
+			CommercialTextField.setText(rs);
+			
+			if (defaultTableModel_Commercial_Info.getRowCount() > 0) {
+				jTable_Commercial_Info.setRowSelectionInterval(0, 0);
+			}
+			//AutomobileInfo end
+		}
+		catch (SQLException e) {
+			System.out.println("SQLException4" +  e.getStackTrace());
+		}
+		
+		finally {
+			closeDatabase();
+		}
+	}
+	
+	public boolean submitMember(int dialogMode, String tempID, String LastName, String FirstName, String cellNum, String birthDate, String email, String priCustID, String memo, String postalCd, String addrStNum, String addrPvNum)
+	{
+		
+		int result = 0;
+		
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+ 
+			if (dialogMode == NEW_MODE)
+			{	
+				String id = String.format("%010d", Integer.parseInt(tempID));
+				
+				preparedStatement = connection.prepareStatement("INSERT INTO CCCUSTOM (CUST_ID, LAST_NAME, FIRST_NAME, CELL_NO, BIRTH_DATE, EMAIL, PRI_CUST_ID, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'));");
+								
+				preparedStatement.setString(1, id);
+				preparedStatement.setString(2, LastName);
+				preparedStatement.setString(3, FirstName);
+				preparedStatement.setString(4, cellNum);
+				preparedStatement.setString(5, birthDate);
+				preparedStatement.setString(6, email);
+				preparedStatement.setString(7, priCustID);
+				preparedStatement.setString(8, memo);
+				preparedStatement.setString(9, postalCd);
+				preparedStatement.setString(10, addrStNum);
+				preparedStatement.setString(11, addrPvNum);
+								
+	//			       the mysql insert statement
+			}
+			else if (dialogMode == EDIT_MODE)
+			{
+				preparedStatement = connection.prepareStatement("UPDATE cccustom SET LAST_NAME=?, FIRST_NAME=?, CELL_NO=?, BIRTH_DATE=?, EMAIL=?, PRI_CUST_ID = ?, MEMO = ?, POSTAL_CD = ?, ADDR_ST_NM = ?, ADDR_PV_NM = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s') WHERE CUST_ID=?");
+				preparedStatement.setString(1, LastName);
+				preparedStatement.setString(2, FirstName);
+				preparedStatement.setString(3, cellNum);
+				preparedStatement.setString(4, birthDate);
+				preparedStatement.setString(5, email);
+				preparedStatement.setString(6, priCustID);
+				preparedStatement.setString(7, memo);
+				preparedStatement.setString(8, postalCd);
+				preparedStatement.setString(9, addrStNum);
+				preparedStatement.setString(10, addrPvNum);
+				preparedStatement.setString(11, tempID);
+				
+			}
+			result = preparedStatement.executeUpdate();
+			
+			// ASCII에서 pricustID가 null이 아니라 0을 넣고 있어서 mysql이 null을 못 넣는다.
+		}
+		catch (SQLException e)
+		{
+			System.out.println("submitMember" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(jFrame, "customer submit error");
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+		
+		System.out.println("SearchMember::submitMember");
+		
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForAuto(int dialogMode, String tempID, String time_stamp, String txnType, String plateNo, String docNo, 
+									  String expDate, String newExpDate, String procType, String premium, String textDateTime, String callDateTime, 
+									  String visitDateTime, String completeDate, String companyName, String ownerShip, String memo, String postalCD, 
+									  String addrStNum, String addrPvNum)
+	{
+		
+		int result = 0;
+		
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+ 
+			if (dialogMode == NEW_MODE)
+			{
+					System.out.println("submitMember new");
+					
+					Float premiumForAuto = Float.parseFloat(premium);
+					
+					preparedStatement = connection.prepareStatement("INSERT INTO AUTXNPRM (CUST_ID, TIME_STAMP, TXN_TYPE, PLATE_NO, DOC_NO, EXP_DATE, NEW_EXP_DATE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'))"); // 19
+				    
+					preparedStatement.setString(1, tempID);
+					preparedStatement.setString(2, time_stamp);
+					preparedStatement.setString(3, txnType);
+					preparedStatement.setString(4, plateNo);
+					preparedStatement.setString(5, docNo);
+					preparedStatement.setString(6, expDate);
+					preparedStatement.setString(7, newExpDate);
+					preparedStatement.setString(8, procType);
+					preparedStatement.setFloat(9, premiumForAuto);
+					preparedStatement.setString(10, textDateTime);
+					preparedStatement.setString(11, callDateTime);
+					preparedStatement.setString(12, visitDateTime);
+					preparedStatement.setString(13, completeDate);
+					preparedStatement.setString(14, companyName);
+					preparedStatement.setString(15, ownerShip);
+					preparedStatement.setString(16, memo);
+					preparedStatement.setString(17, postalCD);
+					preparedStatement.setString(18, addrStNum);
+					preparedStatement.setString(19, addrPvNum);
+
+	//			       the mysql insert statement
+			}
+			else if (dialogMode == EDIT_MODE)
+			{
+				Float premiumForAuto = Float.parseFloat(premium);
+				
+				System.out.println(tempID);
+								
+				preparedStatement = connection.prepareStatement("UPDATE AUTXNPRM SET TXN_TYPE=?, PLATE_NO = ?, DOC_NO = ?, EXP_DATE = ?, NEW_EXP_DATE = ?, PROC_TYPE = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, VISIT_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, POSTAL_CD = ?, ADDR_ST_NM = ?, ADDR_PV_NM = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s') WHERE TIME_STAMP = ? AND CUST_ID = ?");
+				preparedStatement.setString(1, txnType);
+				preparedStatement.setString(2, plateNo);
+				preparedStatement.setString(3, docNo);
+				preparedStatement.setString(4, expDate);
+				preparedStatement.setString(5, newExpDate);
+				preparedStatement.setString(6, procType);
+				preparedStatement.setFloat(7, premiumForAuto);
+				preparedStatement.setString(8, textDateTime);
+				preparedStatement.setString(9, callDateTime);
+				preparedStatement.setString(10, visitDateTime);
+				preparedStatement.setString(11, completeDate);
+				preparedStatement.setString(12, companyName);
+				preparedStatement.setString(13, ownerShip);
+				preparedStatement.setString(14, memo);
+				preparedStatement.setString(15, postalCD);
+				preparedStatement.setString(16, addrStNum);
+				preparedStatement.setString(17, addrPvNum);
+				preparedStatement.setString(18, time_stamp);
+				preparedStatement.setString(19, tempID);
+			}
+				
+			result = preparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			System.out.println("submitMember" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(jFrame, "auto update error");
+		}
+		
+		finally
+		{
+			closeDatabase();
+		}
+		
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForHome(int dialogMode, String tempID, String time_stamp, String expDate,
+									 String newExpDate, String txnType, String procType, String sigxpNo, String premium, 
+									 String textDateTime, String callDateTime, String visitDateTime, String completeDate, String companyName, String ownerShip, 
+									 String memo, String postalCd, String addrStNum, String addrPvNum)
+	{
+
+		int result = 0;
+
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+			if (dialogMode == NEW_MODE)
+			{	
+				Float premiumForAuto = Float.parseFloat(premium);
+
+				preparedStatement = connection.prepareStatement("INSERT INTO HOTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, SIGXP_NO, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'))"); // 18
+
+				preparedStatement.setString(1, tempID);
+				preparedStatement.setString(2, time_stamp);
+				preparedStatement.setString(3, expDate);
+				preparedStatement.setString(4, newExpDate);
+				preparedStatement.setString(5, txnType);
+				preparedStatement.setString(6, procType);
+				preparedStatement.setString(7, sigxpNo);
+				preparedStatement.setFloat(8, premiumForAuto);
+				preparedStatement.setString(9, textDateTime);
+				preparedStatement.setString(10, callDateTime);
+				preparedStatement.setString(11, visitDateTime);
+				preparedStatement.setString(12, completeDate);
+				preparedStatement.setString(13, companyName);
+				preparedStatement.setString(14, ownerShip);
+				preparedStatement.setString(15, memo);
+				preparedStatement.setString(16, postalCd);
+				preparedStatement.setString(17, addrStNum);
+				preparedStatement.setString(18, addrPvNum);
+
+//			       the mysql insert statement
+			}
+			else if (dialogMode == EDIT_MODE)
+			{
+				System.out.println("premium = " + premium);
+				System.out.println("callDateTime = " + callDateTime);
+				System.out.println(time_stamp);				
+				System.out.println(tempID);				
+				
+				System.out.println("submitMember new2");
+				preparedStatement = connection.prepareStatement("UPDATE HOTXNPRM SET EXP_DATE=?, NEW_EXP_DATE = ?, TXN_TYPE = ?, PROC_TYPE = ?, SIGXP_NO = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, VISIT_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, POSTAL_CD = ?, ADDR_ST_NM = ?, ADDR_PV_NM = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s') WHERE TIME_STAMP = ? AND CUST_ID = ?");
+				preparedStatement.setString(1, expDate);
+				preparedStatement.setString(2, newExpDate);
+				preparedStatement.setString(3, txnType);
+				preparedStatement.setString(4, procType);
+				preparedStatement.setString(5, sigxpNo);
+				preparedStatement.setString(6, premium);
+				preparedStatement.setString(7, textDateTime);
+				preparedStatement.setString(8, callDateTime);
+				preparedStatement.setString(9, visitDateTime);
+				preparedStatement.setString(10, completeDate);
+				preparedStatement.setString(11, companyName);
+				preparedStatement.setString(12, ownerShip);
+				preparedStatement.setString(13, memo);
+				preparedStatement.setString(14, postalCd);
+				preparedStatement.setString(15, addrStNum);
+				preparedStatement.setString(16, addrPvNum);
+				preparedStatement.setString(17, time_stamp);
+				preparedStatement.setString(18, tempID);
+			}
+			result = preparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			System.out.println("submitMember" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(jFrame, "home update error");
+		}
+
+		finally
+		{
+			closeDatabase();
+		}
+
+		return (result > 0) ? true : false;
+	}
+	
+	public boolean submitMemberForTravel(int dialogMode, String tempID, String time_stamp, String effDate, 
+			  String expDate, String txnType, String procType, String policyNo, String premium, String textDateTime, String callDateTime, 
+			  String mailDateTime, String completeDate, String companyName, String ownerShip, String memo)
+	{
+	
+		int result = 0;
+	
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		
+			if (dialogMode == NEW_MODE)
+			{
+				
+				preparedStatement = connection.prepareStatement("INSERT INTO TRTXNPRM (CUST_ID, TIME_STAMP, EFF_DATE, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, MAIL_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, POLICY_NO)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s') , ?)"); // 19
+				
+				preparedStatement.setString(1, tempID);
+				preparedStatement.setString(2, time_stamp);
+				preparedStatement.setString(3, effDate);
+				preparedStatement.setString(4, expDate);
+				preparedStatement.setString(5, txnType);
+				preparedStatement.setString(6, procType);
+				preparedStatement.setString(7, premium);
+				preparedStatement.setString(8, textDateTime);
+				preparedStatement.setString(9, callDateTime);
+				preparedStatement.setString(10, mailDateTime);
+				preparedStatement.setString(11, completeDate);
+				preparedStatement.setString(12, companyName);
+				preparedStatement.setString(13, ownerShip);
+				preparedStatement.setString(14, memo);
+				preparedStatement.setString(15, policyNo);
+		
+		//			       the mysql insert statement
+			}
+			else if (dialogMode == EDIT_MODE)
+			{				
+				Float premiumForAuto = Float.parseFloat(premium);
+
+				preparedStatement = connection.prepareStatement("UPDATE TRTXNPRM SET EFF_DATE = ?, EXP_DATE = ?, TXN_TYPE = ?, PROC_TYPE = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, MAIL_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s'), POLICY_NO = ? WHERE TIME_STAMP =? AND CUST_ID = ?");
+				preparedStatement.setString(1, effDate);
+				preparedStatement.setString(2, expDate);
+				preparedStatement.setString(3, txnType);
+				preparedStatement.setString(4, procType);
+				preparedStatement.setFloat(5, premiumForAuto);
+				preparedStatement.setString(6, textDateTime);
+				preparedStatement.setString(7, callDateTime);
+				preparedStatement.setString(8, mailDateTime);
+				preparedStatement.setString(9, completeDate);
+				preparedStatement.setString(10, companyName);
+				preparedStatement.setString(11, ownerShip);
+				preparedStatement.setString(12, memo);
+				preparedStatement.setString(13, policyNo);
+				preparedStatement.setString(14, time_stamp);
+				preparedStatement.setString(15, tempID);
+			}
+
+			result = preparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			System.out.println("submitMemberForTravel" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(jFrame, "travel update error");
+		}
+	
+		finally
+		{
+			closeDatabase();
+		}
+	
+		return (result > 0) ? true : false;
+	
+	}
+	
+	public boolean submitMemberForCommercial(int dialogMode, String tempID, String time_stamp, String expDate, 
+			  String newExpDate, String txnType, String procType, String sigxpNo, String premium, String textDateTime, String callDateTime, 
+			  String visitDateTime, String completeDate, String companyName, String ownerShip, String memo)
+	{
+	
+		int result = 0;
+	
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		
+			if (dialogMode == NEW_MODE)
+			{	
+				
+				Float premiumForCommercial = Float.parseFloat(premium);
+
+				preparedStatement = connection.prepareStatement("INSERT INTO COTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, SIGXP_NO)"+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), ?)"); // 14
+				
+				System.out.println(tempID);
+				
+				preparedStatement.setString(1, tempID);
+				preparedStatement.setString(2, time_stamp);
+				preparedStatement.setString(3, expDate);
+				preparedStatement.setString(4, newExpDate);
+				preparedStatement.setString(5, txnType);
+				preparedStatement.setString(6, procType);
+				preparedStatement.setFloat(7, premiumForCommercial);
+				preparedStatement.setString(8, textDateTime);
+				preparedStatement.setString(9, callDateTime);
+				preparedStatement.setString(10, visitDateTime);
+				preparedStatement.setString(11, completeDate);
+				preparedStatement.setString(12, companyName);
+				preparedStatement.setString(13, ownerShip);
+				preparedStatement.setString(14, memo);
+				preparedStatement.setString(15, sigxpNo);
+		
+		//			       the mysql insert statement
+			}
+			else if (dialogMode == EDIT_MODE)
+			{				
+				Float premiumForCommercial = Float.parseFloat(premium);
+
+				preparedStatement = connection.prepareStatement("UPDATE COTXNPRM SET EXP_DATE = ?, NEW_EXP_DATE = ?, TXN_TYPE = ?, PROC_TYPE = ?, PREMIUM = ?, TEXT_DATE_TIME = ?, CALL_DATE_TIME = ?, VISIT_DATE_TIME = ?, COMPLETE_DATE = ?, COMPANY_NAME = ?, OWNERSHIP = ?, MEMO = ?, CHG_DATE_TIME = DATE_FORMAT(now(),'%Y%m%d%H%i%s'), SIGXP_NO = ? WHERE TIME_STAMP =? AND CUST_ID = ?");
+				preparedStatement.setString(1, expDate);
+				preparedStatement.setString(2, newExpDate);
+				preparedStatement.setString(3, txnType);
+				preparedStatement.setString(4, procType);
+				preparedStatement.setFloat(5, premiumForCommercial);
+				preparedStatement.setString(6, textDateTime);
+				preparedStatement.setString(7, callDateTime);
+				preparedStatement.setString(8, visitDateTime);
+				preparedStatement.setString(9, completeDate);
+				preparedStatement.setString(10, companyName);
+				preparedStatement.setString(11, ownerShip);
+				preparedStatement.setString(12, memo);
+				preparedStatement.setString(13, sigxpNo);
+				preparedStatement.setString(14, time_stamp);
+				preparedStatement.setString(15, tempID);
+			}
+
+			result = preparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			System.out.println("submitMemberForCommercial" +  e.getStackTrace());
+			JOptionPane.showMessageDialog(jFrame, "commercial update error");
+		}
+	
+		finally
+		{
+			closeDatabase();
+		}
+	
+		return (result > 0) ? true : false;
+	
+	}
+	
+	public boolean insertMemberForOther(int dialogMode, String tempID, String time_stamp)
+	{
+	
+		int result = 0;
+	
+		try
+		{
+			connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			if (dialogMode == AUTOMOBILE_MODE) { 
+				preparedStatement = connection.prepareStatement("INSERT INTO AUTXNPRM (CUST_ID, TIME_STAMP, PLATE_NO, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, COMPANY_NAME, OWNERSHIP, CHG_DATE_TIME) SELECT CUST_ID, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), PLATE_NO, NEW_EXP_DATE, 'RENEWAL', 'READY', 0.00, COMPANY_NAME, OWNERSHIP, DATE_FORMAT(now(),'%Y%m%d%H%i%s') FROM AUTXNPRM WHERE CUST_ID = ? AND TIME_STAMP = ?;");
+												
+				preparedStatement.setString(1, tempID);
+				preparedStatement.setString(2, time_stamp);
+			}
+			else if (dialogMode == HOME_MODE) { 
+				preparedStatement = connection.prepareStatement("INSERT INTO HOTXNPRM (CUST_ID, TIME_STAMP, SIGXP_NO, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, COMPANY_NAME, OWNERSHIP, CHG_DATE_TIME) SELECT CUST_ID, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), SIGXP_NO, NEW_EXP_DATE, 'RENEWAL', 'READY', 0.00, COMPANY_NAME, OWNERSHIP, DATE_FORMAT(now(),'%Y%m%d%H%i%s') FROM HOTXNPRM WHERE CUST_ID = ? AND TIME_STAMP = ?;");
+								
+				preparedStatement.setString(1, tempID);
+				preparedStatement.setString(2, time_stamp);
+			}
+			else if (dialogMode == COMMERCIAL_MODE) { 
+				preparedStatement = connection.prepareStatement("INSERT INTO COTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, COMPANY_NAME, OWNERSHIP, CHG_DATE_TIME) SELECT CUST_ID, DATE_FORMAT(now(),'%Y%m%d%H%i%s'), NEW_EXP_DATE, 'RENEWAL', 'READY', 0.00, COMPANY_NAME, OWNERSHIP, DATE_FORMAT(now(),'%Y%m%d%H%i%s') FROM COTXNPRM WHERE CUST_ID = ? AND TIME_STAMP = ?;"); // 14
+								
+				preparedStatement.setString(1, tempID);
+				preparedStatement.setString(2, time_stamp);
+			}
+		//			       the mysql insert statement
+			result = preparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			System.out.println("insertMemberForOther - " +  e.getStackTrace());
+			JOptionPane.showMessageDialog(jFrame, "insert member error");
+		}
+	
+		finally
+		{
+			closeDatabase();
+		}
+	
+		return (result > 0) ? true : false;
+	}
+	
+	public static void main (String[] args) {
+		new CustomerCare();
+	}
+	
+	class MemberDialog {		
+		
+		Calendar cal = Calendar.getInstance();
+		
+		JDialog jDialog = new JDialog(jFrame, "Customer Info Input");
+		JDialog jDialogForAuto = new JDialog(jFrame, "Automobile Info Input");
+		JDialog jDialogForHome = new JDialog(jFrame, "Home Info Input");
+		JDialog jDialogForTravel = new JDialog(jFrame, "Travel Info Input");
+		JDialog jDialogForCommercial = new JDialog(jFrame, "Commercial Info Input");
+		JDialog jDialogUpdate = new JDialog(jFrame, "Update");
+		JDialog jDialogUpdateForAuto = new JDialog(jFrame, "Automobile Update");
+		JDialog jDialogUpdateForHome = new JDialog(jFrame, "Home Update");
+		JDialog jDialogUpdateForTravel = new JDialog(jFrame, "Travel Update");
+		JDialog jDialogUpdateForCommercial = new JDialog(jFrame, "Commercial Update");
+		
+		JButton submitButton = new JButton("Register");
+		JButton cancelButton = new JButton("Cancel");
+		
+		JPanel fieldNamePanel = new JPanel(new GridLayout(0,1));
+		JPanel fieldValuePanel = new JPanel(new GridLayout(0,1));
+		JPanel buttonPanel = new JPanel(new FlowLayout());
+		JPanel buttonPanelForAuto = new JPanel(new FlowLayout());
+		JPanel idPanel = new JPanel(new BorderLayout());
+		JPanel idPanelForAuto = new JPanel(new BorderLayout());
+		JPanel timeStampPanelForAuto = new JPanel(new BorderLayout());
+		JPanel premiumPanelForAuto = new JPanel(new BorderLayout());
+
+		JLabel idLabel = new JLabel("ID");
+		JLabel lastNameLabel = new JLabel("Last Name");
+		JLabel firstNameLabel = new JLabel("First Name");
+		JLabel cellLabel= new JLabel("Phone #");
+		JLabel birthDateLabel= new JLabel("Birth Date");
+		JLabel emailLabel = new JLabel("Email");
+		JLabel priCustIDLabel = new JLabel("Primary ID");
+		JLabel memoLabel = new JLabel("Memo");
+		JLabel postalCdLabel = new JLabel("Postal Code");
+		JLabel addrStNumLabel = new JLabel("Address");
+		JLabel addrPvNumLabel = new JLabel("City/Prov.");
+		
+		JLabel idLabelForAuto = new JLabel("ID");
+		JLabel timeStampLabel = new JLabel("Time Stamp");
+		JLabel txnTypeLabel = new JLabel("Txn Type");
+		JLabel plateNoLabel = new JLabel("Plate #");
+		JLabel docNoLabel = new JLabel("Doc #");
+		JLabel expDatelabel = new JLabel("Expiry Date");
+		JLabel newExpDatelabel = new JLabel("New Expiry Date");
+		JLabel procTypeLabel = new JLabel("Proc Type");
+		JLabel premiumLabel = new JLabel("Premium");
+		JLabel textDateTime = new JLabel("Text Date");
+		JLabel callDateTime = new JLabel("Call Date");
+		JLabel visitDateTime = new JLabel("Visit Date");
+		JLabel completeDateLabel = new JLabel("Complete Date");
+		JLabel companyNameLabel = new JLabel("Company Name");
+		JLabel onwerLabel = new JLabel("Owner");
+		
+		JLabel effDateLabel = new JLabel("Eff Date");
+		JLabel sigxpNoLabel = new JLabel("Sigxp No");
+		JLabel mailDateTimeLabel = new JLabel("Mail Date");
+		JLabel crtDateTimeLabel = new JLabel("Crt Date Time");
+		JLabel policyNoLabel = new JLabel("Policy #");
+		
+		JTextField idField = new JTextField(20);
+		JTextField lastNameField = new JTextField(20);
+		JTextField firstNameField = new JTextField(20);
+		JTextField cellField = new JTextField(20);
+		
+		JTextField birthDateTextField = new JTextField();
+		JTextField emailTextField = new JTextField(20);
+		JTextField priCustIDTextField = new JTextField(20);
+		JTextArea memoTextField = new JTextArea();
+		JScrollPane memoTextFieldArea = new JScrollPane(memoTextField);
+		JTextField postalCdField = new JTextField(20);
+		JTextField addrStrtNumTextField = new JTextField(20);
+		JTextField addrPvNumTextField = new JTextField(20);
+
+		JTextField idFieldForAuto = new JTextField(20);
+		JTextField idFieldForHome = new JTextField(20);
+		JTextField idFieldForTravel = new JTextField(20);
+		JTextField idFieldForCommercial = new JTextField(20);		
+		JTextField timeStampField = new JTextField(20);
+		String[] txnTypeStrings = {"NEW BIZ", "RENEWAL", "CHANGE", "CANCEL", "CLAIM"};
+		String[] txnTypeStringsForAutomobile = {"NEW PLATE", "RENEWAL", "TRANSFER", "CHANGE", "CANCEL", "CLAIM", "AMEND"};
+		JComboBox txnTypeField = new JComboBox(txnTypeStrings);
+		JComboBox txnTypeFieldForAuto = new JComboBox(txnTypeStringsForAutomobile);
+		JTextField plateNoField = new JTextField(20);
+		JTextField docNoField = new JTextField(20);
+		JTextField expDateField = new JTextField(20);
+		JTextField newExpDateField = new JTextField(20);
+		String[] procTypeStrings = { "READY", "ONGOING", "WAITING", "RESERVED", "COMPLETE", "SUCCESS", "FAIL", "NEXT", "OPEN", "CLOSE"};
+		JComboBox procTypeField = new JComboBox(procTypeStrings);
+		JTextField premiumField = new JTextField(20);
+		JTextField premiumFieldForAuto = new JTextField(20);
+		JTextField premiumFieldForHome = new JTextField(20);
+		JTextField premiumFieldForTravel = new JTextField(20);
+		JTextField premiumFieldForCommercial = new JTextField(20);
+		JTextField textDateTimeField = new JTextField();
+		JTextField callDateTimeField = new JTextField();
+		JTextField visitDateTimeField = new JTextField();
+		JTextField completeDateField = new JTextField();
+		JTextField companyNameField = new JTextField();
+		JTextField ownerField = new JTextField(20);
+		
+		JTextField effDateField = new JTextField();
+		JTextField mailDateTimeField = new JTextField();
+		JTextField sigxpNoField = new JTextField(20);
+		JTextField crtDateTimeField = new JTextField();
+		JTextField policyNoField = new JTextField();
+
+		int dialogMode = NEW_MODE;
+
+		MemberDialog(int newInfo, int dialogMode) {			
+
+			Action currentDate = new AbstractAction() {
+			    public void actionPerformed(ActionEvent e) {
+			    	
+			    	   DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+			    	   
+			    	   Date date = new Date();
+			    	   if (effDateField.hasFocus()) {
+			    		   effDateField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (mailDateTimeField.hasFocus()) {
+			    		   mailDateTimeField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (crtDateTimeField.hasFocus()) {
+			    		   crtDateTimeField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (textDateTimeField.hasFocus()) {
+			    		   textDateTimeField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (callDateTimeField.hasFocus()) {
+			    		   callDateTimeField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (visitDateTimeField.hasFocus()) {
+			    		   visitDateTimeField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (completeDateField.hasFocus()) {
+			    		   completeDateField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (expDateField.hasFocus()) {
+			    		   expDateField.setText(dateFormat.format(date));
+			    	   }
+			    	   else if (newExpDateField.hasFocus()) {
+			    		   newExpDateField.setText(dateFormat.format(date));
+			    	   }
+			    }
+			};
+			effDateField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+			                            "currentDate");
+			effDateField.getActionMap().put("currentDate",
+					currentDate);
+		      
+			mailDateTimeField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			mailDateTimeField.getActionMap().put("currentDate",
+			currentDate);
+			
+			crtDateTimeField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			crtDateTimeField.getActionMap().put("currentDate",
+			currentDate);
+			
+			textDateTimeField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			textDateTimeField.getActionMap().put("currentDate",
+			currentDate);
+			
+			callDateTimeField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			callDateTimeField.getActionMap().put("currentDate",
+			currentDate);
+			
+			visitDateTimeField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			visitDateTimeField.getActionMap().put("currentDate",
+			currentDate);
+			
+			completeDateField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			completeDateField.getActionMap().put("currentDate",
+			currentDate);
+			
+			expDateField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			expDateField.getActionMap().put("currentDate",
+			currentDate);
+			
+			newExpDateField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK),
+                    "currentDate");
+			
+			newExpDateField.getActionMap().put("currentDate",
+			currentDate);
+			
+			if (dialogMode == NEW_MODE) {
+				if (newInfo == CUSTOMER_MODE) {
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(lastNameLabel);
+					fieldNamePanel.add(firstNameLabel);
+					fieldNamePanel.add(cellLabel);
+					fieldNamePanel.add(birthDateLabel);
+					fieldNamePanel.add(emailLabel);
+					fieldNamePanel.add(priCustIDLabel);
+					fieldNamePanel.add(postalCdLabel);
+					fieldNamePanel.add(addrStNumLabel);
+					fieldNamePanel.add(addrPvNumLabel);
+					fieldNamePanel.add(memoLabel);
+	
+					fieldValuePanel.add(idPanel);
+					fieldValuePanel.add(lastNameField);
+					fieldValuePanel.add(firstNameField);
+					fieldValuePanel.add(cellField);
+					fieldValuePanel.add(birthDateTextField);
+					fieldValuePanel.add(emailTextField);		
+					fieldValuePanel.add(priCustIDTextField);
+					fieldValuePanel.add(postalCdField);
+					fieldValuePanel.add(addrStrtNumTextField);
+					fieldValuePanel.add(addrPvNumTextField);
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanel.add(idField);
+					idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idField.setText(CustomerCare.this.idCheck());
+					
+					buttonPanel.add(submitButton);
+					buttonPanel.add(cancelButton);
+	
+					jDialog.getContentPane().add(fieldValuePanel, "Center");
+					jDialog.getContentPane().add(fieldNamePanel, "West");
+					jDialog.getContentPane().add(buttonPanel, "South");
+					
+					jDialog.setVisible(true);
+					jDialog.setSize(286, 456);
+					jDialog.setLocationRelativeTo(jFrame);
+					jDialog.setResizable(true);
+				}		
+				else if (newInfo == AUTOMOBILE_MODE) {
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(newExpDatelabel);
+					fieldNamePanel.add(plateNoLabel);
+					fieldNamePanel.add(docNoLabel);
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(visitDateTime);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(postalCdLabel);
+					fieldNamePanel.add(addrStNumLabel);
+					fieldNamePanel.add(addrPvNumLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanelForAuto);
+					fieldValuePanel.add(timeStampPanelForAuto);
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(newExpDateField);
+					fieldValuePanel.add(plateNoField);
+					fieldValuePanel.add(docNoField);
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(visitDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(postalCdField);
+					fieldValuePanel.add(addrStrtNumTextField);
+					fieldValuePanel.add(addrPvNumTextField);
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+										
+					timeStampPanelForAuto.add(timeStampField);
+					timeStampField.setEnabled(false);
+					timeStampField.setText(CustomerCare.this.timeStampCheck());
+																	
+					idPanelForAuto.add(idFieldForAuto);
+					idFieldForAuto.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForAuto.setText(idTextField.getText().trim());
+					
+					premiumPanelForAuto.add(premiumFieldForAuto);
+					premiumFieldForAuto.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForAuto.setText("0.00");
+					
+					buttonPanelForAuto.add(submitButton);
+					buttonPanelForAuto.add(cancelButton);
+					
+					jDialogForAuto.getContentPane().add(fieldValuePanel, "Center");
+					jDialogForAuto.getContentPane().add(fieldNamePanel, "West");
+					jDialogForAuto.getContentPane().add(buttonPanelForAuto, "South");
+	
+					jDialogForAuto.pack();
+					jDialogForAuto.setVisible(true);
+					jDialogForAuto.setSize(301, 514);
+					jDialogForAuto.setLocationRelativeTo(jFrame);
+					jDialogForAuto.setResizable(false);
+				}
+				else if (newInfo == HOME_MODE) {
+					
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(newExpDatelabel);					
+					fieldNamePanel.add(sigxpNoLabel);					
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(visitDateTime);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(postalCdLabel);
+					fieldNamePanel.add(addrStNumLabel);
+					fieldNamePanel.add(addrPvNumLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanelForAuto);
+					fieldValuePanel.add(timeStampPanelForAuto);
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(newExpDateField);					
+					fieldValuePanel.add(sigxpNoField);					
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(visitDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(postalCdField);
+					fieldValuePanel.add(addrStrtNumTextField);
+					fieldValuePanel.add(addrPvNumTextField);											
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanelForAuto.add(idFieldForHome);
+					idFieldForHome.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForHome.setText(idTextField.getText().trim());
+					
+					premiumPanelForAuto.add(premiumFieldForHome);
+					premiumFieldForHome.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForHome.setText("0.00");
+
+					timeStampPanelForAuto.add(timeStampField);
+					timeStampField.setEnabled(false);
+					timeStampField.setText(CustomerCare.this.timeStampCheck());
+					
+					buttonPanelForAuto.add(submitButton);
+					buttonPanelForAuto.add(cancelButton);
+					
+					jDialogForHome.getContentPane().add(fieldValuePanel, "Center");
+					jDialogForHome.getContentPane().add(fieldNamePanel, "West");
+					jDialogForHome.getContentPane().add(buttonPanelForAuto, "South");
+	
+					jDialogForHome.pack();
+					jDialogForHome.setVisible(true);
+					jDialogForHome.setSize(301, 514);
+					jDialogForHome.setLocationRelativeTo(jFrame);
+					jDialogForHome.setResizable(false);
+				}
+				else if (newInfo == TRAVEL_MODE){
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(effDateLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(policyNoLabel);
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(mailDateTimeLabel);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanelForAuto);
+					fieldValuePanel.add(timeStampPanelForAuto);			
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(effDateField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(policyNoField);
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(mailDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+																	
+					idPanelForAuto.add(idFieldForTravel);
+					idFieldForTravel.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForTravel.setText(idTextField.getText().trim());
+					
+					premiumPanelForAuto.add(premiumFieldForTravel);
+					premiumFieldForTravel.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForTravel.setText("0.00");
+					
+					timeStampPanelForAuto.add(timeStampField);
+					timeStampField.setEnabled(false);
+					timeStampField.setText(CustomerCare.this.timeStampCheck());
+					
+					buttonPanelForAuto.add(submitButton);
+					buttonPanelForAuto.add(cancelButton);
+					
+					jDialogForTravel.getContentPane().add(fieldValuePanel, "Center");
+					jDialogForTravel.getContentPane().add(fieldNamePanel, "West");
+					jDialogForTravel.getContentPane().add(buttonPanelForAuto, "South");
+	
+					jDialogForTravel.pack();
+					jDialogForTravel.setVisible(true);
+					jDialogForTravel.setSize(301, 514);
+					jDialogForTravel.setLocationRelativeTo(jFrame);
+					jDialogForTravel.setResizable(false);
+				}
+				else if (newInfo == COMMERCIAL_MODE){
+					System.out.println("CommercialMode");
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(newExpDatelabel);
+					fieldNamePanel.add(sigxpNoLabel);
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(visitDateTime);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanelForAuto);
+					fieldValuePanel.add(timeStampPanelForAuto);		
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(newExpDateField);
+					fieldValuePanel.add(sigxpNoField);
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(visitDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanelForAuto.add(idFieldForCommercial);
+					idFieldForCommercial.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForCommercial.setText(idTextField.getText().trim());
+					
+					premiumPanelForAuto.add(premiumFieldForCommercial);
+					premiumFieldForCommercial.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForCommercial.setText("0.00");
+					
+					timeStampPanelForAuto.add(timeStampField);
+					timeStampField.setEnabled(false);
+					timeStampField.setText(CustomerCare.this.timeStampCheck());
+					
+					buttonPanelForAuto.add(submitButton);
+					buttonPanelForAuto.add(cancelButton);
+					
+					jDialogForCommercial.getContentPane().add(fieldValuePanel, "Center");
+					jDialogForCommercial.getContentPane().add(fieldNamePanel, "West");
+					jDialogForCommercial.getContentPane().add(buttonPanelForAuto, "South");
+	
+					jDialogForCommercial.pack();
+					jDialogForCommercial.setVisible(true);
+					jDialogForCommercial.setSize(301, 514);
+					jDialogForCommercial.setLocationRelativeTo(jFrame);
+					jDialogForCommercial.setResizable(false);
+				}
+			}
+			else if (dialogMode == EDIT_MODE) {
+				if (newInfo == CUSTOMER_MODE) {
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(lastNameLabel);
+					fieldNamePanel.add(firstNameLabel);
+					fieldNamePanel.add(cellLabel);
+					fieldNamePanel.add(birthDateLabel);
+					fieldNamePanel.add(emailLabel);
+					fieldNamePanel.add(priCustIDLabel);
+					fieldNamePanel.add(postalCdLabel);
+					fieldNamePanel.add(addrStNumLabel);
+					fieldNamePanel.add(addrPvNumLabel);
+					fieldNamePanel.add(memoLabel);
+	
+					fieldValuePanel.add(idPanel);
+					fieldValuePanel.add(lastNameField);
+					fieldValuePanel.add(firstNameField);
+					fieldValuePanel.add(cellField);
+					fieldValuePanel.add(birthDateTextField);
+					fieldValuePanel.add(emailTextField);		
+					fieldValuePanel.add(priCustIDTextField);
+					fieldValuePanel.add(postalCdField);
+					fieldValuePanel.add(addrStrtNumTextField);
+					fieldValuePanel.add(addrPvNumTextField);
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanel.add(idField);
+					idField.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idField.setText(String.valueOf(idTextField.getText().trim()));
+					
+					try {
+						connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+						
+						statement = connection.createStatement();
+											
+						resultSet = statement.executeQuery("SELECT * FROM CCCUSTOM where CCCUSTOM.CUST_ID = \"" + idField.getText().trim() + "\"");
+									
+						lastNameField.removeAll();
+						firstNameField.removeAll();
+						cellField.removeAll();
+						birthDateTextField.removeAll();
+						emailTextField.removeAll();
+						priCustIDTextField.removeAll();
+						memoTextField.removeAll();
+						postalCdField.removeAll();
+						addrStrtNumTextField.removeAll();
+						addrPvNumTextField.removeAll();
+						
+						while (resultSet.next()) {
+							String lastName = resultSet.getString(2);
+							String firstName = resultSet.getString(3);
+							String cellNo = resultSet.getString(4);
+							String birthDate = resultSet.getString(5);
+							String email = resultSet.getString(6);
+							String primaryID = resultSet.getString(7);
+							String memo = resultSet.getString(8);
+							String postalCD = resultSet.getString(9);
+							String addrStrt = resultSet.getString(10);
+							String addrPv = resultSet.getString(11);
+
+							lastNameField.setText(lastName);
+							firstNameField.setText(firstName);
+							cellField.setText(cellNo);
+							
+							birthDateTextField.setText(birthDate);
+							emailTextField.setText(email);	
+							priCustIDTextField.setText(primaryID);
+							memoTextField.setText(memo);
+							postalCdField.setText(postalCD);
+							addrStrtNumTextField.setText(addrStrt);
+							addrPvNumTextField.setText(addrPv);	
+						}
+						
+						if (defaultTableModel_House_Info.getRowCount() > 0) {
+							jTable_House_Info.setRowSelectionInterval(0, 0);
+						}
+						
+					} catch (SQLException e) {
+						System.out.println("submitMember" +  e.getStackTrace());
+					}
+					
+					buttonPanel.add(submitButton);
+					buttonPanel.add(cancelButton);
+	
+					jDialogUpdate.getContentPane().add(fieldValuePanel, "Center");
+					jDialogUpdate.getContentPane().add(fieldNamePanel, "West");
+					jDialogUpdate.getContentPane().add(buttonPanel, "South");
+					
+					jDialogUpdate.setVisible(true);
+					jDialogUpdate.setSize(286, 456);
+					jDialogUpdate.setLocationRelativeTo(jFrame);
+					jDialogUpdate.setResizable(false);
+				}
+				else if (newInfo == AUTOMOBILE_MODE) {
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(newExpDatelabel);
+					fieldNamePanel.add(plateNoLabel);
+					fieldNamePanel.add(docNoLabel);
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(visitDateTime);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(postalCdLabel);
+					fieldNamePanel.add(addrStNumLabel);
+					fieldNamePanel.add(addrPvNumLabel);
+					fieldNamePanel.add(memoLabel);
+					
+					fieldValuePanel.add(idPanelForAuto);
+					fieldValuePanel.add(timeStampField);
+					fieldValuePanel.add(txnTypeFieldForAuto);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(newExpDateField);	
+					fieldValuePanel.add(plateNoField);
+					fieldValuePanel.add(docNoField);
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(visitDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(postalCdField);
+					fieldValuePanel.add(addrStrtNumTextField);
+					fieldValuePanel.add(addrPvNumTextField);
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanelForAuto.add(idFieldForAuto);
+					idFieldForAuto.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForAuto.setText(String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 0)));
+					
+					timeStampField.setText(String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 1)));
+					timeStampField.setEnabled(false);//to disable further editing of ID when creating a new profile
+					
+					premiumPanelForAuto.add(premiumFieldForAuto);
+					premiumFieldForAuto.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForAuto.setText("0.00");
+	
+					try {
+					
+						connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+						
+						statement = connection.createStatement();
+					
+						System.out.println("time stamp = " + timeStampField.getText().trim() + "id = " + idFieldForHome.getText().trim());
+						
+						resultAutomobileSet = statement.executeQuery("SELECT * FROM AUTXNPRM where AUTXNPRM.CUST_ID = \"" + String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 0)) + "\" AND TIME_STAMP = \"" + timeStampField.getText().trim() + "\"");
+												
+						while (resultAutomobileSet.next()) {
+							String txnType = resultAutomobileSet.getString(3);
+							String plateNo = resultAutomobileSet.getString(4);
+							String docNo = resultAutomobileSet.getString(5);
+							String expDate = resultAutomobileSet.getString(6);
+							String newExpDate = resultAutomobileSet.getString(7);
+							String procType = resultAutomobileSet.getString(8);
+							String premiumForAuto = resultAutomobileSet.getString(9);
+							String textDateTime = resultAutomobileSet.getString(10);
+							String callDateTime = resultAutomobileSet.getString(11);
+							String visitDateTime = resultAutomobileSet.getString(12);
+							String completeDate = resultAutomobileSet.getString(13);
+							String companyName = resultAutomobileSet.getString(14);
+							String owner = resultAutomobileSet.getString(15);
+							String memoText = resultAutomobileSet.getString(16);
+							String postalCd = resultAutomobileSet.getString(17);
+							String addrStrtNumText = resultAutomobileSet.getString(18);
+							String addrPvNumText = resultAutomobileSet.getString(19);
+
+							txnTypeFieldForAuto.setSelectedItem(txnType);
+							plateNoField.setText(plateNo);
+							docNoField.setText(docNo);
+							expDateField.setText(expDate);
+							newExpDateField.setText(newExpDate);	
+							procTypeField.setSelectedItem(procType);
+							premiumFieldForAuto.setText(premiumForAuto);
+							textDateTimeField.setText(textDateTime);
+							callDateTimeField.setText(callDateTime);
+							visitDateTimeField.setText(visitDateTime);	
+							completeDateField.setText(completeDate);
+							companyNameField.setText(companyName);	
+							ownerField.setText(owner);
+							memoTextField.setText(memoText);
+							postalCdField.setText(postalCd);
+							addrStrtNumTextField.setText(addrStrtNumText);
+							addrPvNumTextField.setText(addrPvNumText);	
+						}
+						
+						if (defaultTableModel_House_Info.getRowCount() > 0) {
+							jTable_House_Info.setRowSelectionInterval(0, 0);
+						}
+						
+					} catch (SQLException e) {
+						System.out.println("submitMember" +  e.getStackTrace());
+					}
+					
+					buttonPanel.add(submitButton);
+					buttonPanel.add(cancelButton);
+	
+					jDialogUpdateForAuto.getContentPane().add(fieldValuePanel, "Center");
+					jDialogUpdateForAuto.getContentPane().add(fieldNamePanel, "West");
+					jDialogUpdateForAuto.getContentPane().add(buttonPanel, "South");
+					
+					jDialogUpdateForAuto.setVisible(true);
+					jDialogUpdateForAuto.setSize(286, 456);
+					jDialogUpdateForAuto.setLocationRelativeTo(jFrame);
+					jDialogUpdateForAuto.setResizable(false);
+				}
+				else if (newInfo == HOME_MODE) {
+					
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(newExpDatelabel);					
+					fieldNamePanel.add(sigxpNoLabel);					
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(visitDateTime);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(postalCdLabel);
+					fieldNamePanel.add(addrStNumLabel);
+					fieldNamePanel.add(addrPvNumLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanel);
+					fieldValuePanel.add(timeStampField);
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(newExpDateField);					
+					fieldValuePanel.add(sigxpNoField);					
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(visitDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(postalCdField);
+					fieldValuePanel.add(addrStrtNumTextField);
+					fieldValuePanel.add(addrPvNumTextField);		
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanel.add(idFieldForHome);
+					idFieldForHome.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForHome.setText(String.valueOf(idTextField.getText().trim()));
+					
+					timeStampField.setText(String.valueOf(defaultTableModel_House_Info.getValueAt(jTable_House_Info.getSelectedRow(), 1)));
+					timeStampField.setEnabled(false);
+					
+					premiumPanelForAuto.add(premiumFieldForHome);
+					premiumFieldForHome.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForHome.setText("0.00");
+					
+					try {
+					
+						connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+						
+						statement = connection.createStatement();
+					
+						System.out.println("time stamp = " + timeStampField.getText().trim() + "id = " + idFieldForHome.getText().trim());
+						
+						resultHomeSet = statement.executeQuery("SELECT * FROM HOTXNPRM where HOTXNPRM.CUST_ID = \"" + idFieldForHome.getText().trim() + "\" AND TIME_STAMP = \"" + timeStampField.getText().trim() + "\"");
+												
+						while (resultHomeSet.next()) {
+							String expDate = resultHomeSet.getString(3);
+							String newExpDate = resultHomeSet.getString(4);
+							String txnType = resultHomeSet.getString(5);
+							String procType = resultHomeSet.getString(6);
+							String sigxpNo = resultHomeSet.getString(7);
+							String premium = resultHomeSet.getString(8);
+							String textDateTime = resultHomeSet.getString(9);
+							String callDateTime = resultHomeSet.getString(10);
+							String visitDateTime = resultHomeSet.getString(11);
+							String completeDate = resultHomeSet.getString(12);
+							String companyName = resultHomeSet.getString(13);
+							String owner = resultHomeSet.getString(14);
+							String memo = resultHomeSet.getString(15);
+							String postalCD = resultHomeSet.getString(16);
+							String addrStNm = resultHomeSet.getString(17);
+							String addrPvNm = resultHomeSet.getString(18);
+
+							expDateField.setText(expDate);
+							newExpDateField.setText(newExpDate);
+							txnTypeField.setSelectedItem(txnType);
+							procTypeField.setSelectedItem(procType);
+							sigxpNoField.setText(sigxpNo);
+							premiumFieldForHome.setText(premium);
+							completeDateField.setText(completeDate);	
+							companyNameField.setText(companyName);
+							ownerField.setText(owner);
+							memoTextField.setText(memo);
+							
+							textDateTimeField.setText(textDateTime);
+							callDateTimeField.setText(callDateTime);
+							visitDateTimeField.setText(visitDateTime);	
+							
+							postalCdField.setText(postalCD);
+							addrStrtNumTextField.setText(addrStNm);	
+							addrPvNumTextField.setText(addrPvNm);
+						}
+						
+						if (defaultTableModel_House_Info.getRowCount() > 0) {
+							jTable_House_Info.setRowSelectionInterval(0, 0);
+						}
+						
+					} catch (SQLException e) {
+						System.out.println("submitMember" +  e.getStackTrace());
+					}
+					
+					buttonPanel.add(submitButton);
+					buttonPanel.add(cancelButton);
+	
+					jDialogUpdateForHome.getContentPane().add(fieldValuePanel, "Center");
+					jDialogUpdateForHome.getContentPane().add(fieldNamePanel, "West");
+					jDialogUpdateForHome.getContentPane().add(buttonPanel, "South");
+					
+					jDialogUpdateForHome.setVisible(true);
+					jDialogUpdateForHome.setSize(286, 456);
+					jDialogUpdateForHome.setLocationRelativeTo(jFrame);
+					jDialogUpdateForHome.setResizable(false);
+				}
+				else if (newInfo == TRAVEL_MODE) {
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(effDateLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(policyNoLabel);
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(mailDateTimeLabel);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanel);
+					fieldValuePanel.add(timeStampField);		
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(effDateField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(policyNoField);
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(mailDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+					
+					idPanel.add(idFieldForTravel);
+					idFieldForTravel.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForTravel.setText(String.valueOf(idTextField.getText().trim()));
+					
+					timeStampField.setText(String.valueOf(defaultTableModel_Traveler_Info.getValueAt(jTable_Traveler_Info.getSelectedRow(), 1)));
+					timeStampField.setEnabled(false);//to disable further editing of ID when creating a new profile
+
+					premiumPanelForAuto.add(premiumFieldForTravel);
+					premiumFieldForTravel.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForTravel.setText("0.00");
+					
+					try {
+						
+						connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+						
+						statement = connection.createStatement();
+					
+						System.out.println("time stamp = " + timeStampField.getText().trim() + "id = " + idFieldForHome.getText().trim());
+						
+						resultTravelSet = statement.executeQuery("SELECT * FROM TRTXNPRM where TRTXNPRM.CUST_ID = \"" + idFieldForTravel.getText().trim() + "\" AND TIME_STAMP = \"" + timeStampField.getText().trim() + "\"");
+												
+						while (resultTravelSet.next()) {
+							String effDate = resultTravelSet.getString(3);
+							String expDate = resultTravelSet.getString(4);
+							String txnType = resultTravelSet.getString(5);
+							String procType = resultTravelSet.getString(6);
+							String premium = resultTravelSet.getString(7);
+							String textDateTime = resultTravelSet.getString(8);
+							String callDateTime = resultTravelSet.getString(9);
+							String mailDateTime = resultTravelSet.getString(10);
+							String completeDate = resultTravelSet.getString(11);
+							String companyName = resultTravelSet.getString(12);
+							String owner = resultTravelSet.getString(13);
+							String memo = resultTravelSet.getString(14);
+							String policyNo = resultTravelSet.getString(16);
+
+							effDateField.setText(effDate);
+							expDateField.setText(expDate);
+							txnTypeField.setSelectedItem(txnType);
+							procTypeField.setSelectedItem(procType);
+							premiumFieldForTravel.setText(premium);	
+							textDateTimeField.setText(textDateTime);
+							callDateTimeField.setText(callDateTime);
+							mailDateTimeField.setText(mailDateTime);	
+							completeDateField.setText(completeDate);	
+							companyNameField.setText(companyName);	
+							ownerField.setText(owner);	
+							memoTextField.setText(memo);
+							policyNoField.setText(policyNo);	
+						}
+						
+						if (defaultTableModel_Traveler_Info.getRowCount() > 0) {
+							jTable_Traveler_Info.setRowSelectionInterval(0, 0);
+						}
+						
+					} catch (SQLException e) {
+						System.out.println("submitMember" +  e.getStackTrace());
+					}
+
+					buttonPanel.add(submitButton);
+					buttonPanel.add(cancelButton);
+	
+					jDialogUpdateForTravel.getContentPane().add(fieldValuePanel, "Center");
+					jDialogUpdateForTravel.getContentPane().add(fieldNamePanel, "West");
+					jDialogUpdateForTravel.getContentPane().add(buttonPanel, "South");
+					
+					jDialogUpdateForTravel.setVisible(true);
+					jDialogUpdateForTravel.setSize(286, 456);
+					jDialogUpdateForTravel.setLocationRelativeTo(jFrame);
+					jDialogUpdateForTravel.setResizable(false);
+				}
+				else if (newInfo == COMMERCIAL_MODE){
+					System.out.println("CommercialMode");
+					fieldNamePanel.add(idLabel);
+					fieldNamePanel.add(timeStampLabel);
+					fieldNamePanel.add(txnTypeLabel);
+					fieldNamePanel.add(procTypeLabel);
+					fieldNamePanel.add(expDatelabel);
+					fieldNamePanel.add(newExpDatelabel);
+					fieldNamePanel.add(sigxpNoLabel);
+					fieldNamePanel.add(premiumLabel);
+					fieldNamePanel.add(textDateTime);
+					fieldNamePanel.add(callDateTime);
+					fieldNamePanel.add(visitDateTime);
+					fieldNamePanel.add(completeDateLabel);
+					fieldNamePanel.add(companyNameLabel);
+					fieldNamePanel.add(onwerLabel);
+					fieldNamePanel.add(memoLabel);
+
+					fieldValuePanel.add(idPanelForAuto);
+					fieldValuePanel.add(timeStampField);		
+					fieldValuePanel.add(txnTypeField);
+					fieldValuePanel.add(procTypeField);
+					fieldValuePanel.add(expDateField);
+					fieldValuePanel.add(newExpDateField);
+					fieldValuePanel.add(sigxpNoField);
+					fieldValuePanel.add(premiumPanelForAuto);
+					fieldValuePanel.add(textDateTimeField);
+					fieldValuePanel.add(callDateTimeField);
+					fieldValuePanel.add(visitDateTimeField);
+					fieldValuePanel.add(completeDateField);	
+					fieldValuePanel.add(companyNameField);	
+					fieldValuePanel.add(ownerField);	
+					fieldValuePanel.add(memoTextFieldArea);
+					memoTextField.setLineWrap(true);
+					memoTextField.setWrapStyleWord(true);
+																	
+					idPanelForAuto.add(idFieldForCommercial);
+					idFieldForCommercial.setEnabled(false);//to disable further editing of ID when creating a new profile
+					idFieldForCommercial.setText(idTextField.getText().trim());
+					
+					premiumPanelForAuto.add(premiumFieldForCommercial);
+					premiumFieldForCommercial.setEnabled(true);//to disable further editing of ID when creating a new profile
+					premiumFieldForCommercial.setText("0.00");
+
+					timeStampField.setText(String.valueOf(defaultTableModel_Commercial_Info.getValueAt(jTable_Commercial_Info.getSelectedRow(), 1)));
+					timeStampField.setEnabled(false);
+					
+					try {
+						
+						connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+						
+						statement = connection.createStatement();
+					
+						System.out.println("time stamp = " + timeStampField.getText().trim() + "id = " + idFieldForCommercial.getText().trim());
+						
+						resultCommercialInfoSet = statement.executeQuery("SELECT * FROM COTXNPRM where CUST_ID = \"" + idFieldForCommercial.getText().trim() + "\" AND TIME_STAMP = \"" + timeStampField.getText().trim() + "\"");
+												
+						while (resultCommercialInfoSet.next()) {
+							String expDate = resultCommercialInfoSet.getString(3);
+							String newExpDate = resultCommercialInfoSet.getString(4);
+							String txnType = resultCommercialInfoSet.getString(5);
+							String procType = resultCommercialInfoSet.getString(6);
+							String premium = resultCommercialInfoSet.getString(7);
+							String textDateTime = resultCommercialInfoSet.getString(8);
+							String callDateTime = resultCommercialInfoSet.getString(9);
+							String visitDateTime = resultCommercialInfoSet.getString(10);
+							String completeDate = resultCommercialInfoSet.getString(11);
+							String companyName = resultCommercialInfoSet.getString(12);
+							String owner = resultCommercialInfoSet.getString(13);
+							String memo = resultCommercialInfoSet.getString(14);
+							String sigxpNo = resultCommercialInfoSet.getString(16);
+
+							expDateField.setText(expDate);
+							newExpDateField.setText(newExpDate);
+							txnTypeField.setSelectedItem(txnType);
+							procTypeField.setSelectedItem(procType);
+							premiumFieldForCommercial.setText(premium);
+							textDateTimeField.setText(textDateTime);
+							callDateTimeField.setText(callDateTime);
+							visitDateTimeField.setText(visitDateTime);
+							completeDateField.setText(completeDate);	
+							companyNameField.setText(companyName);
+							ownerField.setText(owner);
+							memoTextField.setText(memo);
+							sigxpNoField.setText(sigxpNo);
+						}
+						
+						if (defaultTableModel_House_Info.getRowCount() > 0) {
+							jTable_House_Info.setRowSelectionInterval(0, 0);
+						}
+						
+					} catch (SQLException e) {
+						System.out.println("submitMember11" +  e.getStackTrace());
+					}
+					
+					buttonPanelForAuto.add(submitButton);
+					buttonPanelForAuto.add(cancelButton);
+					
+					jDialogUpdateForCommercial.getContentPane().add(fieldValuePanel, "Center");
+					jDialogUpdateForCommercial.getContentPane().add(fieldNamePanel, "West");
+					jDialogUpdateForCommercial.getContentPane().add(buttonPanelForAuto, "South");
+	
+					jDialogUpdateForCommercial.pack();
+					jDialogUpdateForCommercial.setVisible(true);
+					jDialogUpdateForCommercial.setSize(301, 514);
+					jDialogUpdateForCommercial.setLocationRelativeTo(jFrame);
+					jDialogUpdateForCommercial.setResizable(false);
+				}
+				submitButton.setText("Update");	
+				
+			}
+			else if (dialogMode == INSERT_MODE) {
+				if (newInfo == AUTOMOBILE_MODE) {
+					if (CustomerCare.this.insertMemberForOther(AUTOMOBILE_MODE, String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 0)), String.valueOf(defaultTableModel_Automobile_Info.getValueAt(jTable_Automobile_Info.getSelectedRow(), 1)))) {
+						JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Created!");
+						selectAutomobileInfo(idTextField.getText().trim());
+					}
+				}
+				else if (newInfo == HOME_MODE) {
+					if (CustomerCare.this.insertMemberForOther(HOME_MODE, String.valueOf(defaultTableModel_House_Info.getValueAt(jTable_House_Info.getSelectedRow(), 0)), String.valueOf(defaultTableModel_House_Info.getValueAt(jTable_House_Info.getSelectedRow(), 1)))) {
+						JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Created!");
+						selectHomeInfo(idTextField.getText().trim());
+					}
+				}
+				else if (newInfo == COMMERCIAL_MODE) {
+					if (CustomerCare.this.insertMemberForOther(COMMERCIAL_MODE, String.valueOf(defaultTableModel_Commercial_Info.getValueAt(jTable_Commercial_Info.getSelectedRow(), 0)), String.valueOf(defaultTableModel_Commercial_Info.getValueAt(jTable_Commercial_Info.getSelectedRow(), 1)))) {
+						JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Created!");
+						selectCommercialInfo(idTextField.getText().trim());
+					}
+				}
+				jDialogUpdate.dispose();
+			}
+			
+			// 301 514
+			submitButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (newInfo == CUSTOMER_MODE) {
+						if (lastNameField.getText().trim().length() == 0 ) {
+							JOptionPane.showMessageDialog(jDialog, "Please input last name!");
+							lastNameField.requestFocus();
+						}
+						else if (firstNameField.getText().trim().length() == 0) {
+							JOptionPane.showMessageDialog(jDialog, "Please input first name!");
+							firstNameField.requestFocus();
+						}
+						else { // No Error						
+							 if (dialogMode == NEW_MODE) {						
+								if (CustomerCare.this.submitMember(dialogMode, idField.getText().trim(), lastNameField.getText().trim(), 
+										  firstNameField.getText().trim(), cellField.getText().trim(), birthDateTextField.getText().trim(),
+										  emailTextField.getText().trim(), priCustIDTextField.getText().trim(), memoTextField.getText().trim(), 
+										  postalCdField.getText().trim(), addrStrtNumTextField.getText().trim(), addrPvNumTextField.getText().trim())) {
+									try {
+										if (priCustIDTextField.getText().isEmpty()) {
+											connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+											preparedStatement = connection.prepareStatement("UPDATE CCCUSTOM SET PRI_CUST_ID = NULL WHERE length((rtrim(PRI_CUST_ID)))=0;");
+											
+											preparedStatement.executeUpdate();
+										}
+									} catch (SQLException e1) {
+										JOptionPane.showMessageDialog(jDialog, "insert primaryCustID error");
+										System.out.println("new cccustom" +  e1.getStackTrace());
+									}
+									
+									JOptionPane.showMessageDialog(jDialog, "Register Completed!");
+									jDialog.dispose();
+							        customerButton.setSelected(false);
+									allButton.setSelected(false);
+									
+									searchMember(SEARCH_CUSTOMER, idField.getText().trim());
+									
+		            					customerID = (String) jTable_Personal_Info.getValueAt(0, 0);
+
+									selectDetailedInfo(customerID);
+									selectFamilyInfo(idTextField.getText().trim());
+									selectAutomobileInfo(idTextField.getText().trim());
+									selectHomeInfo(idTextField.getText().trim());
+									selectCommercialInfo(idTextField.getText().trim());
+									selectTravelInfo(idTextField.getText().trim());
+								}
+							}	
+							 else if (dialogMode == EDIT_MODE) {
+								if (CustomerCare.this.submitMember(dialogMode, idField.getText().trim(), lastNameField.getText().trim(), 
+																  firstNameField.getText().trim(), cellField.getText().trim(), birthDateTextField.getText().trim(),
+																  emailTextField.getText().trim(), priCustIDTextField.getText().trim(), memoTextField.getText().trim(), 
+																  postalCdField.getText().trim(), addrStrtNumTextField.getText().trim(), addrPvNumTextField.getText().trim())) {
+									selectDetailedInfo(idTextField.getText().trim());
+									selectFamilyInfo(idTextField.getText().trim());
+									jDialogUpdate.dispose();
+									
+									try {
+										if (priCustIDTextField.getText().isEmpty()) {
+											
+											connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+											preparedStatement = connection.prepareStatement("UPDATE CCCUSTOM SET PRI_CUST_ID = NULL WHERE length((rtrim(PRI_CUST_ID)))=0;");
+											
+											preparedStatement.executeUpdate();
+										}
+									} catch (SQLException e1) {
+										JOptionPane.showMessageDialog(jDialog, "update primaryCustID error");
+										System.out.println("update cccustom" +  e1.getStackTrace());
+									}
+									
+									JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Updated!");
+
+								}
+							}			
+						}
+					// submit button을 누를때, automobile이 
+					}
+					else if (newInfo == AUTOMOBILE_MODE) {
+						System.out.println("hello1");
+						if (plateNoField.getText().trim().length() == 0 ) {
+							JOptionPane.showMessageDialog(jDialog, "Please input plate number!");
+							plateNoField.requestFocus();
+						}
+						else if (expDateField.getText().trim().length() == 0) {
+							JOptionPane.showMessageDialog(jDialog, "Please input expiry date!");
+							expDateField.requestFocus();
+						}
+						else { // No Error			
+							System.out.println("asdfasdf" + (String)txnTypeFieldForAuto.getSelectedItem());
+							
+							if (dialogMode == NEW_MODE) {
+								if (CustomerCare.this.submitMemberForAuto(dialogMode, idFieldForAuto.getText().trim(), timeStampField.getText().trim(), (String)txnTypeFieldForAuto.getSelectedItem(),
+										 plateNoField.getText().trim(), docNoField.getText().trim(), expDateField.getText().trim(), newExpDateField.getText().trim(), 
+										 (String)procTypeField.getSelectedItem(), premiumFieldForAuto.getText().trim(), textDateTimeField.getText().trim(), callDateTimeField.getText().trim(), 
+										 visitDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), ownerField.getText().trim(), 
+										 memoTextField.getText().trim(), postalCdField.getText().trim(), addrStrtNumTextField.getText().trim(), addrPvNumTextField.getText().trim())) {
+									JOptionPane.showMessageDialog(jDialogForAuto, "Register Completed!");
+									selectAutomobileInfo(idFieldForAuto.getText().trim());
+
+									jDialogForAuto.dispose();
+								}	
+							}
+							else if (dialogMode == EDIT_MODE){
+								if (CustomerCare.this.submitMemberForAuto(dialogMode, idFieldForAuto.getText().trim(), timeStampField.getText().trim(), (String)txnTypeFieldForAuto.getSelectedItem(),
+										 plateNoField.getText().trim(), docNoField.getText().trim(), expDateField.getText().trim(), newExpDateField.getText().trim(), 
+										 (String)procTypeField.getSelectedItem(), premiumFieldForAuto.getText().trim(), textDateTimeField.getText().trim(), callDateTimeField.getText().trim(), 
+										 visitDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), ownerField.getText().trim(), 
+										 memoTextField.getText().trim(), postalCdField.getText().trim(), addrStrtNumTextField.getText().trim(), addrPvNumTextField.getText().trim())) {
+									
+									JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Updated!");
+									selectAutomobileInfo(idFieldForAuto.getText().trim());
+	
+									jDialogUpdateForAuto.dispose();
+								}	
+							}
+						}
+					}
+					else if (newInfo == HOME_MODE) {
+						if (expDateField.getText().trim().length() == 0 ) {
+							JOptionPane.showMessageDialog(jDialog, "Please input expiry date!");
+							expDateField.requestFocus();
+						}
+						else if (txnTypeFieldForAuto.getSelectedItem().toString().length() == 0) {
+							JOptionPane.showMessageDialog(jDialog, "Please input txn type!");
+							txnTypeField.requestFocus();
+						}
+						else { // No Error	
+							if (dialogMode == NEW_MODE) {
+								if (CustomerCare.this.submitMemberForHome(dialogMode, idFieldForHome.getText().trim(), timeStampField.getText().trim(), expDateField.getText().trim(), newExpDateField.getText().trim(), 
+										(String)txnTypeField.getSelectedItem(), (String)procTypeField.getSelectedItem(), sigxpNoField.getText().trim(), premiumFieldForHome.getText().trim(), textDateTimeField.getText().trim(), 
+										callDateTimeField.getText().trim(), visitDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), 
+										ownerField.getText().trim(), memoTextField.getText().trim(), postalCdField.getText().trim(), addrStrtNumTextField.getText().trim(), addrPvNumTextField.getText().trim())) {								
+
+									selectHomeInfo(idFieldForHome.getText().trim());
+
+									JOptionPane.showMessageDialog(jDialogForHome, "Register Completed!");
+									jDialogForHome.dispose();
+								}		
+							}
+							else {
+								if (CustomerCare.this.submitMemberForHome(dialogMode, idFieldForHome.getText().trim(), timeStampField.getText().trim(), expDateField.getText().trim(), newExpDateField.getText().trim(), 
+										(String)txnTypeField.getSelectedItem(), (String)procTypeField.getSelectedItem(), sigxpNoField.getText().trim(), premiumFieldForHome.getText().trim(), textDateTimeField.getText().trim(), 
+										callDateTimeField.getText().trim(), visitDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), 
+										ownerField.getText().trim(), memoTextField.getText().trim(), postalCdField.getText().trim(), addrStrtNumTextField.getText().trim(), addrPvNumTextField.getText().trim())) {								
+									
+									JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Updated!");
+									selectHomeInfo(idFieldForHome.getText().trim());
+									jDialogUpdateForHome.dispose();
+								}		
+							}
+						}
+					}
+					else if (newInfo == TRAVEL_MODE) {
+						if (txnTypeField.getSelectedItem().toString().length() == 0 ) {
+							JOptionPane.showMessageDialog(jDialog, "Please input Txn Type!");
+							txnTypeField.requestFocus();
+						}
+						else if (expDateField.getText().trim().length() == 0) {
+							JOptionPane.showMessageDialog(jDialog, "Please input expiry date!");
+							expDateField.requestFocus();
+						}
+						else { // No Error			
+							System.out.println("premiumField = " + premiumField.getText().trim());
+	
+							if (dialogMode == NEW_MODE) {
+								if (CustomerCare.this.submitMemberForTravel(dialogMode, idFieldForTravel.getText().trim(), timeStampField.getText().trim(), effDateField.getText().trim(), 
+										 expDateField.getText().trim(), (String)txnTypeField.getSelectedItem(), (String)procTypeField.getSelectedItem(), policyNoField.getText().trim(), premiumFieldForTravel.getText().trim(), textDateTimeField.getText().trim(),
+										 callDateTimeField.getText().trim(), mailDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), ownerField.getText().trim(), 
+										 memoTextField.getText().trim())) {		
+									
+									selectTravelInfo(idFieldForTravel.getText().trim());
+									JOptionPane.showMessageDialog(jDialogForTravel, "Register Completed!");
+									jDialogForTravel.dispose();
+								}	
+
+							}
+							else {
+								if (CustomerCare.this.submitMemberForTravel(dialogMode, idFieldForTravel.getText().trim(), timeStampField.getText().trim(), effDateField.getText().trim(), 
+										 expDateField.getText().trim(), (String)txnTypeField.getSelectedItem(), (String)procTypeField.getSelectedItem(), policyNoField.getText().trim(), premiumFieldForTravel.getText().trim(), textDateTimeField.getText().trim(),
+										 callDateTimeField.getText().trim(), mailDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), ownerField.getText().trim(), 
+										 memoTextField.getText().trim())) {	
+									
+									JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Updated!");
+									selectTravelInfo(idFieldForTravel.getText().trim());
+									jDialogUpdateForTravel.dispose();
+								}	
+							}
+						}
+					}
+					else if (newInfo == COMMERCIAL_MODE) {
+						if (txnTypeField.getSelectedItem().toString().length() == 0 ) {
+							JOptionPane.showMessageDialog(jDialog, "Please input Txn Type!");
+							txnTypeField.requestFocus();
+						}
+						else if (expDateField.getText().trim().length() == 0) {
+							JOptionPane.showMessageDialog(jDialog, "Please input expiry date!");
+							expDateField.requestFocus();
+						}
+						else { // No Error			
+							System.out.println("premiumField = " + premiumField.getText().trim());
+
+							if (dialogMode == NEW_MODE) {
+								if (CustomerCare.this.submitMemberForCommercial(dialogMode, idFieldForCommercial.getText().trim(), timeStampField.getText().trim(), expDateField.getText().trim(), newExpDateField.getText().trim(),  
+										(String)txnTypeField.getSelectedItem(), (String)procTypeField.getSelectedItem(), sigxpNoField.getText().trim(), premiumFieldForCommercial.getText().trim(), textDateTimeField.getText().trim(),
+										 callDateTimeField.getText().trim(), visitDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), ownerField.getText().trim(), 
+										 memoTextField.getText().trim())) {								
+
+									selectCommercialInfo(idFieldForCommercial.getText().trim());
+									JOptionPane.showMessageDialog(jDialogForCommercial, "Register Completed!");
+									jDialogForCommercial.dispose();
+								}	
+							}
+							else {
+								if (CustomerCare.this.submitMemberForCommercial(dialogMode, idFieldForCommercial.getText().trim(), timeStampField.getText().trim(), expDateField.getText().trim(), newExpDateField.getText().trim(),  
+										(String)txnTypeField.getSelectedItem(), (String)procTypeField.getSelectedItem(), sigxpNoField.getText().trim(), premiumFieldForCommercial.getText().trim(), textDateTimeField.getText().trim(),
+										 callDateTimeField.getText().trim(), visitDateTimeField.getText().trim(), completeDateField.getText().trim(), companyNameField.getText().trim(), ownerField.getText().trim(), 
+										 memoTextField.getText().trim())) {
+									
+									JOptionPane.showMessageDialog(jDialogUpdate, "Succesfully Updated!");
+									selectCommercialInfo(idFieldForCommercial.getText().trim());
+									jDialogUpdateForCommercial.dispose();
+								}	
+							}
+						}
+					}
+				}			
+			});
+
+			cancelButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					jDialog.dispose();
+					jDialogForAuto.dispose();
+					jDialogForTravel.dispose();
+					jDialogForHome.dispose();
+					jDialogForCommercial.dispose();
+					jDialogUpdate.dispose();
+					jDialogUpdateForAuto.dispose();
+					jDialogUpdateForTravel.dispose();
+					jDialogUpdateForHome.dispose();
+					jDialogUpdateForCommercial.dispose();
+				}			
+			});
+		}
+
+		public boolean isNumber(String s)
+		{
+			
+			try
+			{
+				Integer.valueOf(s);
+				return true;
+			}
+			catch(NumberFormatException e)
+			{
+				return false;
+			}
+		}
+	}
+	public class DateItem {
+
+	    private Date mDate;
+
+	    public DateItem(Date date) {
+	        mDate = date;
+	    }
+
+	    public Date getDate() {
+	        return mDate;
+	    }
+
+	    @Override
+	    public String toString() {
+
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+
+	        return sdf.format(mDate);
+	    }
+	}
+	
+	public int getRowCount(ResultSet resultSet) {
+	    if (resultSet == null) {
+	        return 0;
+	    }
+	    try {
+	        resultSet.last();
+	        return resultSet.getRow();
+	    } catch (SQLException exp) {
+	        exp.printStackTrace();
+	    } finally {
+	        try {
+	            resultSet.beforeFirst();
+	        } catch (SQLException exp) {
+	            exp.printStackTrace();
+	        }
+	    }
+	    return 0;
+	}
+}
