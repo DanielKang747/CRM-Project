@@ -1,0 +1,80 @@
+package customerCare;
+
+import java.awt.event.ActionEvent;
+
+public class ActionCommand {
+	
+	public ActionCommand() {
+		GUIForCustomerCare.jButtonOpen.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButtonOpen.setActionCommand("jButtonOpen");
+
+		GUIForCustomerCare.jButtonBackUp.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButtonBackUp.setActionCommand("jButtonBackUp");
+
+		GUIForCustomerCare.jButtonRestore.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButtonRestore.setActionCommand("jButtonRestore");
+
+		GUIForCustomerCare.jButtonForNewOther.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButtonForNewOther.setActionCommand("jButtonForNewOther");
+		
+		GUIForCustomerCare.jButtonUpdateForOther.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButtonUpdateForOther.setActionCommand("jButtonUpdateForOther");
+
+		GUIForCustomerCare.jButtonRenewalForOther.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButtonRenewalForOther.setActionCommand("jButtonRenewalForOther");
+
+		GUIForCustomerCare.jButtonForNewCustomer.addActionListener(new ActionPerformer() {
+			public void actionPerformed(ActionEvent e) {
+				MemberDialog.callDialogs(DatabaseConstant.CUSTOMER_MODE, DatabaseConstant.NEW_MODE);
+			}
+		});
+
+		GUIForCustomerCare.jButtonUpdateForCustomer.addActionListener(new ActionPerformer() {
+			
+			public void actionPerformed(ActionEvent e) {
+				if (GUIForCustomerCare.idTextField.getText()) {
+					
+				}
+				else {
+					MemberDialog.callDialogs(DatabaseConstant.CUSTOMER_MODE, DatabaseConstant.EDIT_MODE);
+				}
+			}
+		});
+			
+		GUIForCustomerCare.jButton.addActionListener(new ActionPerformer());
+		GUIForCustomerCare.jButton.setActionCommand("jButton");
+		
+		GUIForCustomerCare.allButton.addActionListener(new ActionPerformer() {
+			
+			public void actionPerformed(ActionEvent e) {
+				GUIForCustomerCare.customerButton.setSelected(false);
+				GUIForCustomerCare.tabbedPaneForCustomerInfo.setSelectedIndex(4);
+			}
+		});
+
+		GUIForCustomerCare.customerButton.addActionListener(new ActionPerformer() {
+			
+			public void actionPerformed(ActionEvent e) {
+				GUIForCustomerCare.tabbedPaneForCustomerInfo.setSelectedIndex(5);
+				GUIForCustomerCare.allButton.setSelected(false);
+				GUIForCustomerCare.jTextField.requestFocus();
+			}
+		});
+		
+		GUIForMemberDialog.submitButton.addActionListener(new ActionPerformer());
+		GUIForMemberDialog.submitButton.setActionCommand("submitButton");
+		
+		GUIForMemberDialog.cancelButton.addActionListener(new ActionPerformer());
+		GUIForMemberDialog.cancelButton.setActionCommand("closeButton");
+		
+		GUIForCustomerCare.jTable_Claim_Info.addMouseListener(new MousePerformer());
+		GUIForCustomerCare.jTable_Reserved_Info.addMouseListener(new MousePerformer());
+		GUIForCustomerCare.jTable_Complete_Info.addMouseListener(new MousePerformer());
+		GUIForCustomerCare.jTable_In_Progress_Info.addMouseListener(new MousePerformer());
+		GUIForCustomerCare.jTable_Personal_Info.addMouseListener(new MousePerformer());
+		GUIForCustomerCare.jTable_All_Info.addMouseListener(new MousePerformer());
+		GUIForCustomerCare.jTable_Family_Info.addMouseListener(new MousePerformer());
+		
+		GUIForCustomerCare.jTextField.addKeyListener(new MousePerformer());
+	}
+}

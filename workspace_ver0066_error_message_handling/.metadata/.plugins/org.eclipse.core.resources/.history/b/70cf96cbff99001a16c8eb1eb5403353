@@ -1,0 +1,1208 @@
+package customerCare;
+
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.*;
+
+import javax.swing.JOptionPane;
+
+public class ActionPerformer implements ActionListener {
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getActionCommand().equals("jButtonOpen")) {
+			final String prefix = GUIForCustomerCare.idTextField.getText() + "_";
+
+			List<String> results = new ArrayList<String>();
+			
+			switch (GUIForCustomerCare.tabbedPane.getSelectedIndex()) {
+				case 0:
+
+					File dirAuto = new File("/Users/Kang/Desktop/Auto");
+					dirAuto.listFiles(new FileFilter() {
+					    @Override
+					    public boolean accept(File pathname) {
+					    		
+					    	int count = results.size();
+					    	
+							System.out.println("candidates = " + pathname.getName().startsWith(prefix));
+							if (pathname.getName().startsWith(prefix)) {		    								
+								try {
+									System.out.println("file name = " + pathname.getName());
+									Desktop.getDesktop().open(new File(dirAuto + "/" + pathname.getName()));
+									results.add(pathname.getName());
+									  
+									count = results.size();
+									  
+									System.out.println("count size = " + results.size());
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							if (count == 0) {
+								try {
+									Runtime.getRuntime().exec("cd " + dirAuto);
+									Runtime.getRuntime().exec("mkdir " + dirAuto + "/" + prefix + GUIForCustomerCare.LastNameTextField.getText() + GUIForCustomerCare.firstNameTextField.getText());
+									Runtime.getRuntime().exec("open " + dirAuto + "/" + prefix + GUIForCustomerCare.LastNameTextField.getText() + GUIForCustomerCare.firstNameTextField.getText());
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									System.out.println("ActionPerformer - OpenButton - Automobile = " + e.getStackTrace());
+								} 
+							}
+							return pathname.getName().startsWith(prefix);
+					    } 
+					});	
+					break;
+				case 1:
+					File dirHome = new File("/Users/Kang/Desktop/House");
+					Utilities.fileOpen(dirHome);
+					break;
+				case 2:
+					File dirTravel = new File("/Users/Kang/Desktop/Travel");
+					Utilities.fileOpen(dirTravel);
+					break;
+				case 3:
+					File dirCommercial = new File("/Users/Kang/Desktop/Commercial");
+					Utilities.fileOpen(dirCommercial);
+					break;
+			}
+		}
+		else if (e.getActionCommand().equals("jButtonBackUp")) {
+			
+			int numClicks = 0;
+	    		numClicks++;
+	    		
+	    		if (numClicks == 2 || numClicks == 1) {
+	        		try
+	        		{
+	        			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			Utilities.statement = Utilities.connection.createStatement();
+	        			
+	        			Utilities.resultSet = Utilities.statement.executeQuery("SELECT * FROM CCCUSTOM;");
+	
+	    				File file = new File("backup.csv");
+	    				        				
+	    			    FileWriter writer = new FileWriter(file); 
+	        			
+	    				writer.write("Customer ID" + "," + "Last Name" + "," + "First Name" + "," + "Phone Num" + "," + "Birth Date" + "," + "Email" +"," + "PriCustID" + "," + "Memo" + "," + "Postal Cd" + "," + "AddrStNm"+ "," + "AddrPvNm" + "," + "Chg Date Time" + "\r\n");
+	    	        		        					    	        			    	        		
+	        			while (Utilities.resultSet.next()) {			
+	            				
+	    					String customerID = Utilities.resultSet.getString(1);
+	    					String lastName = Utilities.resultSet.getString(2);
+	    					String firstName = Utilities.resultSet.getString(3);
+	    					String phoneNum = Utilities.resultSet.getString(4);
+	    					String birthDate = Utilities.resultSet.getString(5);
+	    					String email = Utilities.resultSet.getString(6);
+	    					String priCustID = Utilities.resultSet.getString(7);
+	    					String memo = Utilities.resultSet.getString(8);
+	    					String postalCD = Utilities.resultSet.getString(9);
+	    					String addrStNm = Utilities.resultSet.getString(10);
+	    					String addrPvNm = Utilities.resultSet.getString(11);
+	    					String chgDateTime = Utilities.resultSet.getString(12);
+	    					
+	        				try {
+	    	        			    file.createNewFile();
+	    	        				writer.write(customerID + "," + lastName + "," + firstName + "," + phoneNum + "," + birthDate + "," + email + "," + priCustID + "," + memo + "," + postalCD + "," + addrStNm + "," + addrPvNm + "," + chgDateTime + "\r\n");
+	        				}
+        	        		catch (IOException e5)
+        	        		{
+        	        			System.out.println("ActionPerformer - BackUpButton - Customer - CreateNewFile = " +  e5.getStackTrace());
+        	        		}
+	    				}
+	        			
+	    			    writer.flush();
+	    			    writer.close(); 
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("ActionPerformer - BackUpButton - Customer = " +  e5.getStackTrace());
+	        		}
+	        		
+	        		try
+	        		{
+	        			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			Utilities.statement = Utilities.connection.createStatement();
+	        			
+	        			Utilities.resultAutomobileSet = Utilities.statement.executeQuery("SELECT * FROM AUTXNPRM ORDER BY 1,2;");
+	
+	    				File backupFileForAuto = new File("backupforAuto.csv");
+	    				        				
+	    			    FileWriter writer = new FileWriter(backupFileForAuto); 
+	        			
+	    			    writer.write("Customer ID" + "," + "Time Stamp" + "," + "Txn Type" + "," + "Plate No" + "," + "Doc No" + "," + "Exp Date" +"," + "New Exp Date" + "," + "Proc Type" + "," + "Premium" + "," + "Text Date Time"+ "," + "Call Date Time" + "," + "Visit Date Time" +  "," + "Complete Date" +  "," + "Company Name" + "," + "Ownership" + "," + "Memo" + "," + "Postal Cd" + "," + "Addr St Nm" +"," + "Addr Pv Nm" +"," + "Chg Date Time" + "\r\n");
+	    					        			
+	        			while (Utilities.resultAutomobileSet.next()) {			
+	        				
+	    					String customerID = Utilities.resultAutomobileSet.getString(1);
+	    					String timeStamp = Utilities.resultAutomobileSet.getString(2);
+	    					String txnType = Utilities.resultAutomobileSet.getString(3);
+	    					String plateNo = Utilities.resultAutomobileSet.getString(4);
+	    					String docNo = Utilities.resultAutomobileSet.getString(5);
+	    					String expDate = Utilities.resultAutomobileSet.getString(6);
+	    					String newExpDate = Utilities.resultAutomobileSet.getString(7);
+	    					String procType = Utilities.resultAutomobileSet.getString(8);
+	    					Double premium = Utilities.resultAutomobileSet.getDouble(9);
+	    					String textDateTime = Utilities.resultAutomobileSet.getString(10);
+	    					String callDateTime = Utilities.resultAutomobileSet.getString(11);
+	    					String visitDateTime = Utilities.resultAutomobileSet.getString(12);
+	    					String completeDate = Utilities.resultAutomobileSet.getString(13);
+	    					String companyname = Utilities.resultAutomobileSet.getString(14);
+	    					String ownership = Utilities.resultAutomobileSet.getString(15);
+	    					String memo = Utilities.resultAutomobileSet.getString(16);
+	    					String postalCd = Utilities.resultAutomobileSet.getString(17);
+	    					String addrStNm = Utilities.resultAutomobileSet.getString(18);
+	    					String addrPvNm = Utilities.resultAutomobileSet.getString(19);
+	    					String chgDateTime = Utilities.resultAutomobileSet.getString(20);
+	    					
+	        				try {
+	        						backupFileForAuto.createNewFile();
+	    	        				writer.write(customerID + "," + timeStamp + "," + txnType + "," + plateNo + "," + docNo + "," + expDate + "," + newExpDate + "," + procType + "," + premium + "," + textDateTime + "," + callDateTime + "," + visitDateTime + "," + completeDate +"," + companyname + "," + ownership + "," + memo +"," + postalCd + "," + addrStNm + "," + addrPvNm +"," + chgDateTime + "\r\n");
+	        				}
+        	        		catch (IOException e5)
+        	        		{
+        	        			System.out.println("ActionPerformer - BackUpButton - Automobile - CreateNewFile = " +  e5.getStackTrace());
+        	        		}
+	    				}
+	        			
+	    			    writer.flush();
+	    			    writer.close();        			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("ActionPerformer - BackUpButton - Automobile = " +  e5.getStackTrace());
+	        		}
+	        		//---------------------------------------------Travel
+	        		try
+	        		{
+	        			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			Utilities.statement = Utilities.connection.createStatement();
+	
+	        			Utilities.resultTravelSet = Utilities.statement.executeQuery("SELECT * FROM TRTXNPRM ORDER BY 1,2;");
+	        			
+	    				File file = new File("backupForTravel.csv");
+	    				        				
+	    			    FileWriter writer = new FileWriter(file); 
+	        			   				
+	    				writer.write("Customer ID" + "," + "Time Stamp" + "," + "Eff Date" + "," + "Exp Date" + "," + "Txn Type" + "," + "Proc Type" +"," + "Premium" + "," + "Text Date Time" + "," + "Call Date Time" + "," + "Mail Date Time"+ "," + "Complete Date" + "," + "Company Name" + "," + "Ownership" +"," + "Memo" +"," + "Chg Date Time" +"," + "Policy No" + "\r\n");
+	    					    	        			        			
+	        			while (Utilities.resultTravelSet.next()) {			
+	        				
+	    					String customerID = Utilities.resultTravelSet.getString(1);
+	    					String timeStamp = Utilities.resultTravelSet.getString(2);
+	    					String effDate = Utilities.resultTravelSet.getString(3);
+	    					String expDate = Utilities.resultTravelSet.getString(4);
+	    					String txnType = Utilities.resultTravelSet.getString(5);
+	    					String procType = Utilities.resultTravelSet.getString(6);
+	    					Double premium = Utilities.resultTravelSet.getDouble(7);
+	    					String textDateTime = Utilities.resultTravelSet.getString(8);
+	    					String callDateTime = Utilities.resultTravelSet.getString(9);
+	    					String mailDateTime = Utilities.resultTravelSet.getString(10);
+	    					String completeDate = Utilities.resultTravelSet.getString(11);
+	    					String companyname = Utilities.resultTravelSet.getString(12);
+	    					String ownership = Utilities.resultTravelSet.getString(13);
+	    					String memo = Utilities.resultTravelSet.getString(14);
+	    					String chgDateTime = Utilities.resultTravelSet.getString(15);
+	    					String policyNo = Utilities.resultTravelSet.getString(16);
+	    					
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + effDate + "," + expDate + "," + txnType + "," + procType + "," + premium + "," + textDateTime + "," + callDateTime + "," + mailDateTime + "," + completeDate + "," + companyname + "," + ownership +"," + memo +"," + chgDateTime +"," + policyNo + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("ActionPerformer - BackUpButton - Travel - CreateNewFile = " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+	    			    writer.flush();
+	    			    writer.close();        			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("ActionPerformer - BackUpButton - Travel = " +  e5.getStackTrace());
+	        		}
+	        		//---------------------------------------------------- Home
+	        		try
+	        		{
+	        			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			Utilities.statement = Utilities.connection.createStatement();
+	        			
+	        			Utilities.resultHomeSet = Utilities.statement.executeQuery("SELECT * FROM HOTXNPRM ORDER BY 1,2;");
+	
+	    				File file = new File("backupforHome.csv");
+	    				        				
+	    			    FileWriter writer = new FileWriter(file); 
+	        			        				
+	    				writer.write("Customer ID" + "," + "Time Stamp" + "," + "Exp Date" + "," + "New Exp Date" + "," + "Txn Type" + "," + "Proc Type" +"," + "Sigxp No" + "," + "Premium" + "," + "Text Date Time" + "," + "Call Date Time"+ "," + "Visit Date Time" + "," + "Complete Date" + "," + "Company Name" +"," + "Ownership" +"," + "Memo" + "," + "Postal Code" + "," + "Addr St Nm" +"," + "Addr Pv Nm" +"," + "Chg Date Time" + "\r\n");        				
+	    	        			        			
+	        			while (Utilities.resultHomeSet.next()) {			
+	        				
+	    					String customerID = Utilities.resultHomeSet.getString(1);
+	    					String timeStamp = Utilities.resultHomeSet.getString(2);
+	    					String expDate = Utilities.resultHomeSet.getString(3);
+	    					String newExpDate = Utilities.resultHomeSet.getString(4);
+	    					String txnType = Utilities.resultHomeSet.getString(5);
+	    					String procType = Utilities.resultHomeSet.getString(6);
+	    					String sigxpNo = Utilities.resultHomeSet.getString(7);
+	    					Double premium = Utilities.resultHomeSet.getDouble(8);
+	    					String textDateTime = Utilities.resultHomeSet.getString(9);
+	    					String callDateTime = Utilities.resultHomeSet.getString(10);
+	    					String visitDateTime = Utilities.resultHomeSet.getString(11);
+	    					String completeDate = Utilities.resultHomeSet.getString(12);
+	    					String companyname = Utilities.resultHomeSet.getString(13);
+	    					String ownership = Utilities.resultHomeSet.getString(14);
+	    					String memo = Utilities.resultHomeSet.getString(15);
+	    					String postalCD = Utilities.resultHomeSet.getString(16);
+	    					String addrStNm = Utilities.resultHomeSet.getString(17);
+	    					String addrPvNm = Utilities.resultHomeSet.getString(18);
+	    					String chgDateTime = Utilities.resultHomeSet.getString(19);
+	    					
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + expDate + "," + newExpDate + "," + txnType + "," + procType + "," + sigxpNo + "," + premium + "," + textDateTime + "," + callDateTime + "," + visitDateTime + "," + completeDate + "," + companyname + "," + ownership + "," + memo + "," + postalCD + "," + addrStNm + "," + addrPvNm + "," + chgDateTime + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("ActionPerformer - BackUpButton - Home - CreateNewFile = " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+	    			    writer.flush();
+	    			    writer.close();
+	    			            			    
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("ActionPerformer - BackUpButton - Home = " +  e5.getStackTrace());
+	        		}
+	        		// --------------------------------------------------------------- Commercial
+	        		try
+	        		{
+	        			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+	        			
+	        			Utilities.statement = Utilities.connection.createStatement();
+	        			
+	        			Utilities.resultCommercialInfoSet = Utilities.statement.executeQuery("SELECT * FROM COTXNPRM ORDER BY 1,2;");
+	
+	    				File file = new File("backupforCommercial.csv");
+	    				        				
+	    			    FileWriter writer = new FileWriter(file); 
+	        			
+	    				writer.write("Customer ID" + "," + "Time Stamp" + "," + "Exp Date" + "," + "New Exp Date" + "," + "Txn Type" + "," + "Proc Type" +"," + "Premium" + "," + "Text Date Time" + "," + "Call Date Time" + "," + "Visit Date Time"+ "," + "Complete Date" + "," + "Company Name" + "," + "Ownership" +"," + "Memo" +"," + "Chg Date Time" +"," + "Sigxp No" + "\r\n");
+	    	        			        			
+	        			while (Utilities.resultCommercialInfoSet.next()) {			
+	        				
+	    					String customerID = Utilities.resultCommercialInfoSet.getString(1);
+	    					String timeStamp = Utilities.resultCommercialInfoSet.getString(2);
+	    					String expDate = Utilities.resultCommercialInfoSet.getString(3);
+	    					String newExpDate = Utilities.resultCommercialInfoSet.getString(4);
+	    					String txnType = Utilities.resultCommercialInfoSet.getString(5);
+	    					String procType = Utilities.resultCommercialInfoSet.getString(6);
+	    					Double premium = Utilities.resultCommercialInfoSet.getDouble(7);
+	    					String textDateTime = Utilities.resultCommercialInfoSet.getString(8);
+	    					String callDateTime = Utilities.resultCommercialInfoSet.getString(9);
+	    					String visitDateTime = Utilities.resultCommercialInfoSet.getString(10);
+	    					String completeDate = Utilities.resultCommercialInfoSet.getString(11);
+	    					String companyname = Utilities.resultCommercialInfoSet.getString(12);
+	    					String ownership = Utilities.resultCommercialInfoSet.getString(13);
+	    					String memo = Utilities.resultCommercialInfoSet.getString(14);
+	    					String chgDateTime = Utilities.resultCommercialInfoSet.getString(15);
+	    					String sigxpNo = Utilities.resultCommercialInfoSet.getString(16);
+	
+	        				try {
+	        					
+	    	        			    file.createNewFile();
+	    	        			      	    	        			            	        					            
+	    	        				writer.write(customerID + "," + timeStamp + "," + expDate + "," + newExpDate + "," + txnType + "," + procType + "," + premium + "," + textDateTime + "," + callDateTime + "," + visitDateTime + "," + completeDate + "," + companyname + "," + ownership + "," + memo + "," + chgDateTime + "," + sigxpNo + "\r\n");
+	        				}
+	    	        				
+	        	        		catch (IOException e5)
+	        	        		{
+	        	        			System.out.println("ActionPerformer - BackUpButton - Commerical - CreateNewFile = " +  e5.getStackTrace());
+	        	        		}
+	    				}
+	        			
+	    			    writer.flush();
+	    			    writer.close();
+	    			            			    
+	        			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "Backup Sucessfull");
+	        		}
+	        		
+	        		catch (SQLException | IOException e5)
+	        		{
+	        			System.out.println("ActionPerformer - BackUpButton - Commerical = " +  e5.getStackTrace());
+	        		}
+	        		
+	        		finally
+	        		{
+	        			Utilities.closeDatabase();
+	        		}
+	        	}
+		}
+		else if (e.getActionCommand().equals("jButtonRestore")) {
+	        int numClicks = 0;
+			numClicks++;
+    		
+	    		if (numClicks == 2 || numClicks == 1) {
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backup.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+			    	    			    	    
+		    			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+	    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     			    		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    		     		String custID = lineScanner.next();
+	    		    			String lastName = lineScanner.next();
+	    		    			String firstName = lineScanner.next();
+	    		    			String phoneNum = lineScanner.next();
+	    		    			String birthDate = lineScanner.next();
+	    		    			String email =  lineScanner.next();
+	    		    			String priCustID = lineScanner.next();
+	    		    			String memo = lineScanner.next();
+	    		    			String postalCD = lineScanner.next();
+	    		    			String addrStNm = lineScanner.next();
+	    		    			String addrPvNm = lineScanner.next();
+	    		    			String chgDateTime = lineScanner.next();
+		    		    				    					    			
+		    					String id = String.format("%010d", Integer.parseInt(custID));
+		    	    						    					
+	    	    		     	Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO CCCUSTOM (CUST_ID, LAST_NAME, FIRST_NAME, CELL_NO, BIRTH_DATE, EMAIL, PRI_CUST_ID, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+		    	    				
+		    					Utilities.preparedStatement.setString(1, id);
+		    					Utilities.preparedStatement.setString(2, lastName);
+		    					Utilities.preparedStatement.setString(3, firstName);
+		    					Utilities.preparedStatement.setString(4, phoneNum);
+		    					Utilities.preparedStatement.setString(5, birthDate);
+		    					Utilities.preparedStatement.setString(6, email);
+		    					Utilities.preparedStatement.setString(7, priCustID);
+		    					Utilities.preparedStatement.setString(8, memo);
+		    					Utilities.preparedStatement.setString(9, postalCD);
+		    					Utilities.preparedStatement.setString(10, addrStNm);
+		    					Utilities.preparedStatement.setString(11, addrPvNm);
+		    					Utilities.preparedStatement.setString(12, chgDateTime);		
+		    					
+		    					Utilities.preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e4)
+		    		{
+		    			System.out.println("ActionPerformer - RestoreButton - Customer = " +  e4.getStackTrace());
+		    		}
+		    		// ----------------------------------------------------Automobile
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforAuto.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    							    	    
+		    			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		    					    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String plateNo = lineScanner.next();
+		    					String docNo = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String newExpDate = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String visitDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String postalCd = lineScanner.next();
+		    					String addrStNm = lineScanner.next();
+		    					String addrPvNm = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    								    					
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Double premiumDouble = Double.parseDouble(premium);
+		    					
+		    					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO AUTXNPRM (CUST_ID, TIME_STAMP, TXN_TYPE, PLATE_NO, DOC_NO, EXP_DATE, NEW_EXP_DATE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 19
+		    				    
+		    					Utilities.preparedStatement.setString(1, id);
+		    					Utilities.preparedStatement.setString(2, timeStamp);
+		    					Utilities.preparedStatement.setString(3, txnType);
+		    					Utilities.preparedStatement.setString(4, plateNo);
+		    					Utilities.preparedStatement.setString(5, docNo);
+		    					Utilities.preparedStatement.setString(6, expDate);
+		    					Utilities.preparedStatement.setString(7, newExpDate);
+		    					Utilities.preparedStatement.setString(8, procType);
+		    					Utilities.preparedStatement.setDouble(9, premiumDouble);
+		    					Utilities.preparedStatement.setString(10, textDateTime);
+		    					Utilities.preparedStatement.setString(11, callDateTime);
+		    					Utilities.preparedStatement.setString(12, visitDateTime);
+		    					Utilities.preparedStatement.setString(13, completeDate);
+		    					Utilities.preparedStatement.setString(14, companyname);
+		    					Utilities.preparedStatement.setString(15, ownership);
+		    					Utilities.preparedStatement.setString(16, memo);
+		    					Utilities.preparedStatement.setString(17, postalCd);
+		    					Utilities.preparedStatement.setString(18, addrStNm);
+		    					Utilities.preparedStatement.setString(19, addrPvNm);	
+		    					Utilities.preparedStatement.setString(20, chgDateTime);	
+		    					
+		    					Utilities.preparedStatement.executeUpdate();
+		    					
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("ActionPerformer - RestoreButton - Automobile = " +  e6.getStackTrace());
+		    		}
+		    		//---------------------------------------------Travel
+		    		try {
+		    						    			
+			    	    FileReader in = new FileReader("backupforTravel.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    File f = new File("backupforTravel.csv");
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+		    			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        			    		     				    		     		
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String effDate = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String mailDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    					String policyNo = lineScanner.next();
+		    								    				
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    	    				
+		    					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO TRTXNPRM (CUST_ID, TIME_STAMP, EFF_DATE, EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, MAIL_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, POLICY_NO)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 19
+		    					
+		    					Utilities.preparedStatement.setString(1, id);
+		    					Utilities.preparedStatement.setString(2, timeStamp);
+		    					Utilities.preparedStatement.setString(3, effDate);
+		    					Utilities.preparedStatement.setString(4, expDate);
+		    					Utilities.preparedStatement.setString(5, txnType);
+		    					Utilities.preparedStatement.setString(6, procType);
+		    					Utilities.preparedStatement.setFloat(7, premiumForAuto);
+		    					Utilities.preparedStatement.setString(8, textDateTime);
+		    					Utilities.preparedStatement.setString(9, callDateTime);
+		    					Utilities.preparedStatement.setString(10, mailDateTime);
+		    					Utilities.preparedStatement.setString(11, completeDate);
+		    					Utilities.preparedStatement.setString(12, companyname);
+		    					Utilities.preparedStatement.setString(13, ownership);
+		    					Utilities.preparedStatement.setString(14, memo);
+		    					Utilities.preparedStatement.setString(15, chgDateTime);	
+		    					Utilities.preparedStatement.setString(16, policyNo);	
+		    					
+		    					Utilities.preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("ActionPerformer - RestoreButton - Travel = " +  e6.getStackTrace());
+		    		}
+		    		//---------------------------------------------------- Home
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforHome.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+		    			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+	    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String newExpDate = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String sigxpNo = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String visitDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String postalCD = lineScanner.next();
+		    					String addrStNm = lineScanner.next();
+		    					String addrPvNm = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    		    				    					    			
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    	    				
+		    					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO HOTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, SIGXP_NO, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "); // 19
+	
+		    					Utilities.preparedStatement.setString(1, id);
+		    					Utilities.preparedStatement.setString(2, timeStamp);
+		    					Utilities.preparedStatement.setString(3, expDate);
+		    					Utilities.preparedStatement.setString(4, newExpDate);
+		    					Utilities.preparedStatement.setString(5, txnType);
+		    					Utilities.preparedStatement.setString(6, procType);
+		    					Utilities.preparedStatement.setString(7, sigxpNo);
+		    					Utilities.preparedStatement.setFloat(8, premiumForAuto);
+		    					Utilities.preparedStatement.setString(9, textDateTime);
+		    					Utilities.preparedStatement.setString(10, callDateTime);
+		    					Utilities.preparedStatement.setString(11, visitDateTime);
+		    					Utilities.preparedStatement.setString(12, completeDate);
+		    					Utilities.preparedStatement.setString(13, companyname);
+		    					Utilities.preparedStatement.setString(14, ownership);
+		    					Utilities.preparedStatement.setString(15, memo);
+		    					Utilities.preparedStatement.setString(16, postalCD);
+		    					Utilities.preparedStatement.setString(17, addrStNm);
+		    					Utilities.preparedStatement.setString(18, addrPvNm);
+		    					Utilities.preparedStatement.setString(19, chgDateTime);
+		    					
+		    					Utilities.preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("ActionPerformer - RestoreButton - Home = " +  e6.getStackTrace());
+		    		}
+	        		// --------------------------------------------------------------- Commercial
+		    		try {
+		    			
+			    	    FileReader in = new FileReader("backupforCommercial.csv");
+			    	    BufferedReader br = new BufferedReader(in);
+			    	    
+			    	    Scanner fileScanner = new Scanner(br);
+			    	    fileScanner.nextLine();
+		    			
+		    			Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+		    									
+		    		    while (fileScanner.hasNextLine()) {
+		    		    			    	
+		    		    		String line = fileScanner.nextLine();
+		    		
+		    		     	Scanner lineScanner = new Scanner(line);
+		    		      
+		    		     	lineScanner.useDelimiter(",");
+		    		      		      		     	
+		    		     	while (lineScanner.hasNext()) {
+		    		        
+		    					String customerID = lineScanner.next();
+		    					String timeStamp = lineScanner.next();
+		    					String expDate = lineScanner.next();
+		    					String newExpDate = lineScanner.next();
+		    					String txnType = lineScanner.next();
+		    					String procType = lineScanner.next();
+		    					String premium = lineScanner.next();
+		    					String textDateTime = lineScanner.next();
+		    					String callDateTime = lineScanner.next();
+		    					String visitDateTime = lineScanner.next();
+		    					String completeDate = lineScanner.next();
+		    					String companyname = lineScanner.next();
+		    					String ownership = lineScanner.next();
+		    					String memo = lineScanner.next();
+		    					String chgDateTime = lineScanner.next();
+		    					String sigxpNo = lineScanner.next();
+		    		    				    					    			
+		    					String id = String.format("%010d", Integer.parseInt(customerID));
+		    					Float premiumForAuto = Float.parseFloat(premium);
+		    	    				
+		    					Utilities.preparedStatement = Utilities.connection.prepareStatement("INSERT INTO COTXNPRM (CUST_ID, TIME_STAMP, EXP_DATE, NEW_EXP_DATE, TXN_TYPE, PROC_TYPE, PREMIUM, TEXT_DATE_TIME, CALL_DATE_TIME, VISIT_DATE_TIME, COMPLETE_DATE, COMPANY_NAME, OWNERSHIP, MEMO, CHG_DATE_TIME, SIGXP_NO)"+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 14
+		    							    					
+		    					Utilities.preparedStatement.setString(1, id);
+		    					Utilities.preparedStatement.setString(2, timeStamp);
+		    					Utilities.preparedStatement.setString(3, expDate);
+		    					Utilities.preparedStatement.setString(4, newExpDate);
+		    					Utilities.preparedStatement.setString(5, txnType);
+		    					Utilities.preparedStatement.setString(6, procType);
+		    					Utilities.preparedStatement.setFloat(7, premiumForAuto);
+		    					Utilities.preparedStatement.setString(8, textDateTime);
+		    					Utilities.preparedStatement.setString(9, callDateTime);
+		    					Utilities.preparedStatement.setString(10, visitDateTime);
+		    					Utilities.preparedStatement.setString(11, completeDate);
+		    					Utilities.preparedStatement.setString(12, companyname);
+		    					Utilities.preparedStatement.setString(13, ownership);
+		    					Utilities.preparedStatement.setString(14, memo);
+		    					Utilities.preparedStatement.setString(15, chgDateTime);
+		    					Utilities.preparedStatement.setString(16, sigxpNo);
+		    					
+		    					Utilities.preparedStatement.executeUpdate();
+		    		     	}
+		    		     	lineScanner.close();
+		    		      
+		    		     	System.out.println("\n");
+		    		    }
+		    		    fileScanner.close();
+		    		    
+	        			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "Restore Sucessfull");
+	
+		    		}
+		    		catch (SQLException | FileNotFoundException e6)
+		    		{
+		    			System.out.println("ActionPerformer - RestoreButton - Commercial = " +  e6.getStackTrace());
+		    		}
+		    		
+		    		finally
+		    		{
+		    			Utilities.closeDatabase();
+		    		}
+		    	}
+		}
+		else if (e.getActionCommand().equals("jButtonForNewOther")) {
+   		 	if (!GUIForCustomerCare.idTextField.getText().trim().isEmpty()) {
+   		 		CustomerCare.customerID = (String)GUIForCustomerCare.idTextField.getText().trim();
+   		 		switch (GUIForCustomerCare.tabbedPane.getSelectedIndex()) {
+   		 			case 0:
+   						MemberDialog.callDialogs(DatabaseConstant.AUTOMOBILE_MODE, DatabaseConstant.NEW_MODE); 
+   						break;
+   		 			case 1:
+   						MemberDialog.callDialogs(DatabaseConstant.HOME_MODE, DatabaseConstant.NEW_MODE);
+   						break;
+   		 			case 2:
+   						MemberDialog.callDialogs(DatabaseConstant.TRAVEL_MODE, DatabaseConstant.NEW_MODE);
+   						break;
+   		 			case 3:
+   						MemberDialog.callDialogs(DatabaseConstant.COMMERCIAL_MODE, DatabaseConstant.NEW_MODE);
+   						break;
+   		 		}
+	   		}
+	   		else {
+	   			JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to insert Automobile");
+	   		}
+		}
+		else if (e.getActionCommand().equals("jButtonUpdateForOther")) {
+			switch (GUIForCustomerCare.tabbedPane.getSelectedIndex()) {
+				case 0:
+	    			if (GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.AUTOMOBILE_MODE, DatabaseConstant.EDIT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+				case 1:
+	    			if (GUIForCustomerCare.jTable_House_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.HOME_MODE, DatabaseConstant.EDIT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+				case 2:
+	    			if (GUIForCustomerCare.jTable_Traveler_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.TRAVEL_MODE, DatabaseConstant.EDIT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+				case 3:
+	    			if (GUIForCustomerCare.jTable_Commercial_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.COMMERCIAL_MODE, DatabaseConstant.EDIT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+			}
+		}
+		else if (e.getActionCommand().equals("jButtonRenewalForOther")) {
+			switch (GUIForCustomerCare.tabbedPane.getSelectedIndex()) {
+				case 0:
+	    			if (GUIForCustomerCare.jTable_Automobile_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.AUTOMOBILE_MODE, DatabaseConstant.INSERT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+				case 1:
+	    			if (GUIForCustomerCare.jTable_House_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.HOME_MODE, DatabaseConstant.INSERT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+				case 2:
+					JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "Travel is not renewable");
+					break;
+				case 3:
+	    			if (GUIForCustomerCare.jTable_Commercial_Info.getSelectedRow() != -1) {
+	    				MemberDialog.callDialogs(DatabaseConstant.COMMERCIAL_MODE, DatabaseConstant.INSERT_MODE);
+	    			}
+	    			else {
+	    				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "No data to be updated");
+	    			}
+	    			break;
+			}
+		}
+		else if (e.getActionCommand().equals("jButton")) {
+			if (GUIForCustomerCare.jTextField.getText().trim().length() > 0)
+			{
+				if (GUIForCustomerCare.customerButton.isSelected()) {
+					CustomerCare.searchMember(DatabaseConstant.SEARCH_CUSTOMER, GUIForCustomerCare.jTextField.getText().trim());
+				}
+				else if (GUIForCustomerCare.allButton.isSelected()) {
+					CustomerCare.searchMember(DatabaseConstant.SEARCH_ALL, GUIForCustomerCare.jTextField.getText().trim());
+				}
+				
+				GUIForCustomerCare.jButton.setText("Search");
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "Please enter search word!");
+			}
+		}
+		else if (e.getActionCommand().equals("closeButton")) {
+			GUIForMemberDialog.jDialog.dispose();
+			GUIForMemberDialog.jDialogForAuto.dispose();
+			GUIForMemberDialog.jDialogForTravel.dispose();
+			GUIForMemberDialog.jDialogForHome.dispose();
+			GUIForMemberDialog.jDialogForCommercial.dispose();
+			GUIForMemberDialog.jDialogUpdate.dispose();
+			GUIForMemberDialog.jDialogUpdateForAuto.dispose();
+			GUIForMemberDialog.jDialogUpdateForTravel.dispose();
+			GUIForMemberDialog.jDialogUpdateForHome.dispose();
+			GUIForMemberDialog.jDialogUpdateForCommercial.dispose();
+
+			// what is the difference between jdialog.dispose, and jpanel.removeall? Can things run smoothly without either one?
+			// seems that the program runs smoothly, so not going to change anything until something fucks up.
+			
+			GUIForMemberDialog.idPanel.removeAll();
+			GUIForMemberDialog.idPanel.repaint();
+			GUIForMemberDialog.idPanelForAuto.removeAll();
+			GUIForMemberDialog.idPanelForAuto.repaint();
+			GUIForMemberDialog.premiumPanelForAuto.removeAll();
+			GUIForMemberDialog.premiumPanelForAuto.repaint();
+			GUIForMemberDialog.fieldNamePanel.removeAll();
+			GUIForMemberDialog.fieldNamePanel.repaint();
+			GUIForMemberDialog.fieldValuePanel.removeAll();
+			GUIForMemberDialog.fieldValuePanel.repaint();
+			GUIForMemberDialog.timeStampPanelForAuto.removeAll();
+			GUIForMemberDialog.timeStampPanelForAuto.repaint();
+		}
+		else if (e.getActionCommand().equals("submitButton")) {
+			switch (MemberDialog.getNewInfo()) {
+				case DatabaseConstant.CUSTOMER_MODE:
+					if (GUIForMemberDialog.lastNameField.getText().trim().length() == 0 ) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input last name!");
+						GUIForMemberDialog.lastNameField.requestFocus();
+					}
+					else if (GUIForMemberDialog.firstNameField.getText().trim().length() == 0) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input first name!");
+						GUIForMemberDialog.firstNameField.requestFocus();
+					}
+					else { // No Error	
+						switch (MemberDialog.getDialogMode()) {
+							case DatabaseConstant.NEW_MODE:
+								if (CustomerCare.submitMember(MemberDialog.getDialogMode(), GUIForMemberDialog.idField.getText().trim(), 
+																	 	  GUIForMemberDialog.lastNameField.getText().trim(), 
+																		  GUIForMemberDialog.firstNameField.getText().trim(), 
+																		  GUIForMemberDialog.cellField.getText().trim(), 
+																		  GUIForMemberDialog.birthDateTextField.getText().trim(),
+																		  GUIForMemberDialog.emailTextField.getText().trim(), 
+																		  GUIForMemberDialog.priCustIDTextField.getText().trim(), 
+																		  GUIForMemberDialog.memoTextField.getText().trim(), 
+																		  GUIForMemberDialog.postalCdField.getText().trim(), 
+																		  GUIForMemberDialog.addrStrtNumTextField.getText().trim(), 
+																		  GUIForMemberDialog.addrPvNumTextField.getText().trim())) {
+									try {
+										if (GUIForMemberDialog.priCustIDTextField.getText().isEmpty()) {
+											Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+											Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE CCCUSTOM SET PRI_CUST_ID = NULL WHERE length((rtrim(PRI_CUST_ID)))=0;");
+			
+											Utilities.preparedStatement.executeUpdate();
+										}
+									} catch (SQLException e1) {
+										JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "ActionPerformer - submitButton - CustomerMode - NewMode - Error", "Error - submitMember", JOptionPane.ERROR_MESSAGE);
+										System.out.println("MemberDialog - submitButton - CustomerMode - NewMode = " +  e1.getStackTrace());
+									}
+	
+									CustomerCare.searchMember(DatabaseConstant.SEARCH_CUSTOMER, GUIForMemberDialog.idField.getText().trim());
+	
+									CustomerCare.customerID = (String) GUIForCustomerCare.jTable_Personal_Info.getValueAt(0, 0);
+
+									CustomerCare.selectDetailedInfo(CustomerCare.customerID);
+									CustomerCare.selectFamilyInfo(GUIForCustomerCare.idTextField.getText().trim());
+									CustomerCare.selectAutomobileInfo(GUIForCustomerCare.idTextField.getText().trim());
+									CustomerCare.selectHomeInfo(GUIForCustomerCare.idTextField.getText().trim());
+									CustomerCare.selectCommercialInfo(GUIForCustomerCare.idTextField.getText().trim());
+									CustomerCare.selectTravelInfo(GUIForCustomerCare.idTextField.getText().trim());
+									
+									GUIForCustomerCare.customerButton.setSelected(false);
+									GUIForCustomerCare.allButton.setSelected(false);
+								}
+								break;
+							case DatabaseConstant.EDIT_MODE:
+								if (CustomerCare.submitMember(MemberDialog.getDialogMode(), GUIForMemberDialog.idField.getText().trim(), 
+																		  GUIForMemberDialog.lastNameField.getText().trim(), 
+																		  GUIForMemberDialog.firstNameField.getText().trim(), 
+																		  GUIForMemberDialog.cellField.getText().trim(), 
+																		  GUIForMemberDialog.birthDateTextField.getText().trim(),
+																		  GUIForMemberDialog.emailTextField.getText().trim(), 
+																		  GUIForMemberDialog.priCustIDTextField.getText().trim(), 
+																		  GUIForMemberDialog.memoTextField.getText().trim(), 
+																		  GUIForMemberDialog.postalCdField.getText().trim(), 
+																		  GUIForMemberDialog.addrStrtNumTextField.getText().trim(), 
+																		  GUIForMemberDialog.addrPvNumTextField.getText().trim())) {
+									
+									CustomerCare.selectDetailedInfo(GUIForCustomerCare.idTextField.getText().trim());
+									CustomerCare.selectFamilyInfo(GUIForCustomerCare.idTextField.getText().trim());
+	
+									try {
+										if (GUIForMemberDialog.priCustIDTextField.getText().isEmpty()) {
+			
+											Utilities.connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+
+											Utilities.preparedStatement = Utilities.connection.prepareStatement("UPDATE CCCUSTOM SET PRI_CUST_ID = NULL WHERE length((rtrim(PRI_CUST_ID)))=0;");
+			
+											Utilities.preparedStatement.executeUpdate();
+										}
+									} catch (SQLException e1) {
+										JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "ActionPerformer - submitButton - CustomerMode - EditMode - Error", "Error - submitMember", JOptionPane.ERROR_MESSAGE);
+										System.out.println("MemberDialog - submitButton - CustomerMode - EditMode = " +  e1.getStackTrace());
+									}
+								}
+								GUIForMemberDialog.jDialogUpdate.dispose();
+								break;
+						}	
+					}
+					break;
+				case DatabaseConstant.AUTOMOBILE_MODE:
+					if (GUIForMemberDialog.plateNoField.getText().trim().length() == 0 ) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input plate number!");
+						GUIForMemberDialog.plateNoField.requestFocus();
+					}
+					else if (GUIForMemberDialog.expDateField.getText().trim().length() == 0) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input expiry date!");
+						GUIForMemberDialog.expDateField.requestFocus();
+					}
+					else { // No Error			
+						switch (MemberDialog.getDialogMode()) {
+							case DatabaseConstant.NEW_MODE:
+								if (CustomerCare.submitMemberForAuto(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForAuto.getText().trim(), 
+																				 GUIForMemberDialog.timeStampField.getText().trim(), 
+																				(String)GUIForMemberDialog.txnTypeFieldForAuto.getSelectedItem(),
+																				 GUIForMemberDialog.plateNoField.getText().trim(), 
+																				 GUIForMemberDialog.docNoField.getText().trim(), 
+																				 GUIForMemberDialog.expDateField.getText().trim(), 
+																				 GUIForMemberDialog.newExpDateField.getText().trim(), 
+																				 (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																				 GUIForMemberDialog.premiumFieldForAuto.getText().trim(), 
+																				 GUIForMemberDialog.textDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.visitDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.completeDateField.getText().trim(), 
+																				 GUIForMemberDialog.companyNameField.getText().trim(), 
+																				 GUIForMemberDialog.ownerField.getText().trim(), 
+																				 GUIForMemberDialog.memoTextField.getText().trim(), 
+																				 GUIForMemberDialog.postalCdField.getText().trim(), 
+																				 GUIForMemberDialog.addrStrtNumTextField.getText().trim(), 
+																				 GUIForMemberDialog.addrPvNumTextField.getText().trim())) {
+									
+									CustomerCare.selectAutomobileInfo(GUIForMemberDialog.idFieldForAuto.getText().trim());
+								}	
+								GUIForMemberDialog.jDialogForAuto.dispose();
+								break;
+							case DatabaseConstant.EDIT_MODE:
+								if (CustomerCare.submitMemberForAuto(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForAuto.getText().trim(), 
+																				 GUIForMemberDialog.timeStampField.getText().trim(), 
+																				(String)GUIForMemberDialog.txnTypeFieldForAuto.getSelectedItem(),
+																				 GUIForMemberDialog.plateNoField.getText().trim(), 
+																				 GUIForMemberDialog.docNoField.getText().trim(), 
+																				 GUIForMemberDialog.expDateField.getText().trim(), 
+																				 GUIForMemberDialog.newExpDateField.getText().trim(), 
+																				 (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																				 GUIForMemberDialog.premiumFieldForAuto.getText().trim(), 
+																				 GUIForMemberDialog.textDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.visitDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.completeDateField.getText().trim(), 
+																				 GUIForMemberDialog.companyNameField.getText().trim(), 
+																				 GUIForMemberDialog.ownerField.getText().trim(), 
+																				 GUIForMemberDialog.memoTextField.getText().trim(), 
+																				 GUIForMemberDialog.postalCdField.getText().trim(), 
+																				 GUIForMemberDialog.addrStrtNumTextField.getText().trim(), 
+																				 GUIForMemberDialog.addrPvNumTextField.getText().trim())) {
+									
+									CustomerCare.selectAutomobileInfo(GUIForMemberDialog.idFieldForAuto.getText().trim());
+								}	
+								GUIForMemberDialog.jDialogUpdateForAuto.dispose();
+								break;
+						}
+					}
+					break;
+				case DatabaseConstant.HOME_MODE:
+					if (GUIForMemberDialog.expDateField.getText().trim().length() == 0 ) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input expiry date!");
+						GUIForMemberDialog.expDateField.requestFocus();
+					}
+					else if (GUIForMemberDialog.txnTypeFieldForAuto.getSelectedItem().toString().length() == 0) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input txn type!");
+						GUIForMemberDialog.txnTypeField.requestFocus();
+					}
+					else { // No Error	
+						switch (MemberDialog.getDialogMode()) {
+							case DatabaseConstant.NEW_MODE:
+								if (CustomerCare.submitMemberForHome(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForHome.getText().trim(), 
+																			 	 GUIForMemberDialog.timeStampField.getText().trim(), 
+																			 	 GUIForMemberDialog.expDateField.getText().trim(), 
+																				 GUIForMemberDialog.newExpDateField.getText().trim(), 
+																				 (String)GUIForMemberDialog.txnTypeField.getSelectedItem(), 
+																				 (String)GUIForMemberDialog.procTypeField.getSelectedItem(),
+																				 GUIForMemberDialog.sigxpNoField.getText().trim(), 
+																				 GUIForMemberDialog.premiumFieldForHome.getText().trim(), 
+																				 GUIForMemberDialog.textDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.visitDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.completeDateField.getText().trim(), 
+																				 GUIForMemberDialog.companyNameField.getText().trim(), 
+																				 GUIForMemberDialog.ownerField.getText().trim(), 
+																				 GUIForMemberDialog.memoTextField.getText().trim(),
+																				 GUIForMemberDialog.postalCdField.getText().trim(), 
+																				 GUIForMemberDialog.addrStrtNumTextField.getText().trim(), 
+																				 GUIForMemberDialog.addrPvNumTextField.getText().trim())) {								
+
+									CustomerCare.selectHomeInfo(GUIForMemberDialog.idFieldForHome.getText().trim());
+								}
+								GUIForMemberDialog.jDialogForHome.dispose();
+								break;
+							case DatabaseConstant.EDIT_MODE:
+								if (CustomerCare.submitMemberForHome(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForHome.getText().trim(), 
+																				 GUIForMemberDialog.timeStampField.getText().trim(), 
+																				 GUIForMemberDialog.expDateField.getText().trim(), 
+																				 GUIForMemberDialog.newExpDateField.getText().trim(), 
+																				 (String)GUIForMemberDialog.txnTypeField.getSelectedItem(), 
+																				 (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																				 GUIForMemberDialog.sigxpNoField.getText().trim(), 
+																				 GUIForMemberDialog.premiumFieldForHome.getText().trim(), 
+																				 GUIForMemberDialog.textDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.visitDateTimeField.getText().trim(), 
+																				 GUIForMemberDialog.completeDateField.getText().trim(), 
+																				 GUIForMemberDialog.companyNameField.getText().trim(), 
+																				 GUIForMemberDialog.ownerField.getText().trim(), 
+																				 GUIForMemberDialog.memoTextField.getText().trim(), 
+																				 GUIForMemberDialog.postalCdField.getText().trim(), 
+																				 GUIForMemberDialog.addrStrtNumTextField.getText().trim(), 
+																				 GUIForMemberDialog.addrPvNumTextField.getText().trim())) {								
+									
+									CustomerCare.selectHomeInfo(GUIForMemberDialog.idFieldForHome.getText().trim());
+								}
+								GUIForMemberDialog.jDialogUpdateForHome.dispose();
+								break;
+						}
+					}
+					break;
+				case DatabaseConstant.TRAVEL_MODE:
+					if (GUIForMemberDialog.txnTypeField.getSelectedItem().toString().length() == 0 ) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input Txn Type!");
+						GUIForMemberDialog.txnTypeField.requestFocus();
+					}
+					else if (GUIForMemberDialog.expDateField.getText().trim().length() == 0) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input expiry date!");
+						GUIForMemberDialog.expDateField.requestFocus();
+					}
+					else { // No Error	
+						switch (MemberDialog.getDialogMode()) {
+							case DatabaseConstant.NEW_MODE:
+								if (CustomerCare.submitMemberForTravel(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForTravel.getText().trim(), 
+																				   GUIForMemberDialog.timeStampField.getText().trim(), 
+																				   GUIForMemberDialog.effDateField.getText().trim(), 
+																				   GUIForMemberDialog.expDateField.getText().trim(), 
+																				   (String)GUIForMemberDialog.txnTypeField.getSelectedItem(),
+																				   (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																				   GUIForMemberDialog.policyNoField.getText().trim(), 
+																				   GUIForMemberDialog.premiumFieldForTravel.getText().trim(), 
+																				   GUIForMemberDialog.textDateTimeField.getText().trim(),
+																				   GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																				   GUIForMemberDialog.mailDateTimeField.getText().trim(), 
+																				   GUIForMemberDialog.completeDateField.getText().trim(), 
+																				   GUIForMemberDialog.companyNameField.getText().trim(), 
+																				   GUIForMemberDialog.ownerField.getText().trim(), 
+																				   GUIForMemberDialog.memoTextField.getText().trim())) {		
+									
+									CustomerCare.selectTravelInfo(GUIForMemberDialog.idFieldForTravel.getText().trim());
+								}
+								GUIForMemberDialog.jDialogForTravel.dispose();
+								break;
+							case DatabaseConstant.EDIT_MODE:
+								if (CustomerCare.submitMemberForTravel(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForTravel.getText().trim(), 
+																				   GUIForMemberDialog.timeStampField.getText().trim(), 
+																				   GUIForMemberDialog.effDateField.getText().trim(), 
+																				   GUIForMemberDialog.expDateField.getText().trim(), 
+																				   (String)GUIForMemberDialog.txnTypeField.getSelectedItem(), 
+																				   (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																				   GUIForMemberDialog.policyNoField.getText().trim(), 
+																				   GUIForMemberDialog.premiumFieldForTravel.getText().trim(), 
+																				   GUIForMemberDialog.textDateTimeField.getText().trim(),
+																				   GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																				   GUIForMemberDialog.mailDateTimeField.getText().trim(), 
+																				   GUIForMemberDialog.completeDateField.getText().trim(), 
+																				   GUIForMemberDialog.companyNameField.getText().trim(), 
+																				   GUIForMemberDialog.ownerField.getText().trim(), 
+																				   GUIForMemberDialog.memoTextField.getText().trim())) {	
+									
+									CustomerCare.selectTravelInfo(GUIForMemberDialog.idFieldForTravel.getText().trim());
+								}	
+								GUIForMemberDialog.jDialogUpdateForTravel.dispose();
+								break;
+						}
+					}
+					break;
+				case DatabaseConstant.COMMERCIAL_MODE:
+					if (GUIForMemberDialog.txnTypeField.getSelectedItem().toString().length() == 0 ) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input Txn Type!");
+						GUIForMemberDialog.txnTypeField.requestFocus();
+					}
+					else if (GUIForMemberDialog.expDateField.getText().trim().length() == 0) {
+						JOptionPane.showMessageDialog(GUIForMemberDialog.jDialog, "Please input expiry date!");
+						GUIForMemberDialog.expDateField.requestFocus();
+					}
+					else { // No Error		
+						switch (MemberDialog.getDialogMode()) {
+							case DatabaseConstant.NEW_MODE:
+								if (CustomerCare.submitMemberForCommercial(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForCommercial.getText().trim(), 
+																					   GUIForMemberDialog.timeStampField.getText().trim(), 
+																					   GUIForMemberDialog.expDateField.getText().trim(), 
+																					   GUIForMemberDialog.newExpDateField.getText().trim(),  
+																					   (String)GUIForMemberDialog.txnTypeField.getSelectedItem(), 
+																					   (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																					   GUIForMemberDialog.sigxpNoField.getText().trim(), 
+																					   GUIForMemberDialog.premiumFieldForCommercial.getText().trim(), 
+																					   GUIForMemberDialog.textDateTimeField.getText().trim(),
+																					   GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																					   GUIForMemberDialog.visitDateTimeField.getText().trim(), 
+																					   GUIForMemberDialog.completeDateField.getText().trim(), 
+																					   GUIForMemberDialog.companyNameField.getText().trim(), 
+																					   GUIForMemberDialog.ownerField.getText().trim(), 
+																					   GUIForMemberDialog.memoTextField.getText().trim())) {								
+
+									CustomerCare.selectCommercialInfo(GUIForMemberDialog.idFieldForCommercial.getText().trim());
+								}	
+								GUIForMemberDialog.jDialogForCommercial.dispose();
+								break;
+							case DatabaseConstant.EDIT_MODE:
+								if (CustomerCare.submitMemberForCommercial(MemberDialog.getDialogMode(), GUIForMemberDialog.idFieldForCommercial.getText().trim(), 
+																					   GUIForMemberDialog.timeStampField.getText().trim(), 
+																					   GUIForMemberDialog.expDateField.getText().trim(), 
+																					   GUIForMemberDialog.newExpDateField.getText().trim(),  
+																					   (String)GUIForMemberDialog.txnTypeField.getSelectedItem(), 
+																					   (String)GUIForMemberDialog.procTypeField.getSelectedItem(), 
+																					   GUIForMemberDialog.sigxpNoField.getText().trim(), 
+																					   GUIForMemberDialog.premiumFieldForCommercial.getText().trim(), 
+																					   GUIForMemberDialog.textDateTimeField.getText().trim(),
+																					   GUIForMemberDialog.callDateTimeField.getText().trim(), 
+																					   GUIForMemberDialog.visitDateTimeField.getText().trim(), 
+																					   GUIForMemberDialog.completeDateField.getText().trim(), 
+																					   GUIForMemberDialog.companyNameField.getText().trim(), 
+																					   GUIForMemberDialog.ownerField.getText().trim(), 
+																					   GUIForMemberDialog.memoTextField.getText().trim())) {
+									
+									CustomerCare.selectCommercialInfo(GUIForMemberDialog.idFieldForCommercial.getText().trim());
+								}
+								GUIForMemberDialog.jDialogUpdateForCommercial.dispose();
+								break;
+						}
+					}	
+					break;
+			}
+		}
+	}
+}
