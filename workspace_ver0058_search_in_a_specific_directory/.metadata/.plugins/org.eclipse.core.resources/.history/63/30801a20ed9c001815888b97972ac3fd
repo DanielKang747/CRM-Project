@@ -1,0 +1,68 @@
+import java.io.IOException;
+
+class add extends Thread {
+	
+	private String msg;
+	
+	public add(String message) {
+		msg = message;
+	}
+	
+	public void run() {
+		while (true) {
+			System.out.println(msg);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class addby2 extends Thread {
+	
+	private String msg;
+	
+	public add(String message) {
+		msg = message;
+	}
+	
+	public void run() {
+		while (true) {
+			System.out.println(msg);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+public class ThreadTest3 {
+	
+	public static void main(String[] args) throws IOException {
+		
+		add add = new add("Hello1");
+		add add2 = new add("Hello2");
+		
+		add.setDaemon(true);
+		add2.setDaemon(true);
+		
+		add.start();	
+		add2.start();
+		
+		try {
+			add.join();
+			add2.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		System.in.read();
+		
+	}
+}

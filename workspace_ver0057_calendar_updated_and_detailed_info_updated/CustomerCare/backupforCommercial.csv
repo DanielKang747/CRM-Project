@@ -1,7 +1,0 @@
-Customer ID,Time Stamp,Exp Date,New Exp Date,Txn Type,Proc Type,Premium,Text Date Time,Call Date Time,Visit Date Time,Complete Date,Company Name,Ownership,Memo,Chg Date Time,Sigxp No
-0000000001,20171003004006,12345678,,NEW BIZ,READY,0.0,,,,,,,,null,null
-0000000001,20171003004042,,null,RENEWAL,READY,0.0,null,null,null,null,,,null,null,null
-0000000001,20171003004236,null,null,RENEWAL,READY,0.0,null,null,null,null,,,null,null,null
-0000000051,20171018004052,asdf,asdddf,NEW BIZ,READY,0.0,,,,,,,,20171018004126,null
-0000000051,20171018232416,asdf,asdf,NEW BIZ,RESERVED,0.0,,,,,,,,20171112172404,1w4
-0000000051,20171018232423,asdf,null,RENEWAL,READY,0.0,null,null,null,null,,,null,20171018232423,null
