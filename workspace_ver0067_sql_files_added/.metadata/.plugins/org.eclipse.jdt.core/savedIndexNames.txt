@@ -1,0 +1,6 @@
+INDEX VERSION 1.131+/Users/danielkang/Documents/CustomerCare/workspace_ver0067_sql_files_added/.metadata/.plugins/org.eclipse.jdt.core
+3580130460.index
+992445858.index
+3854768870.index
+1865797976.index
+3678010407.index
