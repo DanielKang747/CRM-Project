@@ -1,0 +1,65 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.sql.DriverManager;
+import java.util.Scanner;
+
+public class Filereader {
+
+	public static void main (String[] args) throws IOException {
+		
+	    FileReader in = new FileReader("backup.csv");
+	    BufferedReader br = new BufferedReader(in);
+	    
+	    Scanner fileScanner = new Scanner(br);
+	    fileScanner.nextLine();
+	    
+	    while (fileScanner.hasNextLine()) {
+	      String line = fileScanner.nextLine();
+
+	      Scanner lineScanner = new Scanner(line);
+	      
+	      lineScanner.useDelimiter(",");
+	      
+	      while (lineScanner.hasNext()) {
+	        
+    			String custID = lineScanner.next();
+    			String lastName = lineScanner.next();
+    			String firstName = lineScanner.next();
+    			String phoneNum = lineScanner.next();
+    			String birthDate = lineScanner.next();
+    			String email =  lineScanner.next();
+    			String priCustID = lineScanner.next();
+    			String memo = lineScanner.next();
+    			String postalCD = lineScanner.next();
+    			String addrStNm = lineScanner.next();
+    			String addrPvNm = lineScanner.next();
+    			String chgDateTime = lineScanner.next();
+    			
+			String id = String.format("%010d", Integer.parseInt(tempID));
+			
+			Connection connection = DriverManager.getConnection(DatabaseConstant.URL, DatabaseConstant.USER, DatabaseConstant.PASSWORD);
+			
+			preparedStatement = connection.prepareStatement("INSERT INTO CCCUSTOM (CUST_ID, LAST_NAME, FIRST_NAME, CELL_NO, BIRTH_DATE, EMAIL, PRI_CUST_ID, MEMO, POSTAL_CD, ADDR_ST_NM, ADDR_PV_NM, CHG_DATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_FORMAT(now(),'%Y%m%d%H%i%s'));");
+								
+			preparedStatement.setString(1, custID);
+			preparedStatement.setString(2, lastName);
+			preparedStatement.setString(3, firstName);
+			preparedStatement.setString(4, phoneNum);
+			preparedStatement.setString(5, birthDate);
+			preparedStatement.setString(6, email);
+			preparedStatement.setString(7, priCustID);
+			preparedStatement.setString(8, memo);
+			preparedStatement.setString(9, postalCD);
+			preparedStatement.setString(10, addrStNm);
+			preparedStatement.setString(11, addrPvNm);
+			preparedStatement.setString(12, chgDateTime);		
+	      }
+	      lineScanner.close();
+	      
+	      System.out.println("\n");
+	    }
+	    fileScanner.close();
+ 	}
+}

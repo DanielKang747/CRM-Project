@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename compilation unit &apos;ProgressBar.java&apos; to &apos;ProgressBarDemo.java&apos;&#x0A;- Original project: &apos;CustomerCare&apos;&#x0A;- Original element: &apos;ProgressBar.java&apos;&#x0A;- Renamed element: &apos;ProgressBarDemo.java&apos;" description="Rename compilation unit &apos;ProgressBar.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;{ProgressBar.java" name="ProgressBarDemo.java" references="false" stamp="1515103461225" version="1.0"/>
-</session>
