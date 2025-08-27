@@ -1,0 +1,208 @@
+package customerCare;
+
+import java.awt.event.*;
+import javax.swing.JOptionPane;
+
+public class MousePerformer implements MouseListener, KeyListener {
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource().equals(GUIForCustomerCare.jTable_Claim_Info)) {
+			if (e.getClickCount() == 1) {
+				if (GUIForCustomerCare.jTable_Claim_Info.getSelectedColumn() != -1) {
+		    	
+					CustomerCare.customerID = (String) GUIForCustomerCare.jTable_Claim_Info.getValueAt(GUIForCustomerCare.jTable_Claim_Info.getSelectedRow(), 0);
+					
+					Utilities.selectMethods();
+						    						    				
+					if ((boolean)GUIForCustomerCare.jTable_Claim_Info.getValueAt(GUIForCustomerCare.jTable_Claim_Info.getSelectedRow(), 5).equals("AUTO")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(0);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Claim_Info.getValueAt(GUIForCustomerCare.jTable_Claim_Info.getSelectedRow(), 5).equals("HOME")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(1);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Claim_Info.getValueAt(GUIForCustomerCare.jTable_Claim_Info.getSelectedRow(), 5).equals("COMM")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(3);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Claim_Info.getValueAt(GUIForCustomerCare.jTable_Claim_Info.getSelectedRow(), 5).equals("TRAV")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(2);
+					}
+				}
+		 	}
+		}
+		else if (e.getSource().equals(GUIForCustomerCare.jTable_Reserved_Info)) {
+			if (e.getClickCount() == 1) {
+				if (GUIForCustomerCare.jTable_Reserved_Info.getSelectedColumn() != -1) {
+		    	
+					CustomerCare.customerID = (String) GUIForCustomerCare.jTable_Reserved_Info.getValueAt(GUIForCustomerCare.jTable_Reserved_Info.getSelectedRow(), 0);
+					
+					// click complete
+					Utilities.selectMethods();
+						    						    				
+					if ((boolean)GUIForCustomerCare.jTable_Reserved_Info.getValueAt(GUIForCustomerCare.jTable_Reserved_Info.getSelectedRow(), 4).equals("AUTO")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(0);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Reserved_Info.getValueAt(GUIForCustomerCare.jTable_Reserved_Info.getSelectedRow(), 4).equals("HOME")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(1);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Reserved_Info.getValueAt(GUIForCustomerCare.jTable_Reserved_Info.getSelectedRow(), 4).equals("COMM")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(3);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Reserved_Info.getValueAt(GUIForCustomerCare.jTable_Reserved_Info.getSelectedRow(), 4).equals("TRAV")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(2);
+					}
+				}
+			}
+		} 
+		else if (e.getSource().equals(GUIForCustomerCare.jTable_Complete_Info)) {
+			if (e.getClickCount() == 1) {
+				if (GUIForCustomerCare.jTable_Complete_Info.getSelectedColumn() != -1) {
+		    	
+					CustomerCare.customerID = (String) GUIForCustomerCare.jTable_Complete_Info.getValueAt(GUIForCustomerCare.jTable_Complete_Info.getSelectedRow(), 0);
+					
+					// click complete
+					Utilities.selectMethods();
+						    						    				
+					if ((boolean)GUIForCustomerCare.jTable_Complete_Info.getValueAt(GUIForCustomerCare.jTable_Complete_Info.getSelectedRow(), 4).equals("AUTO")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(0);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Complete_Info.getValueAt(GUIForCustomerCare.jTable_Complete_Info.getSelectedRow(), 4).equals("HOME")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(1);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Complete_Info.getValueAt(GUIForCustomerCare.jTable_Complete_Info.getSelectedRow(), 4).equals("COMM")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(3);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_Complete_Info.getValueAt(GUIForCustomerCare.jTable_Complete_Info.getSelectedRow(), 4).equals("TRAV")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(2);
+					}
+				}
+		 	}
+		}
+		else if (e.getSource().equals(GUIForCustomerCare.jTable_In_Progress_Info)) {
+			if (e.getClickCount() == 1) {
+				if (GUIForCustomerCare.jTable_In_Progress_Info.getSelectedColumn() != -1) {
+		    	
+					CustomerCare.customerID = (String) GUIForCustomerCare.jTable_In_Progress_Info.getValueAt(GUIForCustomerCare.jTable_In_Progress_Info.getSelectedRow(), 0);
+					
+					// click complete
+					Utilities.selectMethods();
+					
+					if ((boolean)GUIForCustomerCare.jTable_In_Progress_Info.getValueAt(GUIForCustomerCare.jTable_In_Progress_Info.getSelectedRow(), 5).equals("AUTO")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(0);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_In_Progress_Info.getValueAt(GUIForCustomerCare.jTable_In_Progress_Info.getSelectedRow(), 5).equals("HOME")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(1);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_In_Progress_Info.getValueAt(GUIForCustomerCare.jTable_In_Progress_Info.getSelectedRow(), 5).equals("TRAV")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(2);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_In_Progress_Info.getValueAt(GUIForCustomerCare.jTable_In_Progress_Info.getSelectedRow(), 5).equals("COMM")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(3);
+					}
+				}
+		 	}
+		}
+		else if (e.getSource().equals(GUIForCustomerCare.jTable_Personal_Info)) {
+			if (e.getClickCount() == 1) {
+			    if (GUIForCustomerCare.jTable_Personal_Info.getSelectedColumn() != -1) {
+			    	
+					CustomerCare.customerID =  (String) GUIForCustomerCare.jTable_Personal_Info.getValueAt(GUIForCustomerCare.jTable_Personal_Info.getSelectedRow(), 0);
+					CustomerCare.priCustID = (String) GUIForCustomerCare.priCustIDField.getText().trim();
+					
+					Utilities.selectMethods();
+			 	}
+			}
+		}
+		else if (e.getSource().equals(GUIForCustomerCare.jTable_All_Info)) {
+			if (e.getClickCount() == 1) {
+				if (GUIForCustomerCare.jTable_All_Info.getSelectedColumn() != -1) {
+					CustomerCare.customerID = (String) GUIForCustomerCare.jTable_All_Info.getValueAt(GUIForCustomerCare.jTable_All_Info.getSelectedRow(), 0);
+					
+					Utilities.selectMethods();
+
+					if ((boolean)GUIForCustomerCare.jTable_All_Info.getValueAt(GUIForCustomerCare.jTable_All_Info.getSelectedRow(), 5).equals("AUTO")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(0);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_All_Info.getValueAt(GUIForCustomerCare.jTable_All_Info.getSelectedRow(), 5).equals("HOME")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(1);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_All_Info.getValueAt(GUIForCustomerCare.jTable_All_Info.getSelectedRow(), 5).equals("TRAV")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(2);
+					}
+					else if ((boolean)GUIForCustomerCare.jTable_All_Info.getValueAt(GUIForCustomerCare.jTable_All_Info.getSelectedRow(), 5).equals("COMM")) {
+						GUIForCustomerCare.tabbedPane.setSelectedIndex(3);
+					}
+	    		}
+			}	 
+		}
+		else if (e.getSource().equals(GUIForCustomerCare.jTable_Family_Info)) {
+			if (e.getClickCount() == 1) {
+				if (GUIForCustomerCare.jTable_Family_Info.getSelectedColumn() != -1) {
+		    			int prevRow = GUIForCustomerCare.jTable_Family_Info.getSelectedRow();
+		    			int prevCol = GUIForCustomerCare.jTable_Family_Info.getSelectedColumn();
+		    			
+					CustomerCare.customerID = (String) GUIForCustomerCare.jTable_Family_Info.getValueAt(GUIForCustomerCare.jTable_Family_Info.getSelectedRow(), 0);
+					Utilities.selectMethods();
+
+					//Resets list, so as the default, switches to top row
+					GUIForCustomerCare.jTable_Family_Info.changeSelection(prevRow, prevCol, false, false);
+		    		}
+			}
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (GUIForCustomerCare.jTextField.getText().trim().length() > 0)
+			{
+				if (GUIForCustomerCare.customerButton.isSelected()) {
+					CustomerCare.searchMember(DatabaseConstant.SEARCH_CUSTOMER, GUIForCustomerCare.jTextField.getText().trim());
+				}
+				else if (GUIForCustomerCare.allButton.isSelected()) {
+					System.out.println("Hello4");
+					CustomerCare.searchMember(DatabaseConstant.SEARCH_ALL, GUIForCustomerCare.jTextField.getText().trim());
+				}
+				GUIForCustomerCare.jButton.setText("Search");
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(GUIForCustomerCare.jFrame, "Please enter search word!");
+			}
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {		
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+	}
+}
