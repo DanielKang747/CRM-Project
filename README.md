@@ -13,6 +13,8 @@ The **CustomerCare** system is a Java-based application designed to manage custo
 
 It integrates with a **database** for storage/retrieval and uses a **Swing GUI** for user interaction.
 
+<img width="1445" height="803" alt="Screenshot 2025-08-29 at 10 09 41 AM" src="https://github.com/user-attachments/assets/ba8e7852-ddee-4432-a808-de205ec02d8b" />
+
 ---
 
 ## Features
